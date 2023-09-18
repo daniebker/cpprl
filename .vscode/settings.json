@@ -101,5 +101,8 @@
     "xtree": "cpp",
     "xutility": "cpp",
     "fstream": "cpp"
+  },
+  "[cpp]": {
+    "editor.defaultFormatter": "ms-vscode.cpptools"
   }
 }
