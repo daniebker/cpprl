@@ -1,21 +1,25 @@
 #ifndef GAME_ENTITY_H
 #define GAME_ENTITY_H
-#include "draw.hpp"
+#include <libtcod.hpp>
+#include <string_view>
+
 #include "math.hpp"
 
 namespace cpprl {
 class GameEntity {
  public:
-  GameEntity(Vector2D position, char symbol, RGB_Colour colour);
+  GameEntity(Vector2D position, std::string_view symbol, tcod::ColorRGB colour);
   virtual ~GameEntity();
   void move(Vector2D& vector2D);
-  int get_x();
-  int get_y();
+  std::string_view get_symbol() { return symbol_; };
+  tcod::ColorRGB get_colour() { return colour_; };
+  int get_x() { return position_.x; }
+  int get_y() { return position_.y; };
 
  private:
   Vector2D position_;
-  char symbol_;
-  RGB_Colour colour_;
+  std::string_view symbol_;
+  tcod::ColorRGB colour_;
 };
 }  // namespace cpprl
 

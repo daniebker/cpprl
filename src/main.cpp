@@ -7,8 +7,9 @@
 #include <filesystem>
 #include <iostream>
 #include <libtcod.hpp>
+#include <list>
 
-#include "draw.hpp"
+#include "engine.hpp"
 #include "game_entity.hpp"
 #include "input_handler.hpp"
 
@@ -30,19 +31,23 @@ auto get_data_dir() -> std::filesystem::path {
 };
 
 static constexpr auto WHITE = tcod::ColorRGB{255, 255, 255};
+static constexpr auto RED = tcod::ColorRGB{255, 0, 0};
 
 static tcod::Console g_console;  // The global console object.
 static tcod::Context g_context;  // The global libtcod context.
 
-static cpprl::GameEntity player(
-    cpprl::Vector2D{0, 0}, '@', cpprl::RGB_Colour{255, 255, 0});  // The global player object
-static cpprl::InputHandler* inputHandler = new cpprl::InputHandler();
+static cpprl::GameEntity player(cpprl::Vector2D{0, 0}, "@", RED);
+std::list<cpprl::GameEntity*> entities = {&player};
+static cpprl::InputHandler inputHandler;
+static cpprl::Engine engine(entities, inputHandler);
 
 /// Game loop.
 void main_loop() {
   // Rendering.
-  g_console.clear();
-  tcod::print(g_console, {player.get_x(), player.get_y()}, "@", WHITE, std::nullopt);
+  // g_console.clear();
+
+  // tcod::print(g_console, {player.get_x(), player.get_y()}, player.get_symbol(), player.get_colour(), std::nullopt);
+  engine.render(g_console);
   g_context.present(g_console);
 
   // Handle input.
@@ -53,7 +58,7 @@ void main_loop() {
 #endif
   while (SDL_PollEvent(&event)) {
     if (event.type == SDL_KEYDOWN) {
-      cpprl::Command* command = inputHandler->handle_input(event.key.keysym.sym);
+      cpprl::Command* command = inputHandler.handle_input(event.key.keysym.sym);
       command->execute(player);
     } else if (event.type == SDL_QUIT) {
       std::exit(EXIT_SUCCESS);

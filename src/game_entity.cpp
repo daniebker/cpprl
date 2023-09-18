@@ -1,16 +1,16 @@
 #include "game_entity.hpp"
 
+#include <libtcod.hpp>
+#include <string_view>
+
 namespace cpprl {
-GameEntity::GameEntity(Vector2D position, char symbol, RGB_Colour colour) {
+GameEntity::GameEntity(Vector2D position, std::string_view symbol, tcod::ColorRGB colour) {
   position_ = position;
   symbol_ = symbol;
   colour_ = colour;
 }
 
 GameEntity::~GameEntity() {}
-
-int GameEntity::get_x() { return position_.x; }
-int GameEntity::get_y() { return position_.y; }
 
 void GameEntity::move(cpprl::Vector2D& vector2D) {
   position_.x += vector2D.x;
