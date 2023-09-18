@@ -39,31 +39,13 @@ static tcod::Context g_context;  // The global libtcod context.
 static cpprl::GameEntity player(cpprl::Vector2D{0, 0}, "@", RED);
 std::list<cpprl::GameEntity*> entities = {&player};
 static cpprl::InputHandler inputHandler;
-static cpprl::Engine engine(entities, inputHandler);
+static cpprl::Engine engine(entities, player, inputHandler);
 
-/// Game loop.
 void main_loop() {
-  // Rendering.
-  // g_console.clear();
-
-  // tcod::print(g_console, {player.get_x(), player.get_y()}, player.get_symbol(), player.get_colour(), std::nullopt);
   engine.render(g_console);
   g_context.present(g_console);
-
-  // Handle input.
   SDL_Event event;
-#ifndef __EMSCRIPTEN__
-  // Block until events exist.  This conserves resources well but isn't compatible with animations or Emscripten.
-  SDL_WaitEvent(nullptr);
-#endif
-  while (SDL_PollEvent(&event)) {
-    if (event.type == SDL_KEYDOWN) {
-      cpprl::Command* command = inputHandler.handle_input(event.key.keysym.sym);
-      command->execute(player);
-    } else if (event.type == SDL_QUIT) {
-      std::exit(EXIT_SUCCESS);
-    }
-  }
+  engine.handle_events(event);
 }
 
 /// Main program entry point.
