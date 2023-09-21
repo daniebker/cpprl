@@ -4,7 +4,7 @@
 #include <string_view>
 
 namespace cpprl {
-GameEntity::GameEntity(Vector2D position, std::string_view symbol, tcod::ColorRGB colour) {
+GameEntity::GameEntity(Vector2D position, std::string_view symbol, const tcod::ColorRGB& colour) {
   position_ = position;
   symbol_ = symbol;
   colour_ = colour;

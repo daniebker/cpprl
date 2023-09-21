@@ -8,7 +8,7 @@
 namespace cpprl {
 class GameEntity {
  public:
-  GameEntity(Vector2D position, std::string_view symbol, tcod::ColorRGB colour);
+  GameEntity(Vector2D position, std::string_view symbol, const tcod::ColorRGB& colour);
   virtual ~GameEntity();
   void move(Vector2D& vector2D);
   std::string_view get_symbol() { return symbol_; };

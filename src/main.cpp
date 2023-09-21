@@ -12,6 +12,7 @@
 #include "engine.hpp"
 #include "game_entity.hpp"
 #include "input_handler.hpp"
+#include "types/map.hpp"
 
 #if defined(_MSC_VER)
 #pragma warning(disable : 4297)  // Allow "throw" in main().  Letting the compiler handle termination.
@@ -39,7 +40,8 @@ static tcod::Context g_context;  // The global libtcod context.
 static cpprl::GameEntity player(cpprl::Vector2D{0, 0}, "@", RED);
 std::list<cpprl::GameEntity*> entities = {&player};
 static cpprl::InputHandler inputHandler;
-static cpprl::Engine engine(entities, player, inputHandler);
+static cpprl::Map map = {80, 40};
+static cpprl::Engine engine(entities, player, map, inputHandler);
 
 void main_loop() {
   engine.render(g_console);

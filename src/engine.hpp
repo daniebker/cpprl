@@ -6,19 +6,21 @@
 #include <list>
 
 #include "input_handler.hpp"
+#include "types/map.hpp"
 
 namespace cpprl {
 class Engine {
  private:
   std::list<GameEntity*> entities_;
   GameEntity& player_;
+  Map& map_;
   InputHandler input_handler_;
 
  public:
-  Engine(std::list<GameEntity*> entities, GameEntity& player, InputHandler input_handler);
+  Engine(std::list<GameEntity*> entities, GameEntity& player, Map& gameMap, InputHandler input_handler);
   virtual ~Engine();
   void handle_events(SDL_Event& event);
-  void render(TCOD_Console& console);
+  void render(tcod::Console& console);
 };
 }  // namespace cpprl
 #endif

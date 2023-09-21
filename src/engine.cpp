@@ -1,9 +1,11 @@
 #include "engine.hpp"
 
+#include <iostream>
+
 namespace cpprl {
 
-Engine::Engine(std::list<GameEntity*> entities, GameEntity& player, InputHandler input_handler)
-    : entities_(entities), player_(player), input_handler_(input_handler) {}
+Engine::Engine(std::list<GameEntity*> entities, GameEntity& player, Map& map, InputHandler input_handler)
+    : entities_(entities), player_(player), map_(map), input_handler_(input_handler) {}
 Engine::~Engine() {}
 
 void Engine::handle_events(SDL_Event& event) {
@@ -20,9 +22,17 @@ void Engine::handle_events(SDL_Event& event) {
     }
   }
 }
-void Engine::render(TCOD_Console& console) {
+void Engine::render(tcod::Console& console) {
   console.clear();
-  for (auto& entity : entities_) {
+  for (int y{0}; y < map_.get_height(); ++y) {
+    for (int x{0}; x < map_.get_width(); ++x) {
+      if (!console.in_bounds({x, y})) continue;
+      bool isFloor = map_.get_tiles().at(x, y) == Tiles::floor;
+      console.at({x, y}) = isFloor ? TCOD_ConsoleTile{'.', tcod::ColorRGB{128, 128, 128}, tcod::ColorRGB{0, 0, 0}}
+                                   : TCOD_ConsoleTile{'#', tcod::ColorRGB{128, 128, 128}, tcod::ColorRGB{0, 0, 0}};
+    }
+  }
+  for (auto entity : entities_) {
     tcod::print(console, {entity->get_x(), entity->get_y()}, entity->get_symbol(), entity->get_colour(), std::nullopt);
   }
 }
