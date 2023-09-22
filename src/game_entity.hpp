@@ -13,8 +13,10 @@ class GameEntity {
   void move(Vector2D& vector2D);
   std::string_view get_symbol() { return symbol_; };
   tcod::ColorRGB get_colour() { return colour_; };
-  int get_x() { return position_.x; }
-  int get_y() { return position_.y; };
+  Vector2D get_position() { return position_; };
+
+  [[deprecated("Use get_position() instead.")]] int get_x() { return position_.x; }
+  [[deprecated("Use get_position() instead.")]] int get_y() { return position_.y; };
 
  private:
   Vector2D position_;

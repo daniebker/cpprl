@@ -5,6 +5,6 @@ class QuitCommand : public Command {
  public:
   QuitCommand();
   virtual ~QuitCommand();
-  virtual void execute(GameEntity& entity);
+  virtual void execute(Map& map, GameEntity& entity);
 };
 }  // namespace cpprl

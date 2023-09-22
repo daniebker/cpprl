@@ -12,8 +12,5 @@ GameEntity::GameEntity(Vector2D position, std::string_view symbol, const tcod::C
 
 GameEntity::~GameEntity() {}
 
-void GameEntity::move(cpprl::Vector2D& vector2D) {
-  position_.x += vector2D.x;
-  position_.y += vector2D.y;
-}
+void GameEntity::move(cpprl::Vector2D& vector2D) { position_ = vector2D; }
 }  // namespace cpprl

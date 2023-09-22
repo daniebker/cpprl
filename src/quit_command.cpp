@@ -5,5 +5,5 @@
 namespace cpprl {
 QuitCommand::QuitCommand() {}
 QuitCommand::~QuitCommand() {}
-void QuitCommand::execute(GameEntity& entity) { std::exit(0); }
+void QuitCommand::execute(Map& map, GameEntity& entity) { std::exit(0); }
 }  // namespace cpprl

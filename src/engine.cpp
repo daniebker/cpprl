@@ -16,7 +16,7 @@ void Engine::handle_events(SDL_Event& event) {
   while (SDL_PollEvent(&event)) {
     if (event.type == SDL_KEYDOWN) {
       cpprl::Command* command = input_handler_.handle_input(event.key.keysym.sym);
-      command->execute(player_);
+      command->execute(map_, player_);
     } else if (event.type == SDL_QUIT) {
       std::exit(EXIT_SUCCESS);
     }

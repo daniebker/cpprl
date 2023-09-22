@@ -17,13 +17,6 @@ class Array2D {
     return data_[row][col];
   }
 
-  const T& at(int row, int col) const {
-    if (row < 0 || row >= rows_ || col < 0 || col >= cols_) {
-      throw std::out_of_range("Array2D index out of bounds");
-    }
-    return data_[row][col];
-  }
-
   int getRows() const { return rows_; }
 
   int getCols() const { return cols_; }
