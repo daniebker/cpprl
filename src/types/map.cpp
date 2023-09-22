@@ -16,6 +16,10 @@ Map::Map(int width, int height) : width_(width), height_(height), tiles_(width, 
 
 Map::~Map() {}
 
+bool Map::is_in_bounds(Vector2D position) const {
+  return position.x >= 0 && position.x < width_ && position.y >= 0 && position.y < height_;
+}
+
 // void Map::render(tcod::Console& console) {
 //   for (int px = 0; px < width_; px++) {
 //     for (int py = 0; py < height; py++) {

@@ -4,6 +4,7 @@
 
 #include <libtcod.hpp>
 
+#include "../math.hpp"
 #include "nparray.hpp"
 
 namespace cpprl {
@@ -19,6 +20,8 @@ class Map {
   void render(tcod::Console& console);
   int get_height() const { return height_; }
   int get_width() const { return width_; }
+  bool is_in_bounds(Vector2D position) const;
+  bool is_not_in_bounds(Vector2D position) const { return !is_in_bounds(position); }
   Array2D<Tiles> get_tiles() const { return tiles_; }
 
  private:
