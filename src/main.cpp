@@ -9,6 +9,7 @@
 #include <libtcod.hpp>
 #include <list>
 
+#include "dungeon.hpp"
 #include "engine.hpp"
 #include "game_entity.hpp"
 #include "input_handler.hpp"
@@ -40,7 +41,8 @@ static tcod::Context g_context;  // The global libtcod context.
 static cpprl::GameEntity player(cpprl::Vector2D{0, 0}, "@", RED);
 std::list<cpprl::GameEntity*> entities = {&player};
 static cpprl::InputHandler inputHandler;
-static cpprl::Map map = {80, 40};
+static cpprl::Dungeon dungeon = cpprl::Dungeon();
+static cpprl::Map map = dungeon.generate(80, 40);
 static cpprl::Engine engine(entities, player, map, inputHandler);
 
 void main_loop() {

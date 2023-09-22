@@ -20,7 +20,7 @@ class Map {
   int get_width() const { return width_; }
   bool is_in_bounds(Vector2D position) const;
   bool is_not_in_bounds(Vector2D position) const { return !is_in_bounds(position); }
-  Array2D<Tiles> get_tiles() const { return tiles_; }
+  Array2D<Tiles>& get_tiles() { return tiles_; }
 
  private:
   int width_, height_;

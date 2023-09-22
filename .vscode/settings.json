@@ -121,7 +121,9 @@
     "string_view": "cpp",
     "variant": "cpp",
     "__nullptr": "cpp",
-    "__string": "cpp"
+    "__string": "cpp",
+    "*.tcc": "cpp",
+    "*.ipp": "cpp"
   },
   "[cpp]": {
     "editor.defaultFormatter": "ms-vscode.cpptools"

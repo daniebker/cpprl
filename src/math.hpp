@@ -6,6 +6,7 @@ struct Vector2D {
 
   Vector2D operator+(const Vector2D& other) const noexcept { return {x + other.x, y + other.y}; }
   Vector2D operator-(const Vector2D& other) const noexcept { return {x - other.x, y - other.y}; }
+  Vector2D operator/(int scalar) const noexcept { return {x / scalar, y / scalar}; }
   bool operator==(const Vector2D& other) const noexcept { return x == other.x && y == other.y; }
   bool operator!=(const Vector2D& other) const noexcept { return !(*this == other); }
 

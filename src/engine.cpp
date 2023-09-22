@@ -29,13 +29,13 @@ void Engine::render(tcod::Console& console) {
   for (int y{0}; y < map_.get_height(); ++y) {
     for (int x{0}; x < map_.get_width(); ++x) {
       if (!console.in_bounds({x, y})) continue;
-      bool isFloor = map_.get_tiles().at(x, y) == Tiles::floor;
+      bool isFloor = map_.get_tiles().at({x, y}) == Tiles::floor;
       console.at({x, y}) = isFloor ? TCOD_ConsoleTile{'.', tcod::ColorRGB{128, 128, 128}, tcod::ColorRGB{0, 0, 0}}
                                    : TCOD_ConsoleTile{'#', tcod::ColorRGB{128, 128, 128}, tcod::ColorRGB{0, 0, 0}};
     }
   }
   for (auto entity : entities_) {
-    tcod::print(console, {entity->get_x(), entity->get_y()}, entity->get_symbol(), entity->get_colour(), std::nullopt);
+    tcod::print(console, entity->get_position(), entity->get_symbol(), entity->get_colour(), std::nullopt);
   }
 }
 }  // namespace cpprl

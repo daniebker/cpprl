@@ -1,6 +1,7 @@
 #ifndef CPPRL_TYPES_NPARRAY_HPP_
 #define CPPRL_TYPES_NPARRAY_HPP_
 #include <vector>
+
 #include "../math.hpp"
 
 namespace cpprl {
@@ -8,12 +9,11 @@ namespace cpprl {
 template <typename T>
 class Array2D {
  public:
-  Array2D(int rows, int cols) : rows_(rows), cols_(cols) { data_.resize(rows_, std::vector<T>(cols_)); }
-
-  [[deprecated("Use at(Vector2D position) instead")]]
-  T& at(int row, int col) {
-    this->at({row, col});
+  Array2D(int rows, int cols, T initialValue) : rows_(rows), cols_(cols) {
+    data_.resize(rows_, std::vector<T>(cols_, initialValue));
   }
+
+  [[deprecated("Use at(Vector2D position) instead")]] T& at(int row, int col) { return at({row, col}); }
 
   T& at(Vector2D position) {
     int row = position.x;
@@ -23,6 +23,8 @@ class Array2D {
     }
     return data_[row][col];
   }
+
+  void set(Vector2D position, T value) { data_[position.x][position.y] = value; }
 
   int getRows() const { return rows_; }
 
