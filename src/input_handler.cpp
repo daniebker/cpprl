@@ -31,5 +31,6 @@ Command* InputHandler::handle_input(SDL_Keycode key) {
       return buttonRight_;
       break;
   }
+  return nullptr;
 };
 }  // namespace cpprl
