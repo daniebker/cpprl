@@ -10,8 +10,8 @@ Map::Map(int width, int height) : width_(width), height_(height), tiles_(width, 
     }
   }
 
-  tiles_.at(30, 22) = Tiles::wall;
-  tiles_.at(50, 22) = Tiles::wall;
+  tiles_.at({30, 22}) = Tiles::wall;
+  tiles_.at({50, 22}) = Tiles::wall;
 }
 
 Map::~Map() {}

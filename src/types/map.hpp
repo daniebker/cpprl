@@ -1,5 +1,3 @@
-#ifndef MAP_HPP
-#define MAP_HPP
 #pragma once
 
 #include <libtcod.hpp>
@@ -31,5 +29,3 @@ class Map {
 };
 
 }  // namespace cpprl
-
-#endif
