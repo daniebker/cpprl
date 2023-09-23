@@ -2,7 +2,7 @@
 #define CPPRL_TYPES_NPARRAY_HPP_
 #include <vector>
 
-#include "../math.hpp"
+#include "math.hpp"
 
 namespace cpprl {
 
@@ -25,6 +25,16 @@ class Array2D {
   }
 
   void set(Vector2D position, T value) { data_[position.x][position.y] = value; }
+
+  void set_range(std::tuple<Vector2D, Vector2D> bounds, T value) {
+    Vector2D bottom_left, top_right;
+    std::tie(bottom_left, top_right) = bounds;
+    for (int x = bottom_left.x; x < top_right.x; x++) {
+      for (int y = bottom_left.y; y < top_right.y; y++) {
+        set({x, y}, value);
+      }
+    }
+  }
 
   int getRows() const { return rows_; }
 

@@ -3,7 +3,7 @@
 #include <libtcod.hpp>
 #include <string_view>
 
-#include "math.hpp"
+#include "types/math.hpp"
 
 namespace cpprl {
 class GameEntity {

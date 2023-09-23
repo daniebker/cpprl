@@ -4,7 +4,7 @@
 
 #include <tuple>
 
-#include "math.hpp"
+#include "types/math.hpp"
 
 namespace cpprl {
 class RectangularRoom {

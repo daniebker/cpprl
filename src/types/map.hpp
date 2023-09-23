@@ -2,7 +2,7 @@
 
 #include <libtcod.hpp>
 
-#include "../math.hpp"
+#include "math.hpp"
 #include "nparray.hpp"
 
 namespace cpprl {
