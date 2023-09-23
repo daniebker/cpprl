@@ -19,7 +19,7 @@ class RectangularRoom {
   };
   ~RectangularRoom(){};
 
-  Vector2D center() { return center_; }
+  Vector2D get_center() { return center_; }
 
   /** Return the innerBounds area of this room as a 2D array index */
   std::tuple<Vector2D, Vector2D> innerBounds() {
