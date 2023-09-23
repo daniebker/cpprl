@@ -6,19 +6,37 @@
 #include "types/map.hpp"
 
 namespace cpprl {
-Map Dungeon::generate(int width, int height) {
-  map_ = Map(width, height);
+Map Dungeon::generate(
+    int max_rooms, int room_min_size, int room_max_size, int map_width, int map_height, GameEntity& player) {
+  map_ = Map(map_width, map_height);
+  auto rooms = std::vector<RectangularRoom>{};
 
-  RectangularRoom room1 = RectangularRoom({20, 15}, 10, 15);
-  RectangularRoom room2 = RectangularRoom({35, 15}, 10, 15);
+  auto* random = TCODRandom::getInstance();
+  for (int i = 0; i < max_rooms; i++) {
+    int room_width = random->getInt(room_min_size, room_max_size);
+    int room_height = random->getInt(room_min_size, room_max_size);
 
-  map_.set_tiles_at(room1.innerBounds(), Tiles::floor);
-  map_.set_tiles_at(room2.innerBounds(), Tiles::floor);
+    int x = random->getInt(0, map_width - room_width - 1);
+    int y = random->getInt(0, map_height - room_height - 1);
 
-  std::vector<Vector2D> tunnel = l_tunnel_between(room1.get_center(), room2.get_center());
+    RectangularRoom new_room = RectangularRoom({x, y}, room_width, room_height);
 
-  for (const Vector2D position : tunnel) {
-    map_.get_tiles().set(position, Tiles::floor);
+    if (std::any_of(rooms.begin(), rooms.end(), [&](RectangularRoom room) { return room.intersects(new_room); })) {
+      continue;
+    }
+
+    map_.set_tiles_at(new_room.innerBounds(), Tiles::floor);
+
+    if (rooms.empty()) {
+      player.set_position(new_room.get_center());
+    } else {
+      Vector2D previous_room_center = rooms.back().get_center();
+      std::vector<Vector2D> tunnel = l_tunnel_between(previous_room_center, new_room.get_center());
+
+      for (const Vector2D position : tunnel) {
+        map_.get_tiles().set(position, Tiles::floor);
+      }
+    }
   }
 
   return map_;

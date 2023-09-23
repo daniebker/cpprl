@@ -2,6 +2,7 @@
 
 #include <vector>
 
+#include "game_entity.hpp"
 #include "types/map.hpp"
 
 namespace cpprl {
@@ -13,6 +14,6 @@ class Dungeon {
  public:
   Dungeon() : map_(Map(0, 0)){};
   ~Dungeon(){};
-  Map generate(int width, int height);
+  Map generate(int max_rooms, int room_min_size, int room_max_size, int map_width, int map_height, GameEntity& player);
 };
 }  // namespace cpprl

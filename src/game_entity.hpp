@@ -14,6 +14,7 @@ class GameEntity {
   std::string_view get_symbol() { return symbol_; };
   tcod::ColorRGB get_colour() { return colour_; };
   Vector2D get_position() { return position_; };
+  void set_position(Vector2D position) { position_ = position; };
 
   [[deprecated("Use get_position() instead.")]] int get_x() { return position_.x; }
   [[deprecated("Use get_position() instead.")]] int get_y() { return position_.y; };

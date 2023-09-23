@@ -22,11 +22,7 @@ class RectangularRoom {
   Vector2D get_center() { return center_; }
 
   /** Return the innerBounds area of this room as a 2D array index */
-  std::tuple<Vector2D, Vector2D> innerBounds() {
-    Vector2D innerBottomLeft, innerTopRight;
-    innerBottomLeft = {bottomLeft_.x + 1, bottomLeft_.y + 1};
-    innerTopRight = {topRight_.x - 1, topRight_.y - 1};
-    return std::tuple<Vector2D, Vector2D>(innerBottomLeft, innerTopRight);
-  }
+  std::tuple<Vector2D, Vector2D> innerBounds() const;
+  bool intersects(RectangularRoom other) const;
 };
 }  // namespace cpprl
