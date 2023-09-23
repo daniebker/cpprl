@@ -37,6 +37,7 @@ Map Dungeon::generate(
         map_.get_tiles().set(position, Tiles::floor);
       }
     }
+    rooms.push_back(new_room);
   }
 
   return map_;
