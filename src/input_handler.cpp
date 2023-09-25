@@ -18,15 +18,19 @@ Command* InputHandler::handle_input(SDL_Keycode key) {
     case SDLK_ESCAPE:
       return quit_;
       break;
+    case SDLK_w:
     case SDLK_UP:
       return buttonUp_;
       break;
+    case SDLK_s:
     case SDLK_DOWN:
       return buttonDown_;
       break;
+    case SDLK_a:
     case SDLK_LEFT:
       return buttonLeft_;
       break;
+    case SDLK_d:
     case SDLK_RIGHT:
       return buttonRight_;
       break;
