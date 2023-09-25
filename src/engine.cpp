@@ -4,7 +4,7 @@
 
 namespace cpprl {
 
-Engine::Engine(std::list<GameEntity*> entities, GameEntity& player, Map* map, InputHandler input_handler)
+Engine::Engine(std::list<GameEntity*> entities, GameEntity& player, Map* map, InputHandler* input_handler)
     : entities_(entities), player_(player), map_(map), input_handler_(input_handler) {}
 
 void Engine::handle_events(SDL_Event& event) {
@@ -14,7 +14,7 @@ void Engine::handle_events(SDL_Event& event) {
 #endif
   while (SDL_PollEvent(&event)) {
     if (event.type == SDL_KEYDOWN) {
-      cpprl::Command* command = input_handler_.handle_input(event.key.keysym.sym);
+      cpprl::Command* command = input_handler_->handle_input(event.key.keysym.sym);
       if (command) {
         command->execute(map_, player_);
       }
@@ -25,6 +25,7 @@ void Engine::handle_events(SDL_Event& event) {
 }
 void Engine::render(tcod::Console& console) {
   console.clear();
+  // TODO: Should happen in the map render function
   map_->compute_fov(player_.get_position(), 4);
   for (int y{0}; y < map_->get_height(); ++y) {
     for (int x{0}; x < map_->get_width(); ++x) {

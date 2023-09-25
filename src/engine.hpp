@@ -14,10 +14,10 @@ class Engine {
   std::list<GameEntity*> entities_;
   GameEntity& player_;
   Map* map_;
-  InputHandler input_handler_;
+  InputHandler* input_handler_;
 
  public:
-  Engine(std::list<GameEntity*> entities, GameEntity& player, Map* gameMap, InputHandler input_handler);
+  Engine(std::list<GameEntity*> entities, GameEntity& player, Map* gameMap, InputHandler* input_handler);
   void handle_events(SDL_Event& event);
   void render(tcod::Console& console);
 };

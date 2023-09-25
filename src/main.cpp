@@ -40,7 +40,7 @@ static tcod::Context g_context;  // The global libtcod context.
 
 static cpprl::GameEntity player(cpprl::Vector2D{0, 0}, "@", RED);
 std::list<cpprl::GameEntity*> entities = {&player};
-static cpprl::InputHandler inputHandler;
+cpprl::InputHandler* inputHandler = new cpprl::InputHandler();
 static cpprl::Dungeon dungeon = cpprl::Dungeon();
 static cpprl::Map* map = dungeon.generate(30, 6, 10, 80, 40, player);
 static cpprl::Engine engine(entities, player, map, inputHandler);
@@ -75,6 +75,8 @@ int main(int argc, char** argv) {
     emscripten_set_main_loop(main_loop, 0, 0);
 #else
     while (true) main_loop();
+    delete inputHandler;
+    delete map;
 #endif
   } catch (const std::exception& exc) {
     std::cerr << exc.what() << "\n";

@@ -25,7 +25,7 @@ Map* Dungeon::generate(
       continue;
     }
 
-    map->set_tiles_at(new_room.innerBounds(), {false, TileType::floor});
+    map->set_tiles_range(new_room.innerBounds(), {false, TileType::floor});
 
     if (rooms.empty()) {
       player.set_position(new_room.get_center());
@@ -34,7 +34,7 @@ Map* Dungeon::generate(
       std::vector<Vector2D> tunnel = l_tunnel_between(previous_room_center, new_room.get_center());
 
       for (const Vector2D position : tunnel) {
-        map->get_tiles().set(position, {false, TileType::floor});
+        map->set_tiles_at(position, {false, TileType::floor});
       }
     }
     rooms.push_back(new_room);

@@ -13,7 +13,7 @@ void MovementCommand::execute(Map* map, GameEntity& entity) {
     return;
   }
 
-  if (map->get_tiles().at(new_position).tile == TileType::floor) {
+  if (map->is_walkable(new_position)) {
     entity.move(new_position);
   }
 }
