@@ -25,7 +25,7 @@ void Engine::handle_events(SDL_Event& event) {
 }
 void Engine::render(tcod::Console& console) {
   console.clear();
-  map_->compute_fov(player_.get_position(), 16);
+  map_->compute_fov(player_.get_position(), 4);
   for (int y{0}; y < map_->get_height(); ++y) {
     for (int x{0}; x < map_->get_width(); ++x) {
       if (!console.in_bounds({x, y})) continue;
