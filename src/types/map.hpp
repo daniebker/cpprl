@@ -17,7 +17,7 @@ enum class TileType {
  */
 struct Tile {
   bool explored;
-  TileType tile;
+  TileType type;
 };
 
 struct TileGraphic {

@@ -20,13 +20,13 @@ void Map::set_tiles_range(std::tuple<Vector2D, Vector2D> bounds, Tile tile) {
   std::tie(bottom_left, top_right) = bounds;
   for (int x = bottom_left.x; x < top_right.x; x++) {
     for (int y = bottom_left.y; y < top_right.y; y++) {
-      tcod_map_.setProperties(x, y, tile.tile == TileType::floor, tile.tile == TileType::floor);
+      tcod_map_.setProperties(x, y, tile.type == TileType::floor, tile.type == TileType::floor);
       tiles_.set({x, y}, tile);
     }
   }
 }
 void Map::set_tiles_at(Vector2D position, Tile tile) {
-  tcod_map_.setProperties(position.x, position.y, tile.tile == TileType::floor, tile.tile == TileType::floor);
+  tcod_map_.setProperties(position.x, position.y, tile.type == TileType::floor, tile.type == TileType::floor);
   tiles_.set(position, tile);
 }
 

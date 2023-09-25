@@ -30,7 +30,7 @@ void Engine::render(tcod::Console& console) {
   for (int y{0}; y < map_->get_height(); ++y) {
     for (int x{0}; x < map_->get_width(); ++x) {
       if (!console.in_bounds({x, y})) continue;
-      bool isFloor = map_->get_tiles().at({x, y}).tile == TileType::floor;
+      bool isFloor = map_->get_tiles().at({x, y}).type == TileType::floor;
       if (map_->is_in_fov({x, y})) {
         map_->set_is_explored({x, y});
         console.at({x, y}) = isFloor ? map_->get_floor_tile().light : map_->get_wall_tile().light;
