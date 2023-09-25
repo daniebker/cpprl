@@ -32,7 +32,6 @@ auto get_data_dir() -> std::filesystem::path {
   return root_directory / "data";
 };
 
-static constexpr auto WHITE = tcod::ColorRGB{255, 255, 255};
 static constexpr auto RED = tcod::ColorRGB{255, 0, 0};
 
 static tcod::Console g_console;  // The global console object.

@@ -3,10 +3,10 @@
 namespace cpprl {
 Map::Map(int width, int height)
     : width_(width), height_(height), tiles_(width, height, {false, TileType::wall}), tcod_map_(width, height) {
-  wall_tile_.light = TCOD_ConsoleTile{'#', tcod::ColorRGB{255, 255, 255}, tcod::ColorRGB{0, 0, 0}};
-  wall_tile_.dark = TCOD_ConsoleTile{'#', tcod::ColorRGB{128, 128, 128}, tcod::ColorRGB{0, 0, 0}};
-  floor_tile_.light = TCOD_ConsoleTile{'.', tcod::ColorRGB{255, 255, 255}, tcod::ColorRGB{0, 0, 0}};
-  floor_tile_.dark = TCOD_ConsoleTile{'.', tcod::ColorRGB{128, 128, 128}, tcod::ColorRGB{0, 0, 0}};
+  wall_tile_.light = TCOD_ConsoleTile{'#', WHITE, BLACK};
+  wall_tile_.dark = TCOD_ConsoleTile{'#', GREY, BLACK};
+  floor_tile_.light = TCOD_ConsoleTile{'.', WHITE, BLACK};
+  floor_tile_.dark = TCOD_ConsoleTile{'.', GREY, BLACK};
 }
 
 Map::~Map() {}

@@ -24,6 +24,10 @@ struct TileGraphic {
   TCOD_ConsoleTile light, dark;
 };
 
+static constexpr auto WHITE = tcod::ColorRGB{200, 200, 200};
+static constexpr auto BLACK = tcod::ColorRGB{0, 0, 0};
+static constexpr auto GREY = tcod::ColorRGB{128, 128, 128};
+
 class Map {
  public:
   Map(int width, int height);
