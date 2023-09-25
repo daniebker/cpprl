@@ -6,9 +6,9 @@
 #include "types/map.hpp"
 
 namespace cpprl {
-Map Dungeon::generate(
+Map* Dungeon::generate(
     int max_rooms, int room_min_size, int room_max_size, int map_width, int map_height, GameEntity& player) {
-  map_ = Map(map_width, map_height);
+  auto map = new Map(map_width, map_height);
   auto rooms = std::vector<RectangularRoom>{};
 
   auto* random = TCODRandom::getInstance();
@@ -25,7 +25,7 @@ Map Dungeon::generate(
       continue;
     }
 
-    map_.set_tiles_at(new_room.innerBounds(), Tiles::floor);
+    map->set_tiles_at(new_room.innerBounds(), {false, TileType::floor});
 
     if (rooms.empty()) {
       player.set_position(new_room.get_center());
@@ -34,13 +34,13 @@ Map Dungeon::generate(
       std::vector<Vector2D> tunnel = l_tunnel_between(previous_room_center, new_room.get_center());
 
       for (const Vector2D position : tunnel) {
-        map_.get_tiles().set(position, Tiles::floor);
+        map->get_tiles().set(position, {false, TileType::floor});
       }
     }
     rooms.push_back(new_room);
   }
 
-  return map_;
+  return map;
 }
 
 constexpr float half_chance = 0.5F;

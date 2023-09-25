@@ -123,7 +123,20 @@
     "__nullptr": "cpp",
     "__string": "cpp",
     "*.tcc": "cpp",
-    "*.ipp": "cpp"
+    "*.ipp": "cpp",
+    "csignal": "cpp",
+    "any": "cpp",
+    "strstream": "cpp",
+    "codecvt": "cpp",
+    "set": "cpp",
+    "memory_resource": "cpp",
+    "future": "cpp",
+    "numbers": "cpp",
+    "semaphore": "cpp",
+    "cfenv": "cpp",
+    "cinttypes": "cpp",
+    "typeindex": "cpp",
+    "valarray": "cpp"
   },
   "[cpp]": {
     "editor.defaultFormatter": "ms-vscode.cpptools"

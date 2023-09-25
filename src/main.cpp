@@ -42,7 +42,7 @@ static cpprl::GameEntity player(cpprl::Vector2D{0, 0}, "@", RED);
 std::list<cpprl::GameEntity*> entities = {&player};
 static cpprl::InputHandler inputHandler;
 static cpprl::Dungeon dungeon = cpprl::Dungeon();
-static cpprl::Map map = dungeon.generate(30, 6, 10, 80, 40, player);
+static cpprl::Map* map = dungeon.generate(30, 6, 10, 80, 40, player);
 static cpprl::Engine engine(entities, player, map, inputHandler);
 
 void main_loop() {

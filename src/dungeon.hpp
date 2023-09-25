@@ -8,12 +8,10 @@
 namespace cpprl {
 class Dungeon {
  private:
-  Map map_;
   std::vector<Vector2D> l_tunnel_between(Vector2D start, Vector2D end);
 
  public:
-  Dungeon() : map_(Map(0, 0)){};
-  ~Dungeon(){};
-  Map generate(int max_rooms, int room_min_size, int room_max_size, int map_width, int map_height, GameEntity& player);
+  Dungeon(){};
+  Map* generate(int max_rooms, int room_min_size, int room_max_size, int map_width, int map_height, GameEntity& player);
 };
 }  // namespace cpprl
