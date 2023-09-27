@@ -43,3 +43,11 @@ Now that you know the template works you'll want to take care the following:
   - On Windows, when CMake Tools asks for a toolkit you should select `Visual Studio Community ... - amd64`.
   - When CMake Tools asks for a project select `libtcod-vcpkg-template`.
 - The project will now build and run with F5.
+
+## Resources
+
+- [cpp implementation of the tutorials](https://gitlab.com/libtcod-tutorials/libtcod-tutorials)
+- [Getting Started Docs](https://libtcod.readthedocs.io/en/latest/guides/getting-started.html)
+- [Game Programming Patterns](https://gameprogrammingpatterns.com/)
+- [Python tutorial](https://rogueliketutorials.com/tutorials/tcod/v2/)
+- [HexDecimals tcod engine 2022 edition](https://github.com/HexDecimal/tcod-cpp-engine-2022)
