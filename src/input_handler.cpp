@@ -12,13 +12,7 @@ InputHandler::InputHandler() {
   buttonDown_ = new MovementCommand(Vector2D{0, 1});
 }
 
-InputHandler::~InputHandler() {
-  delete quit_;
-  delete buttonRight_;
-  delete buttonLeft_;
-  delete buttonUp_;
-  delete buttonDown_;
-}
+InputHandler::~InputHandler() {}
 
 Command* InputHandler::handle_input(SDL_Keycode key) {
   switch (key) {

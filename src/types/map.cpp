@@ -1,12 +1,8 @@
 #include "map.hpp"
 
 namespace cpprl {
-Map::Map(int width, int height, std::vector<GameEntity> entities)
-    : width_(width),
-      height_(height),
-      tiles_(width, height, {false, TileType::wall}),
-      tcod_map_(width, height),
-      entities_(entities) {
+Map::Map(int width, int height)
+    : width_(width), height_(height), tiles_(width, height, {false, TileType::wall}), tcod_map_(width, height) {
   wall_tile_.light = TCOD_ConsoleTile{'#', WHITE, BLACK};
   wall_tile_.dark = TCOD_ConsoleTile{'#', GREY, BLACK};
   floor_tile_.light = TCOD_ConsoleTile{'.', WHITE, BLACK};
@@ -41,11 +37,22 @@ bool Map::is_walkable(Vector2D position) const { return tcod_map_.isWalkable(pos
 void Map::compute_fov(Vector2D position, int radius) { tcod_map_.computeFov(position.x, position.y, radius); }
 
 bool Map::is_explored(Vector2D position) { return tiles_.at(position).explored; }
+
 void Map::render(tcod::Console& console) {
-  for (auto entity : entities_) {
-    // TODO: Entity should have a render function
-    if (is_in_fov(entity->get_position())) {
-      tcod::print(console, entity->get_position(), entity->get_symbol(), entity->get_colour(), std::nullopt);
+  console.clear();
+  // TODO: Should happen in the map render function
+  for (int y{0}; y < get_height(); ++y) {
+    for (int x{0}; x < get_width(); ++x) {
+      if (!console.in_bounds({x, y})) continue;
+      bool isFloor = get_tiles().at({x, y}).type == TileType::floor;
+      if (is_in_fov({x, y})) {
+        set_is_explored({x, y});
+        console.at({x, y}) = isFloor ? get_floor_tile().light : get_wall_tile().light;
+      } else if (is_explored({x, y})) {
+        console.at({x, y}) = isFloor ? get_floor_tile().dark : get_wall_tile().dark;
+      } else {
+        console.at({x, y}) = TCOD_ConsoleTile{' ', tcod::ColorRGB{0, 0, 0}, tcod::ColorRGB{0, 0, 0}};
+      }
     }
   }
 }

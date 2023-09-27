@@ -24,6 +24,6 @@ class RectangularRoom {
   bool intersects(RectangularRoom other) const;
   Vector2D get_bottom_left() const { return bottomLeft_; }
   Vector2D get_top_right() const { return topRight_; }
-  Vector2D get_center() const { return center_; }
+  Vector2D get_center() { return center_; }
 };
 }  // namespace cpprl

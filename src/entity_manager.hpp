@@ -3,18 +3,22 @@
 #include <vector>
 
 #include "game_entity.hpp"
+#include "rectangular_room.hpp"
+#include "types/map.hpp"
 
 namespace cpprl {
 class EntityManager {
  public:
-  clear();
-  Entity* get_blocking_entity_at(Vector2D position);
+  EntityManager() : entities_(){};
+  void clear();
+  GameEntity* get_blocking_entity_at(Vector2D position);
   void place_entities(RectangularRoom room, int max_monsters_per_room);
-  Entity& spawn(const Entity& entity);
-  Entity& spawn(const Entity& entity, Vector2D position);
+  GameEntity& spawn(const GameEntity& entity);
+  GameEntity& spawn(const GameEntity& entity, Vector2D position);
+  GameEntity& at(int index) { return entities_.at(index); }
 
-  using iterator = std::vector<Entity>::iterator;
-  using const_iterator = std::vector<Entity>::const_iterator;
+  using iterator = std::vector<GameEntity>::iterator;
+  using const_iterator = std::vector<GameEntity>::const_iterator;
 
   iterator begin() { return entities_.begin(); }
 
@@ -26,5 +30,5 @@ class EntityManager {
 
  private:
   std::vector<GameEntity> entities_;
-}
+};
 }  // namespace cpprl

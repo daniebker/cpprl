@@ -3,6 +3,7 @@
 #include <libtcod.hpp>
 #include <string_view>
 
+#include "colours.hpp"
 #include "types/math.hpp"
 
 namespace cpprl {
@@ -10,15 +11,11 @@ class GameEntity {
  public:
   GameEntity(
       std::string_view name, Vector2D position, std::string_view symbol, const tcod::ColorRGB& colour, bool blocker);
-  virtual ~GameEntity();
   void move(Vector2D& vector2D);
   std::string_view get_symbol() { return symbol_; };
   tcod::ColorRGB get_colour() { return colour_; };
   Vector2D get_position() { return position_; };
   void set_position(Vector2D position) { position_ = position; };
-
-  [[deprecated("Use get_position() instead.")]] int get_x() { return position_.x; }
-  [[deprecated("Use get_position() instead.")]] int get_y() { return position_.y; };
 
  private:
   std::string_view name_;
@@ -28,9 +25,9 @@ class GameEntity {
   bool blocker_;
 };
 
-static const GameEntity PLAYER = GameEntity("player", {0, 0}, "@", WHITE, true);
-static const GameEntity ORC = GameEntity("orc", {0, 0}, "o", WHITE, true);
-static const GameEntity TROLL = GameEntity("troll", {0, 0}, "T", WHITE, true);
+static const GameEntity PLAYER{"player", {0, 0}, "@", RED, true};
+static const GameEntity ORC{"orc", {0, 0}, "o", WHITE, true};
+static const GameEntity TROLL{"troll", {0, 0}, "T", WHITE, true};
 }  // namespace cpprl
 
 #endif

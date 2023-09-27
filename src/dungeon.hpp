@@ -21,6 +21,6 @@ class Dungeon {
 
  public:
   Dungeon(){};
-  Map* generate(DungeonConfig config, GameEntity& player);
+  Map* generate(DungeonConfig config);
 };
 }  // namespace cpprl

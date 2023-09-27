@@ -1,8 +1,8 @@
 #pragma once
-
 #include <libtcod.hpp>
 
 #include "../game_entity.hpp"
+#include "../rectangular_room.hpp"
 #include "math.hpp"
 #include "nparray.hpp"
 
@@ -25,18 +25,12 @@ struct TileGraphic {
   TCOD_ConsoleTile light, dark;
 };
 
-static constexpr auto WHITE = tcod::ColorRGB{200, 200, 200};
-static constexpr auto BLACK = tcod::ColorRGB{0, 0, 0};
-static constexpr auto GREY = tcod::ColorRGB{128, 128, 128};
-
 class Map {
  public:
-  Map(int width, int height, std::vector<GameEntity> entities);
+  Map(int width, int height);
   ~Map();
-  void render(tcod::Console& console);
   int get_height() const { return height_; }
   int get_width() const { return width_; }
-  std::vector<GameEntity*> get_entities() { return entities_; }
   bool is_in_bounds(Vector2D position) const;
   bool is_not_in_bounds(Vector2D position) const { return !is_in_bounds(position); }
   bool is_explored(Vector2D position);
@@ -47,6 +41,9 @@ class Map {
   bool is_walkable(Vector2D position) const;
   Array2D<Tile>& get_tiles() { return tiles_; }
   void set_tiles_range(std::tuple<Vector2D, Vector2D> bounds, Tile tile);
+  void set_rooms(std::vector<RectangularRoom> rooms) { _rooms = rooms; }
+  RectangularRoom get_first_room() { return _rooms.front(); }
+  std::vector<RectangularRoom> get_rooms() { return _rooms; }
   void set_tiles_at(Vector2D position, Tile tile);
   /** Returns the wall tile for this map */
   TileGraphic& get_wall_tile() { return wall_tile_; }
@@ -54,7 +51,6 @@ class Map {
   TileGraphic& get_floor_tile() { return floor_tile_; }
   /** Render the map */
   void render(tcod::Console& console);
-  void push_entity(GameEntity* entity) { entities_.push_back(entity); }
 
  private:
   /** The wall tile */
@@ -67,8 +63,7 @@ class Map {
   Array2D<Tile> tiles_;
   /** The tcod map */
   TCODMap tcod_map_;
-  /** The entities as part of this map */
-  std::vector<GameEntity*> entities_;
+  std::vector<RectangularRoom> _rooms;
 };
 
 }  // namespace cpprl

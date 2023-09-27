@@ -1,11 +1,15 @@
 #include "engine.hpp"
 
+#include <SDL2/SDL.h>
+
 #include <iostream>
 
 namespace cpprl {
 
-Engine::Engine(GameEntity& player, Map* map, InputHandler* input_handler)
-    : player_(player), map_(map), input_handler_(input_handler) {}
+Engine::Engine(EntityManager& entities, Dungeon& dungeon, InputHandler* input_handler)
+    : dungeon_(dungeon), entities_(entities), player_(nullptr), map_(nullptr), input_handler_(input_handler) {
+  generate_map(80, 40);
+}
 
 void Engine::handle_events(SDL_Event& event) {
 #ifndef __EMSCRIPTEN__
@@ -23,24 +27,27 @@ void Engine::handle_events(SDL_Event& event) {
     }
   }
 }
+
+void Engine::generate_map(int width, int height) {
+  map_ = dungeon_.generate(DungeonConfig{30, 6, 10, width, height, 2});
+
+  std::vector<RectangularRoom> rooms = map_->get_rooms();
+  for (auto it = rooms.begin() + 1; it != rooms.end(); ++it) {
+    entities_.place_entities(*it, 2);
+  }
+  player_ = &entities_.spawn(PLAYER, rooms[0].get_center());
+  map_->compute_fov(player_->get_position(), 4);
+}
+
 void Engine::render(tcod::Console& console) {
-  console.clear();
-  // TODO: Should happen in the map render function
-  map_->compute_fov(player_.get_position(), 4);
-  for (int y{0}; y < map_->get_height(); ++y) {
-    for (int x{0}; x < map_->get_width(); ++x) {
-      if (!console.in_bounds({x, y})) continue;
-      bool isFloor = map_->get_tiles().at({x, y}).type == TileType::floor;
-      if (map_->is_in_fov({x, y})) {
-        map_->set_is_explored({x, y});
-        console.at({x, y}) = isFloor ? map_->get_floor_tile().light : map_->get_wall_tile().light;
-      } else if (map_->is_explored({x, y})) {
-        console.at({x, y}) = isFloor ? map_->get_floor_tile().dark : map_->get_wall_tile().dark;
-      } else {
-        console.at({x, y}) = TCOD_ConsoleTile{' ', tcod::ColorRGB{0, 0, 0}, tcod::ColorRGB{0, 0, 0}};
-      }
+  map_->compute_fov(player_->get_position(), 4);
+  map_->render(console);
+
+  for (auto entity : entities_) {
+    // TODO: Entity should have a render function
+    if (map_->is_in_fov(entity.get_position())) {
+      tcod::print(console, entity.get_position(), entity.get_symbol(), entity.get_colour(), std::nullopt);
     }
   }
-  map_->render(console);
 }
 }  // namespace cpprl

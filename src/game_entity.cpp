@@ -4,13 +4,14 @@
 #include <string_view>
 
 namespace cpprl {
-GameEntity::GameEntity(Vector2D position, std::string_view symbol, const tcod::ColorRGB& colour) {
+GameEntity::GameEntity(
+    std::string_view name, Vector2D position, std::string_view symbol, const tcod::ColorRGB& colour, bool blocker) {
   position_ = position;
   symbol_ = symbol;
   colour_ = colour;
+  name_ = name;
+  blocker_ = blocker;
 }
-
-GameEntity::~GameEntity() {}
 
 void GameEntity::move(cpprl::Vector2D& vector2D) { position_ = vector2D; }
 }  // namespace cpprl
