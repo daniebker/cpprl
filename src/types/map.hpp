@@ -2,6 +2,7 @@
 
 #include <libtcod.hpp>
 
+#include "../game_entity.hpp"
 #include "math.hpp"
 #include "nparray.hpp"
 
@@ -30,11 +31,12 @@ static constexpr auto GREY = tcod::ColorRGB{128, 128, 128};
 
 class Map {
  public:
-  Map(int width, int height);
+  Map(int width, int height, std::vector<GameEntity> entities);
   ~Map();
   void render(tcod::Console& console);
   int get_height() const { return height_; }
   int get_width() const { return width_; }
+  std::vector<GameEntity*> get_entities() { return entities_; }
   bool is_in_bounds(Vector2D position) const;
   bool is_not_in_bounds(Vector2D position) const { return !is_in_bounds(position); }
   bool is_explored(Vector2D position);
@@ -50,6 +52,9 @@ class Map {
   TileGraphic& get_wall_tile() { return wall_tile_; }
   /** Returns the floor tile for this map */
   TileGraphic& get_floor_tile() { return floor_tile_; }
+  /** Render the map */
+  void render(tcod::Console& console);
+  void push_entity(GameEntity* entity) { entities_.push_back(entity); }
 
  private:
   /** The wall tile */
@@ -62,6 +67,8 @@ class Map {
   Array2D<Tile> tiles_;
   /** The tcod map */
   TCODMap tcod_map_;
+  /** The entities as part of this map */
+  std::vector<GameEntity*> entities_;
 };
 
 }  // namespace cpprl

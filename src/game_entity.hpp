@@ -8,7 +8,8 @@
 namespace cpprl {
 class GameEntity {
  public:
-  GameEntity(Vector2D position, std::string_view symbol, const tcod::ColorRGB& colour);
+  GameEntity(
+      std::string_view name, Vector2D position, std::string_view symbol, const tcod::ColorRGB& colour, bool blocker);
   virtual ~GameEntity();
   void move(Vector2D& vector2D);
   std::string_view get_symbol() { return symbol_; };
@@ -20,10 +21,16 @@ class GameEntity {
   [[deprecated("Use get_position() instead.")]] int get_y() { return position_.y; };
 
  private:
+  std::string_view name_;
   Vector2D position_;
   std::string_view symbol_;
   tcod::ColorRGB colour_;
+  bool blocker_;
 };
+
+static const GameEntity PLAYER = GameEntity("player", {0, 0}, "@", WHITE, true);
+static const GameEntity ORC = GameEntity("orc", {0, 0}, "o", WHITE, true);
+static const GameEntity TROLL = GameEntity("troll", {0, 0}, "T", WHITE, true);
 }  // namespace cpprl
 
 #endif

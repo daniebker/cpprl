@@ -37,12 +37,14 @@ static constexpr auto RED = tcod::ColorRGB{255, 0, 0};
 static tcod::Console g_console;  // The global console object.
 static tcod::Context g_context;  // The global libtcod context.
 
+// TODO: Spawn the player.
+
 static cpprl::GameEntity player(cpprl::Vector2D{0, 0}, "@", RED);
 std::list<cpprl::GameEntity*> entities = {&player};
 cpprl::InputHandler* inputHandler = new cpprl::InputHandler();
 static cpprl::Dungeon dungeon = cpprl::Dungeon();
-static cpprl::Map* map = dungeon.generate(30, 6, 10, 80, 40, player);
-static cpprl::Engine engine(entities, player, map, inputHandler);
+static cpprl::Map* map = dungeon.generate({30, 6, 10, 80, 40, 2}, player);
+static cpprl::Engine engine(player, map, inputHandler);
 
 void main_loop() {
   engine.render(g_console);

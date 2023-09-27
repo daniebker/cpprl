@@ -6,18 +6,17 @@
 #include "types/map.hpp"
 
 namespace cpprl {
-Map* Dungeon::generate(
-    int max_rooms, int room_min_size, int room_max_size, int map_width, int map_height, GameEntity& player) {
-  auto map = new Map(map_width, map_height);
+Map* Dungeon::generate(DungeonConfig dungeon_config, GameEntity& player) {
+  auto map = new Map(dungeon_config.map_width, dungeon_config.map_height, {player});
   auto rooms = std::vector<RectangularRoom>{};
 
   auto* random = TCODRandom::getInstance();
-  for (int i = 0; i < max_rooms; i++) {
-    int room_width = random->getInt(room_min_size, room_max_size);
-    int room_height = random->getInt(room_min_size, room_max_size);
+  for (int i = 0; i < dungeon_config.max_rooms; i++) {
+    int room_width = random->getInt(dungeon_config.room_min_size, dungeon_config.room_max_size);
+    int room_height = random->getInt(dungeon_config.room_min_size, dungeon_config.room_max_size);
 
-    int x = random->getInt(0, map_width - room_width - 1);
-    int y = random->getInt(0, map_height - room_height - 1);
+    int x = random->getInt(0, dungeon_config.map_width - room_width - 1);
+    int y = random->getInt(0, dungeon_config.map_height - room_height - 1);
 
     RectangularRoom new_room = RectangularRoom({x, y}, room_width, room_height);
 
@@ -26,6 +25,8 @@ Map* Dungeon::generate(
     }
 
     map->set_tiles_range(new_room.innerBounds(), {false, TileType::floor});
+
+    place_entities(new_room, dungeon_config.max_monsters_per_room, map);
 
     if (rooms.empty()) {
       player.set_position(new_room.get_center());
@@ -44,6 +45,33 @@ Map* Dungeon::generate(
 }
 
 constexpr float half_chance = 0.5F;
+
+void place_entities(RectangularRoom room, int max_monsters_per_room, Map* map) {
+  auto* random = TCODRandom::getInstance();
+  int number_of_monsters = random->getInt(0, max_monsters_per_room);
+
+  for (int i = 0; i < number_of_monsters; i++) {
+    int x = random->getInt(room.get_bottom_left().x + 1, room.get_top_right().x - 1);
+    int y = random->getInt(room.get_bottom_left().y + 1, room.get_top_right().y - 1);
+
+    // Check theres no other monster on this position in the room
+    auto iterator = std::find_if(map->get_entities().begin(), map->get_entities().end(), [&](GameEntity* entity) {
+      return entity->get_position() == Vector2D{x, y};
+    });
+
+    if (iterator != map->get_entities().end()) {
+      continue;
+    }
+
+    if (random->getFloat(0.0f, 1.0f) < 0.8f) {
+      auto* monster = new GameEntity({x, y}, "o", tcod::ColorRGB{0, 255, 0});
+      map->push_entity(monster);
+    } else {
+      auto* troll = new GameEntity({x, y}, "T", tcod::ColorRGB{0, 255, 0});
+      map->push_entity(troll);
+    }
+  }
+}
 
 std::vector<Vector2D> Dungeon::l_tunnel_between(Vector2D start, Vector2D end) {
   auto* random = TCODRandom::getInstance();

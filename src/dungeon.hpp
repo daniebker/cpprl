@@ -5,6 +5,15 @@
 #include "game_entity.hpp"
 #include "types/map.hpp"
 
+struct DungeonConfig {
+  int max_rooms;
+  int room_min_size;
+  int room_max_size;
+  int map_width;
+  int map_height;
+  int max_monsters_per_room;
+};
+
 namespace cpprl {
 class Dungeon {
  private:
@@ -12,6 +21,6 @@ class Dungeon {
 
  public:
   Dungeon(){};
-  Map* generate(int max_rooms, int room_min_size, int room_max_size, int map_width, int map_height, GameEntity& player);
+  Map* generate(DungeonConfig config, GameEntity& player);
 };
 }  // namespace cpprl

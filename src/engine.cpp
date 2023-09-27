@@ -4,8 +4,8 @@
 
 namespace cpprl {
 
-Engine::Engine(std::list<GameEntity*> entities, GameEntity& player, Map* map, InputHandler* input_handler)
-    : entities_(entities), player_(player), map_(map), input_handler_(input_handler) {}
+Engine::Engine(GameEntity& player, Map* map, InputHandler* input_handler)
+    : player_(player), map_(map), input_handler_(input_handler) {}
 
 void Engine::handle_events(SDL_Event& event) {
 #ifndef __EMSCRIPTEN__
@@ -41,8 +41,6 @@ void Engine::render(tcod::Console& console) {
       }
     }
   }
-  for (auto entity : entities_) {
-    tcod::print(console, entity->get_position(), entity->get_symbol(), entity->get_colour(), std::nullopt);
-  }
+  map_->render(console);
 }
 }  // namespace cpprl
