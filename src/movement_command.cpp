@@ -14,8 +14,6 @@ void MovementCommand::execute() {
   }
 
   if (engine_.get_entities().get_blocking_entity_at(new_position)) {
-    auto action = MeleeCommand(engine_, entity_, move_vector_);
-    action.execute();
     return;
   }
 

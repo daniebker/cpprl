@@ -1,16 +1,13 @@
 #ifndef MOVEMENTCOMMAND_HPP
 #define MOVEMENTCOMMAND_HPP
 
-#include "command.hpp"
+#include "directional_command.hpp"
 
 namespace cpprl {
-class MovementCommand : public Command {
- protected:
-  Vector2D move_vector_;
-
+class MovementCommand : public DirectionalCommand {
  public:
   MovementCommand(Engine& engine, GameEntity& entity, Vector2D move_vector)
-      : Command(engine, entity), move_vector_(move_vector){};
+      : DirectionalCommand(engine, entity, move_vector){};
   virtual void execute();
 };
 }  // namespace cpprl

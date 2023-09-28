@@ -1,6 +1,6 @@
 #include "input_handler.hpp"
 
-#include "movement_command.hpp"
+#include "directional_command.hpp"
 #include "quit_command.hpp"
 
 namespace cpprl {
@@ -14,10 +14,10 @@ namespace cpprl {
 
 EngineEvent& InputHandler::handle_input(SDL_Keycode key) {
   static QuitCommand quitCommand(engine_);
-  static MovementCommand buttonRight(engine_, engine_.get_player(), Vector2D{1, 0});
-  static MovementCommand buttonLeft(engine_, engine_.get_player(), Vector2D{-1, 0});
-  static MovementCommand buttonUp(engine_, engine_.get_player(), Vector2D{0, -1});
-  static MovementCommand buttonDown(engine_, engine_.get_player(), Vector2D{0, 1});
+  static DirectionalCommand buttonRight(engine_, engine_.get_player(), Vector2D{1, 0});
+  static DirectionalCommand buttonLeft(engine_, engine_.get_player(), Vector2D{-1, 0});
+  static DirectionalCommand buttonUp(engine_, engine_.get_player(), Vector2D{0, -1});
+  static DirectionalCommand buttonDown(engine_, engine_.get_player(), Vector2D{0, 1});
   static NoOpEvent noop(engine_);
 
   switch (key) {

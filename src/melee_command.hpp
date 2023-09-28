@@ -1,13 +1,13 @@
 #pragma once
 
-#include "movement_command.hpp"
+#include "directional_command.hpp"
 
 namespace cpprl {
 
-class MeleeCommand : MovementCommand {
+class MeleeCommand : DirectionalCommand {
  public:
   MeleeCommand(Engine& engine, GameEntity& entity, Vector2D target_vector)
-      : MovementCommand(engine, entity, target_vector){};
+      : DirectionalCommand(engine, entity, target_vector){};
   void execute();
 };
 }  // namespace cpprl
