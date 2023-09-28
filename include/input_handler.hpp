@@ -2,6 +2,8 @@
 #define INPUT_HANDLER_H
 #include <SDL2/SDL.h>
 
+#include <vector>
+
 namespace cpprl {
 
 class Engine;

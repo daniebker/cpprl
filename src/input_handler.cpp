@@ -1,22 +1,19 @@
 #include "../include/input_handler.hpp"
 
-#include "../include/directional_command.hpp"
 #include "../include/engine.hpp"
-#include "../include/quit_command.hpp"
+#include "../include/events/directional_command.hpp"
+#include "../include/events/quit_command.hpp"
 
 namespace cpprl {
-// InputHandler::InputHandler(Engine& engine) {
-//   quit_ = new QuitCommand();
-//   buttonRight_ = new MovementCommand(Vector2D{1, 0});
-//   buttonLeft_ = new MovementCommand(Vector2D{-1, 0});
-//   buttonUp_ = new MovementCommand(Vector2D{0, -1});
-//   buttonDown_ = new MovementCommand(Vector2D{0, 1});
-// }
 
 EngineEvent& InputHandler::handle_input(SDL_Keycode key) {
   static QuitCommand quitCommand(engine_);
   static DirectionalCommand buttonRight(engine_, engine_.get_player(), Vector2D{1, 0});
+  static DirectionalCommand buttonUpRight(engine_, engine_.get_player(), Vector2D{1, -1});
   static DirectionalCommand buttonLeft(engine_, engine_.get_player(), Vector2D{-1, 0});
+  static DirectionalCommand buttonDownLeft(engine_, engine_.get_player(), Vector2D{-1, 1});
+  static DirectionalCommand buttonDownRight(engine_, engine_.get_player(), Vector2D{1, 1});
+  static DirectionalCommand buttonUpLeft(engine_, engine_.get_player(), Vector2D{-1, -1});
   static DirectionalCommand buttonUp(engine_, engine_.get_player(), Vector2D{0, -1});
   static DirectionalCommand buttonDown(engine_, engine_.get_player(), Vector2D{0, 1});
   static NoOpEvent noop(engine_);
@@ -24,6 +21,18 @@ EngineEvent& InputHandler::handle_input(SDL_Keycode key) {
   switch (key) {
     case SDLK_ESCAPE:
       return quitCommand;
+      break;
+    case SDLK_e:
+      return buttonUpRight;
+      break;
+    case SDLK_q:
+      return buttonUpLeft;
+      break;
+    case SDLK_z:
+      return buttonDownLeft;
+      break;
+    case SDLK_c:
+      return buttonDownRight;
       break;
     case SDLK_w:
     case SDLK_UP:

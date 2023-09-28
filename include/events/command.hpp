@@ -1,10 +1,10 @@
 #ifndef COMMAND_H
 #define COMMAND_H
 
-#include "engine.hpp"
+#include "../engine.hpp"
+#include "../game_entity.hpp"
+#include "../types/map.hpp"
 #include "engine_event.hpp"
-#include "game_entity.hpp"
-#include "types/map.hpp"
 
 namespace cpprl {
 class Command : public EngineEvent {

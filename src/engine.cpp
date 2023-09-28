@@ -4,7 +4,7 @@
 
 #include <iostream>
 
-#include "../include/engine_event.hpp"
+#include "../include/events/engine_event.hpp"
 #include "../include/input_handler.hpp"
 
 namespace cpprl {
