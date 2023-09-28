@@ -1,4 +1,4 @@
-#include "quit_command.hpp"
+#include "../include/quit_command.hpp"
 
 #include "iostream"
 

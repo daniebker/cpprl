@@ -1,7 +1,8 @@
-#include "input_handler.hpp"
+#include "../include/input_handler.hpp"
 
-#include "directional_command.hpp"
-#include "quit_command.hpp"
+#include "../include/directional_command.hpp"
+#include "../include/engine.hpp"
+#include "../include/quit_command.hpp"
 
 namespace cpprl {
 // InputHandler::InputHandler(Engine& engine) {

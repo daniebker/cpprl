@@ -1,4 +1,4 @@
-#include "game_entity.hpp"
+#include "../include/game_entity.hpp"
 
 #include <libtcod.hpp>
 #include <string_view>

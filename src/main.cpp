@@ -9,11 +9,11 @@
 #include <libtcod.hpp>
 #include <list>
 
-#include "dungeon.hpp"
-#include "engine.hpp"
-#include "game_entity.hpp"
-#include "input_handler.hpp"
-#include "types/map.hpp"
+#include "../include/dungeon.hpp"
+#include "../include/engine.hpp"
+#include "../include/game_entity.hpp"
+#include "../include/input_handler.hpp"
+#include "../include/types/map.hpp"
 
 #if defined(_MSC_VER)
 #pragma warning(disable : 4297)  // Allow "throw" in main().  Letting the compiler handle termination.

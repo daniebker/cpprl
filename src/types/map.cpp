@@ -1,4 +1,4 @@
-#include "map.hpp"
+#include "../../include/types/map.hpp"
 
 namespace cpprl {
 Map::Map(int width, int height)

@@ -1,7 +1,7 @@
-#include "directional_command.hpp"
+#include "../include/directional_command.hpp"
 
-#include "melee_command.hpp"
-#include "movement_command.hpp"
+#include "../include/melee_command.hpp"
+#include "../include/movement_command.hpp"
 
 namespace cpprl {
 

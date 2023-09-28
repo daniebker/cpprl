@@ -1,7 +1,7 @@
-#include "movement_command.hpp"
+#include "../include/movement_command.hpp"
 
-#include "melee_command.hpp"
-#include "types/map.hpp"
+#include "../include/melee_command.hpp"
+#include "../include/types/map.hpp"
 
 namespace cpprl {
 

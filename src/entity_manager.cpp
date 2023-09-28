@@ -1,4 +1,4 @@
-#include "entity_manager.hpp"
+#include "../include/entity_manager.hpp"
 
 #include <SDL2/SDL.h>
 

@@ -1,9 +1,9 @@
-#include "dungeon.hpp"
+#include "../include/dungeon.hpp"
 
 #include <tuple>
 
-#include "rectangular_room.hpp"
-#include "types/map.hpp"
+#include "../include/rectangular_room.hpp"
+#include "../include/types/map.hpp"
 
 namespace cpprl {
 Map* Dungeon::generate(DungeonConfig dungeon_config) {

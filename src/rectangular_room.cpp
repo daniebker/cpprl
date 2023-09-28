@@ -1,4 +1,4 @@
-#include "rectangular_room.hpp"
+#include "../include/rectangular_room.hpp"
 
 namespace cpprl {
 

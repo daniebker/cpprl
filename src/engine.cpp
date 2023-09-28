@@ -1,11 +1,11 @@
-#include "engine.hpp"
+#include "../include/engine.hpp"
 
 #include <SDL2/SDL.h>
 
 #include <iostream>
 
-#include "engine_event.hpp"
-#include "input_handler.hpp"
+#include "../include/engine_event.hpp"
+#include "../include/input_handler.hpp"
 
 namespace cpprl {
 

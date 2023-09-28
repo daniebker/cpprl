@@ -1,4 +1,4 @@
-#include "melee_command.hpp"
+#include "../include/melee_command.hpp"
 
 #include <SDL2/SDL.h>
 
