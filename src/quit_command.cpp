@@ -3,7 +3,5 @@
 #include "iostream"
 
 namespace cpprl {
-QuitCommand::QuitCommand() {}
-QuitCommand::~QuitCommand() {}
-void QuitCommand::execute(Map* map, GameEntity* entity) { std::exit(0); }
+void QuitCommand::execute() { std::exit(0); }
 }  // namespace cpprl

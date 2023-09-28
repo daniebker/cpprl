@@ -15,6 +15,8 @@ class EntityManager {
   void place_entities(RectangularRoom room, int max_monsters_per_room);
   GameEntity& spawn(const GameEntity& entity);
   GameEntity& spawn(const GameEntity& entity, Vector2D position);
+  GameEntity& spawn_player(Vector2D position);
+
   GameEntity& at(int index) { return entities_.at(index); }
 
   using iterator = std::vector<GameEntity>::iterator;

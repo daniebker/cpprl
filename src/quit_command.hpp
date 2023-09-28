@@ -1,10 +1,9 @@
-#include "command.hpp"
+#include "engine_event.hpp"
 
 namespace cpprl {
-class QuitCommand : public Command {
+class QuitCommand : public EngineEvent {
  public:
-  QuitCommand();
-  virtual ~QuitCommand();
-  virtual void execute(Map* map, GameEntity* entity);
+  QuitCommand(Engine& engine) : EngineEvent(engine){};
+  virtual void execute();
 };
 }  // namespace cpprl

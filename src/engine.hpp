@@ -7,10 +7,13 @@
 
 #include "dungeon.hpp"
 #include "entity_manager.hpp"
-#include "input_handler.hpp"
-#include "types/map.hpp"
 
 namespace cpprl {
+
+class InputHandler;
+class GameEntity;
+class Map;
+
 class Engine {
  private:
   Dungeon& dungeon_;
@@ -22,9 +25,12 @@ class Engine {
   void generate_map(int width, int height);
 
  public:
-  Engine(EntityManager& entities, Dungeon& dungeon, InputHandler* input_handler);
+  Engine(EntityManager& entities, Dungeon& dungeon);
   void handle_events(SDL_Event& event);
+  EntityManager& get_entities();
   void render(tcod::Console& console);
+  Map* get_map() { return map_; }
+  GameEntity& get_player() { return *player_; }
 };
 }  // namespace cpprl
 #endif

@@ -9,9 +9,9 @@ class MovementCommand : public Command {
   Vector2D move_vector_;
 
  public:
-  MovementCommand(Vector2D move_vector);
-  virtual ~MovementCommand();
-  virtual void execute(Map* map, GameEntity* entity);
+  MovementCommand(Engine& engine, GameEntity& entity, Vector2D move_vector)
+      : Command(engine, entity), move_vector_(move_vector){};
+  virtual void execute();
 };
 }  // namespace cpprl
 

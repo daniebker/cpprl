@@ -45,4 +45,8 @@ GameEntity& EntityManager::spawn(const GameEntity& src, Vector2D position) {
   return entity;
 }
 
+GameEntity& EntityManager::spawn_player(Vector2D position) {
+  auto& player = spawn(PLAYER, position);
+  return player;
+}
 }  // namespace cpprl

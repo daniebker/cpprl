@@ -4,10 +4,13 @@
 
 #include <iostream>
 
+#include "engine_event.hpp"
+#include "input_handler.hpp"
+
 namespace cpprl {
 
-Engine::Engine(EntityManager& entities, Dungeon& dungeon, InputHandler* input_handler)
-    : dungeon_(dungeon), entities_(entities), player_(nullptr), map_(nullptr), input_handler_(input_handler) {
+Engine::Engine(EntityManager& entities, Dungeon& dungeon)
+    : dungeon_(dungeon), entities_(entities), player_(nullptr), map_(nullptr), input_handler_(new InputHandler(*this)) {
   generate_map(80, 40);
 }
 
@@ -18,10 +21,8 @@ void Engine::handle_events(SDL_Event& event) {
 #endif
   while (SDL_PollEvent(&event)) {
     if (event.type == SDL_KEYDOWN) {
-      cpprl::Command* command = input_handler_->handle_input(event.key.keysym.sym);
-      if (command) {
-        command->execute(map_, player_);
-      }
+      EngineEvent& command = input_handler_->handle_input(event.key.keysym.sym);
+      command.execute();
     } else if (event.type == SDL_QUIT) {
       std::exit(EXIT_SUCCESS);
     }
@@ -35,7 +36,7 @@ void Engine::generate_map(int width, int height) {
   for (auto it = rooms.begin() + 1; it != rooms.end(); ++it) {
     entities_.place_entities(*it, 2);
   }
-  player_ = &entities_.spawn(PLAYER, rooms[0].get_center());
+  player_ = &entities_.spawn_player(rooms[0].get_center());
   map_->compute_fov(player_->get_position(), 4);
 }
 

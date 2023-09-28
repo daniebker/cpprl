@@ -1,13 +1,19 @@
 #ifndef COMMAND_H
 #define COMMAND_H
 
+#include "engine.hpp"
+#include "engine_event.hpp"
 #include "game_entity.hpp"
 #include "types/map.hpp"
 
 namespace cpprl {
-class Command {
+class Command : public EngineEvent {
+ protected:
+  GameEntity& entity_;
+
  public:
-  virtual void execute(Map* map, GameEntity* gameEntity) = 0;
+  Command(Engine& engine, GameEntity& entity) : EngineEvent(engine), entity_(entity) {}
+  virtual void execute() = 0;
 };
 }  // namespace cpprl
 #endif

@@ -35,10 +35,9 @@ auto get_data_dir() -> std::filesystem::path {
 static tcod::Console g_console;  // The global console object.
 static tcod::Context g_context;  // The global libtcod context.
 
-static cpprl::InputHandler* inputHandler = new cpprl::InputHandler();
 static cpprl::Dungeon dungeon = cpprl::Dungeon();
 static cpprl::EntityManager entityManager = cpprl::EntityManager();
-static cpprl::Engine engine(entityManager, dungeon, inputHandler);
+static cpprl::Engine engine(entityManager, dungeon);
 
 void main_loop() {
   engine.render(g_console);
@@ -70,7 +69,6 @@ int main(int argc, char** argv) {
     emscripten_set_main_loop(main_loop, 0, 0);
 #else
     while (true) main_loop();
-    delete inputHandler;
 #endif
   } catch (const std::exception& exc) {
     std::cerr << exc.what() << "\n";
