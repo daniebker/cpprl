@@ -12,6 +12,10 @@ void MovementCommand::execute() {
     return;
   }
 
+  if (engine_.get_entities().get_blocking_entity_at(new_position)) {
+    return;
+  }
+
   if (map->is_walkable(new_position)) {
     entity_.move(new_position);
   }

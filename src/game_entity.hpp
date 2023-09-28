@@ -16,6 +16,7 @@ class GameEntity {
   tcod::ColorRGB get_colour() { return colour_; };
   Vector2D get_position() { return position_; };
   void set_position(Vector2D position) { position_ = position; };
+  bool is_blocking() { return blocker_; };
 
  private:
   std::string_view name_;

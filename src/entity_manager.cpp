@@ -49,4 +49,13 @@ GameEntity& EntityManager::spawn_player(Vector2D position) {
   auto& player = spawn(PLAYER, position);
   return player;
 }
+
+GameEntity* EntityManager::get_blocking_entity_at(Vector2D position) {
+  for (auto& entity : entities_) {
+    if (entity.is_blocking() && entity.get_position() == position) {
+      return &entity;
+    }
+  }
+  return nullptr;
+}
 }  // namespace cpprl

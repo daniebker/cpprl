@@ -27,7 +27,7 @@ class Engine {
  public:
   Engine(EntityManager& entities, Dungeon& dungeon);
   void handle_events(SDL_Event& event);
-  EntityManager& get_entities();
+  EntityManager& get_entities() { return entities_; };
   void render(tcod::Console& console);
   Map* get_map() { return map_; }
   GameEntity& get_player() { return *player_; }
