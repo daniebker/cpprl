@@ -1,5 +1,6 @@
 #include "movement_command.hpp"
 
+#include "melee_command.hpp"
 #include "types/map.hpp"
 
 namespace cpprl {
@@ -13,6 +14,8 @@ void MovementCommand::execute() {
   }
 
   if (engine_.get_entities().get_blocking_entity_at(new_position)) {
+    auto action = MeleeCommand(engine_, entity_, move_vector_);
+    action.execute();
     return;
   }
 

@@ -17,6 +17,7 @@ class GameEntity {
   Vector2D get_position() { return position_; };
   void set_position(Vector2D position) { position_ = position; };
   bool is_blocking() { return blocker_; };
+  std::string_view get_name() { return name_; };
 
  private:
   std::string_view name_;

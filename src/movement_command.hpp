@@ -5,7 +5,7 @@
 
 namespace cpprl {
 class MovementCommand : public Command {
- private:
+ protected:
   Vector2D move_vector_;
 
  public:
