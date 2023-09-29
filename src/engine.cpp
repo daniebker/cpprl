@@ -23,6 +23,7 @@ void Engine::handle_events(SDL_Event& event) {
     if (event.type == SDL_KEYDOWN) {
       EngineEvent& command = input_handler_->handle_input(event.key.keysym.sym);
       command.execute();
+      handle_enemy_turns();
     } else if (event.type == SDL_QUIT) {
       std::exit(EXIT_SUCCESS);
     }
@@ -50,5 +51,18 @@ void Engine::render(tcod::Console& console) {
       tcod::print(console, entity.get_position(), entity.get_symbol(), entity.get_colour(), std::nullopt);
     }
   }
+}
+
+void Engine::handle_enemy_turns() {
+  for (GameEntity& entity : entities_) {
+    if (entity.get_name() != "player" && entity.is_not_dead()) {
+      entity.act(*this);
+    }
+  }
+}
+
+void Engine::handle_player_death() {  //
+  // change the game state to start a new game or quit
+  // essentially a new input handler in the engine
 }
 }  // namespace cpprl

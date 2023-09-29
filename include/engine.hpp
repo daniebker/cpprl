@@ -23,6 +23,7 @@ class Engine {
   InputHandler* input_handler_;
 
   void generate_map(int width, int height);
+  void handle_enemy_turns();
 
  public:
   Engine(EntityManager& entities, Dungeon& dungeon);
@@ -31,6 +32,7 @@ class Engine {
   void render(tcod::Console& console);
   Map* get_map() { return map_; }
   GameEntity& get_player() { return *player_; }
+  void handle_player_death();
 };
 }  // namespace cpprl
 #endif
