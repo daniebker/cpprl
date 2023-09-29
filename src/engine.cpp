@@ -10,8 +10,18 @@
 namespace cpprl {
 
 Engine::Engine(EntityManager& entities, Dungeon& dungeon)
-    : dungeon_(dungeon), entities_(entities), player_(nullptr), map_(nullptr), input_handler_(new InputHandler(*this)) {
+    : dungeon_(dungeon), entities_(entities), player_(nullptr), map_(nullptr), input_handler_(nullptr) {
   generate_map(80, 40);
+  // TODO: this is a dodgy way to do this
+  // Input handler needs a ref to the engines
+  // player so we must always ensure the player
+  // is created before the input handler
+  input_handler_ = new GameInputHandler(*this);
+}
+
+Engine::~Engine() {
+  delete input_handler_;
+  delete map_;
 }
 
 void Engine::handle_events(SDL_Event& event) {
@@ -21,9 +31,11 @@ void Engine::handle_events(SDL_Event& event) {
 #endif
   while (SDL_PollEvent(&event)) {
     if (event.type == SDL_KEYDOWN) {
-      EngineEvent& command = input_handler_->handle_input(event.key.keysym.sym);
-      command.execute();
-      handle_enemy_turns();
+      EngineEvent* command = input_handler_->handle_input(event.key.keysym.sym);
+      command->execute();
+      if (!game_over_) {
+        handle_enemy_turns();
+      }
     } else if (event.type == SDL_QUIT) {
       std::exit(EXIT_SUCCESS);
     }
@@ -62,7 +74,25 @@ void Engine::handle_enemy_turns() {
 }
 
 void Engine::handle_player_death() {  //
-  // change the game state to start a new game or quit
-  // essentially a new input handler in the engine
+  game_over_ = true;
+  delete input_handler_;
+  input_handler_ = new MenuInputHandler(*this);
+}
+
+void Engine::reset_game() {
+  game_over_ = false;
+  // player is already freed?
+  // delete player_;
+  entities_.clear();
+  delete map_;
+  delete input_handler_;
+  player_ = nullptr;
+  map_ = nullptr;
+  generate_map(80, 40);
+  // TODO: this is a dodgy way to do this
+  // Input handler needs a ref to the engines
+  // player so we must always ensure the player
+  // is created before the input handler
+  input_handler_ = new GameInputHandler(*this);
 }
 }  // namespace cpprl

@@ -21,18 +21,21 @@ class Engine {
   GameEntity* player_;
   Map* map_;
   InputHandler* input_handler_;
+  bool game_over_ = false;
 
   void generate_map(int width, int height);
   void handle_enemy_turns();
 
  public:
   Engine(EntityManager& entities, Dungeon& dungeon);
+  ~Engine();
   void handle_events(SDL_Event& event);
   EntityManager& get_entities() { return entities_; };
   void render(tcod::Console& console);
   Map* get_map() { return map_; }
   GameEntity& get_player() { return *player_; }
   void handle_player_death();
+  void reset_game();
 };
 }  // namespace cpprl
 #endif

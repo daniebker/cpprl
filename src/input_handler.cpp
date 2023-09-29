@@ -6,22 +6,19 @@
 
 namespace cpprl {
 
-EngineEvent& InputHandler::handle_input(SDL_Keycode key) {
-  static QuitCommand quitCommand(engine_);
-  static DirectionalCommand buttonRight(engine_, engine_.get_player(), Vector2D{1, 0});
-  static DirectionalCommand buttonUpRight(engine_, engine_.get_player(), Vector2D{1, -1});
-  static DirectionalCommand buttonLeft(engine_, engine_.get_player(), Vector2D{-1, 0});
-  static DirectionalCommand buttonDownLeft(engine_, engine_.get_player(), Vector2D{-1, 1});
-  static DirectionalCommand buttonDownRight(engine_, engine_.get_player(), Vector2D{1, 1});
-  static DirectionalCommand buttonUpLeft(engine_, engine_.get_player(), Vector2D{-1, -1});
-  static DirectionalCommand buttonUp(engine_, engine_.get_player(), Vector2D{0, -1});
-  static DirectionalCommand buttonDown(engine_, engine_.get_player(), Vector2D{0, 1});
-  static NoOpEvent noop(engine_);
-
+EngineEvent* InputHandler::handle_input(SDL_Keycode key) {
   switch (key) {
     case SDLK_ESCAPE:
       return quitCommand;
       break;
+    default:
+      return noop;
+      break;
+  }
+};
+
+EngineEvent* GameInputHandler::handle_input(SDL_Keycode key) {
+  switch (key) {
     case SDLK_e:
       return buttonUpRight;
       break;
@@ -51,7 +48,18 @@ EngineEvent& InputHandler::handle_input(SDL_Keycode key) {
       return buttonRight;
       break;
     default:
-      return noop;
+      return InputHandler::handle_input(key);
+      break;
+  }
+};
+
+EngineEvent* MenuInputHandler::handle_input(SDL_Keycode key) {
+  switch (key) {
+    case SDLK_RETURN:
+      return resetGameCommand;
+      break;
+    default:
+      return InputHandler::handle_input(key);
       break;
   }
 };

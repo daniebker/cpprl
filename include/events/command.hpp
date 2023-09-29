@@ -13,6 +13,7 @@ class Command : public EngineEvent {
 
  public:
   Command(Engine& engine, GameEntity& entity) : EngineEvent(engine), entity_(entity) {}
+  virtual ~Command() {}
   virtual void execute() = 0;
 };
 }  // namespace cpprl
