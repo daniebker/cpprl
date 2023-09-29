@@ -16,13 +16,10 @@ Engine::Engine(EntityManager& entities, Dungeon& dungeon)
   // Input handler needs a ref to the engines
   // player so we must always ensure the player
   // is created before the input handler
-  input_handler_ = new GameInputHandler(*this);
+  input_handler_ = std::make_unique<GameInputHandler>(*this);
 }
 
-Engine::~Engine() {
-  delete input_handler_;
-  delete map_;
-}
+Engine::~Engine() { delete map_; }
 
 void Engine::handle_events(SDL_Event& event) {
 #ifndef __EMSCRIPTEN__
@@ -75,8 +72,7 @@ void Engine::handle_enemy_turns() {
 
 void Engine::handle_player_death() {  //
   game_over_ = true;
-  delete input_handler_;
-  input_handler_ = new MenuInputHandler(*this);
+  input_handler_ = std::make_unique<MenuInputHandler>(*this);
 }
 
 void Engine::reset_game() {
@@ -85,7 +81,6 @@ void Engine::reset_game() {
   // delete player_;
   entities_.clear();
   delete map_;
-  delete input_handler_;
   player_ = nullptr;
   map_ = nullptr;
   generate_map(80, 40);
@@ -93,6 +88,6 @@ void Engine::reset_game() {
   // Input handler needs a ref to the engines
   // player so we must always ensure the player
   // is created before the input handler
-  input_handler_ = new GameInputHandler(*this);
+  input_handler_ = std::make_unique<GameInputHandler>(*this);
 }
 }  // namespace cpprl

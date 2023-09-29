@@ -20,7 +20,7 @@ class Engine {
   EntityManager entities_;
   GameEntity* player_;
   Map* map_;
-  InputHandler* input_handler_;
+  std::unique_ptr<InputHandler> input_handler_;
   bool game_over_ = false;
 
   void generate_map(int width, int height);
