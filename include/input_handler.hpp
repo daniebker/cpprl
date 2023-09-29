@@ -21,7 +21,7 @@ class InputHandler {
  public:
   InputHandler(Engine& engine) : engine_(engine) {
     quitCommand = new QuitCommand(engine_);
-    noop = new QuitCommand(engine_);
+    noop = new NoOpEvent(engine_);
   };
   virtual ~InputHandler() {
     delete quitCommand;
@@ -45,16 +45,17 @@ class GameInputHandler : public InputHandler {
   DirectionalCommand* buttonDownLeft;
 
  public:
-  GameInputHandler(Engine& engine) : InputHandler(engine) {
-    buttonRight = new DirectionalCommand(engine_, engine_.get_player(), Vector2D{1, 0});
-    buttonLeft = new DirectionalCommand(engine_, engine_.get_player(), Vector2D{-1, 0});
-    buttonUp = new DirectionalCommand(engine_, engine_.get_player(), Vector2D{0, -1});
-    buttonDown = new DirectionalCommand(engine_, engine_.get_player(), Vector2D{0, 1});
-    buttonUpRight = new DirectionalCommand(engine_, engine_.get_player(), Vector2D{1, -1});
-    buttonUpLeft = new DirectionalCommand(engine_, engine_.get_player(), Vector2D{-1, -1});
-    buttonDownRight = new DirectionalCommand(engine_, engine_.get_player(), Vector2D{1, 1});
-    buttonDownLeft = new DirectionalCommand(engine_, engine_.get_player(), Vector2D{-1, 1});
+  GameInputHandler(Engine& engine, GameEntity& controllableEntity) : InputHandler(engine) {
+    buttonRight = new DirectionalCommand(engine_, controllableEntity, Vector2D{1, 0});
+    buttonLeft = new DirectionalCommand(engine_, controllableEntity, Vector2D{-1, 0});
+    buttonUp = new DirectionalCommand(engine_, controllableEntity, Vector2D{0, -1});
+    buttonDown = new DirectionalCommand(engine_, controllableEntity, Vector2D{0, 1});
+    buttonUpRight = new DirectionalCommand(engine_, controllableEntity, Vector2D{1, -1});
+    buttonUpLeft = new DirectionalCommand(engine_, controllableEntity, Vector2D{-1, -1});
+    buttonDownRight = new DirectionalCommand(engine_, controllableEntity, Vector2D{1, 1});
+    buttonDownLeft = new DirectionalCommand(engine_, controllableEntity, Vector2D{-1, 1});
   };
+
   ~GameInputHandler() {
     delete buttonRight;
     delete buttonLeft;

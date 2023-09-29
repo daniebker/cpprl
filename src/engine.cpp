@@ -12,11 +12,16 @@ namespace cpprl {
 Engine::Engine(EntityManager& entities, Dungeon& dungeon)
     : dungeon_(dungeon), entities_(entities), player_(nullptr), map_(nullptr), input_handler_(nullptr) {
   generate_map(80, 40);
-  // TODO: this is a dodgy way to do this
-  // Input handler needs a ref to the engines
-  // player so we must always ensure the player
-  // is created before the input handler
-  input_handler_ = std::make_unique<GameInputHandler>(*this);
+  /**
+  // TODO: this is a bit of a hack since the order matters here.
+  // we can't create an input handler until we have a player
+  // but this is hidden since the constructor of the input
+  // handler is calling engine get player. This should be
+  // refactored so only the engine is required in the base
+  // constructor and then the player is passed to a controller
+  // input handler
+  */
+  input_handler_ = std::make_unique<GameInputHandler>(*this, *player_);
 }
 
 Engine::~Engine() { delete map_; }
@@ -84,10 +89,6 @@ void Engine::reset_game() {
   player_ = nullptr;
   map_ = nullptr;
   generate_map(80, 40);
-  // TODO: this is a dodgy way to do this
-  // Input handler needs a ref to the engines
-  // player so we must always ensure the player
-  // is created before the input handler
-  input_handler_ = std::make_unique<GameInputHandler>(*this);
+  input_handler_ = std::make_unique<GameInputHandler>(*this, *player_);
 }
 }  // namespace cpprl
