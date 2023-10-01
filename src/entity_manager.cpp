@@ -31,6 +31,7 @@ void EntityManager::place_entities(RectangularRoom room, int max_monsters_per_ro
       spawn(TROLL, {x, y});
     }
   }
+  entities_.shrink_to_fit();
 }
 
 GameEntity& EntityManager::spawn(const GameEntity& src) { return entities_.emplace_back(src); }
