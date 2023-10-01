@@ -3,14 +3,22 @@
 #include <SDL2/SDL.h>
 
 #include <iostream>
+#include <memory>
 
-#include "../include/events/engine_event.hpp"
-#include "../include/input_handler.hpp"
+#include "events/engine_event.hpp"
+#include "health_bar.hpp"
+#include "input_handler.hpp"
+#include "types/math.hpp"
 
 namespace cpprl {
 
 Engine::Engine(EntityManager& entities, Dungeon& dungeon)
-    : dungeon_(dungeon), entities_(entities), player_(nullptr), map_(nullptr), input_handler_(nullptr) {
+    : dungeon_(dungeon),
+      entities_(entities),
+      player_(nullptr),
+      health_bar_(nullptr),
+      map_(nullptr),
+      input_handler_(nullptr) {
   generate_map(80, 40);
   /**
   // TODO: this is a bit of a hack since the order matters here.
@@ -19,7 +27,8 @@ Engine::Engine(EntityManager& entities, Dungeon& dungeon)
   // handler is calling engine get player. This should be
   // refactored so only the engine is required in the base
   // constructor and then the player is passed to a controller
-  // input handler
+  // input handler. One way to make this clearer would be to add a spawn player
+  // call
   */
   input_handler_ = std::make_unique<GameInputHandler>(*this, *player_);
 }
@@ -28,7 +37,8 @@ Engine::~Engine() { delete map_; }
 
 void Engine::handle_events(SDL_Event& event) {
 #ifndef __EMSCRIPTEN__
-  // Block until events exist.  This conserves resources well but isn't compatible with animations or Emscripten.
+  // Block until events exist.  This conserves resources well but isn't
+  // compatible with animations or Emscripten.
   SDL_WaitEvent(nullptr);
 #endif
   while (SDL_PollEvent(&event)) {
@@ -55,6 +65,8 @@ void Engine::generate_map(int width, int height) {
   }
   player_ = &entities_.spawn_player(rooms[0].get_center());
   map_->compute_fov(player_->get_position(), 4);
+  health_bar_ =
+      new HealthBar(20, 1, {0, 45}, std::ref(player_->get_defense_component()));
 }
 
 void Engine::render(tcod::Console& console) {
@@ -64,9 +76,15 @@ void Engine::render(tcod::Console& console) {
   for (auto entity : entities_) {
     // TODO: Entity should have a render function
     if (map_->is_in_fov(entity.get_position())) {
-      tcod::print(console, entity.get_position(), entity.get_symbol(), entity.get_colour(), std::nullopt);
+      tcod::print(
+          console,
+          entity.get_position(),
+          entity.get_symbol(),
+          entity.get_colour(),
+          std::nullopt);
     }
   }
+  health_bar_->render(console);
 }
 
 void Engine::handle_enemy_turns() {

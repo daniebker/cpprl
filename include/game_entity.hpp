@@ -31,8 +31,8 @@ class GameEntity {
   void die();
   bool is_dead() { return defenseComponent_.hp <= 0; };
   bool is_not_dead() { return !is_dead(); };
-  AttackComponent get_attack_component() { return attackComponent_; };
-  DefenseComponent get_defense_component() { return defenseComponent_; };
+  AttackComponent& get_attack_component() { return attackComponent_; };
+  DefenseComponent& get_defense_component() { return defenseComponent_; };
   void take_damage(int damage) { defenseComponent_.hp -= damage; };
 
  private:

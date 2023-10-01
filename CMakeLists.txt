@@ -27,7 +27,7 @@ target_include_directories(${PROJECT_NAME}
 
 
 # Ensure the C++17 standard is available.
-target_compile_features(${PROJECT_NAME} PRIVATE cxx_std_17)
+target_compile_features(${PROJECT_NAME} PRIVATE cxx_std_20)
 
 # Enforce UTF-8 encoding on MSVC.
 if (MSVC)
@@ -52,6 +52,8 @@ if (EMSCRIPTEN)
     )
 endif()
 
+
+find_package(fmt CONFIG REQUIRED)
 find_package(SDL2 CONFIG REQUIRED)
 find_package(libtcod CONFIG REQUIRED)
 target_link_libraries(
@@ -60,4 +62,5 @@ target_link_libraries(
         SDL2::SDL2
         SDL2::SDL2main
         libtcod::libtcod
+        fmt::fmt
 )

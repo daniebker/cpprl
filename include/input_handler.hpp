@@ -15,7 +15,8 @@ class EngineEvent;
 
 class InputHandler {
  public:
-  InputHandler(Engine& engine) : engine_(engine), quitCommand(engine), noop(engine){};
+  InputHandler(Engine& engine)
+      : engine_(engine), quitCommand(engine), noop(engine){};
   virtual EngineEvent& handle_input(SDL_Keycode key);
 
  protected:
@@ -26,7 +27,7 @@ class InputHandler {
   NoOpEvent noop;
 };
 
-class GameInputHandler : public InputHandler {
+class GameInputHandler final : public InputHandler {
  private:
   DirectionalCommand buttonRight;
   DirectionalCommand buttonUp;
@@ -52,12 +53,13 @@ class GameInputHandler : public InputHandler {
   virtual EngineEvent& handle_input(SDL_Keycode key) override;
 };
 
-class MenuInputHandler : public InputHandler {
+class MenuInputHandler final : public InputHandler {
  private:
   ResetGameCommand resetGameCommand;
 
  public:
-  MenuInputHandler(Engine& engine) : InputHandler(engine), resetGameCommand(engine){};
+  MenuInputHandler(Engine& engine)
+      : InputHandler(engine), resetGameCommand(engine){};
   virtual EngineEvent& handle_input(SDL_Keycode key) override;
 };
 
