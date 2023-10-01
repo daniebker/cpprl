@@ -48,6 +48,8 @@ void Engine::generate_map(int width, int height) {
   map_ = dungeon_.generate(DungeonConfig{30, 6, 10, width, height, 2});
 
   std::vector<RectangularRoom> rooms = map_->get_rooms();
+  int room_count = rooms.size();
+  entities_.reserve(room_count * 2);
   for (auto it = rooms.begin() + 1; it != rooms.end(); ++it) {
     entities_.place_entities(*it, 2);
   }

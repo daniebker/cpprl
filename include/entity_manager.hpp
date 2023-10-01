@@ -16,6 +16,7 @@ class EntityManager {
   GameEntity& spawn(const GameEntity& entity);
   GameEntity& spawn(const GameEntity& entity, Vector2D position);
   GameEntity& spawn_player(Vector2D position);
+  void reserve(size_t size) { entities_.reserve(size); }
 
   GameEntity& at(int index) { return entities_.at(index); }
 
