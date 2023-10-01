@@ -14,18 +14,27 @@ void HealthBar::render(tcod::Console& console) const {
   const auto bar_width =
       (int)((float)health_.hp / (float)health_.max_hp * (float)width_);
   tcod::draw_rect(
-      console, {position_.x, position_.y, width_, 1}, 0, {}, DARK_RED);
+      console,
+      {position_.x, position_.y, width_, height_},
+      0,
+      std::nullopt,
+      DARK_RED);
   tcod::draw_rect(
-      console, {position_.x, position_.y, bar_width, 1}, 0, {}, DARK_GREEN);
+      console,
+      {position_.x, position_.y, bar_width, height_},
+      0,
+      std::nullopt,
+      DARK_GREEN);
+
   // health bar text
   // std::string_view health_text =
   //     std::format("{}/{}", health_.hp, health_.max_hp);
   tcod::print_rect(
       console,
-      {position_.x, position_.y, width_, 1},
+      {position_.x, position_.y, width_, height_},
       "HP",
       WHITE,
-      {},
-      TCOD_LEFT);
+      std::nullopt,
+      TCOD_CENTER);
 }
 }  // namespace cpprl

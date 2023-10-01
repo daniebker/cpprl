@@ -65,12 +65,11 @@ void Engine::generate_map(int width, int height) {
   }
   player_ = &entities_.spawn_player(rooms[0].get_center());
   map_->compute_fov(player_->get_position(), 4);
-  health_bar_ =
-      new HealthBar(20, 1, {0, 45}, std::ref(player_->get_defense_component()));
+  health_bar_ = new HealthBar(20, 1, {2, 2}, player_->get_defense_component());
 }
 
 void Engine::render(tcod::Console& console) {
-  map_->compute_fov(player_->get_position(), 4);
+  map_->compute_fov(player_->get_position(), 10);
   map_->render(console);
 
   for (auto entity : entities_) {
@@ -105,9 +104,11 @@ void Engine::reset_game() {
   // player is already freed?
   // delete player_;
   entities_.clear();
+  delete health_bar_;
   delete map_;
   player_ = nullptr;
   map_ = nullptr;
+  health_bar_ = nullptr;
   generate_map(80, 40);
   input_handler_ = std::make_unique<GameInputHandler>(*this, *player_);
 }
