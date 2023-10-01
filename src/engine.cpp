@@ -33,8 +33,8 @@ void Engine::handle_events(SDL_Event& event) {
 #endif
   while (SDL_PollEvent(&event)) {
     if (event.type == SDL_KEYDOWN) {
-      EngineEvent* command = input_handler_->handle_input(event.key.keysym.sym);
-      command->execute();
+      EngineEvent& command = input_handler_->handle_input(event.key.keysym.sym);
+      command.execute();
       if (!game_over_) {
         handle_enemy_turns();
       }

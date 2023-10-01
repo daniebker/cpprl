@@ -6,7 +6,7 @@
 
 namespace cpprl {
 
-EngineEvent* InputHandler::handle_input(SDL_Keycode key) {
+EngineEvent& InputHandler::handle_input(SDL_Keycode key) {
   switch (key) {
     case SDLK_ESCAPE:
       return quitCommand;
@@ -17,7 +17,7 @@ EngineEvent* InputHandler::handle_input(SDL_Keycode key) {
   }
 };
 
-EngineEvent* GameInputHandler::handle_input(SDL_Keycode key) {
+EngineEvent& GameInputHandler::handle_input(SDL_Keycode key) {
   switch (key) {
     case SDLK_e:
       return buttonUpRight;
@@ -53,7 +53,7 @@ EngineEvent* GameInputHandler::handle_input(SDL_Keycode key) {
   }
 };
 
-EngineEvent* MenuInputHandler::handle_input(SDL_Keycode key) {
+EngineEvent& MenuInputHandler::handle_input(SDL_Keycode key) {
   switch (key) {
     case SDLK_RETURN:
       return resetGameCommand;
