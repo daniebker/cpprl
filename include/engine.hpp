@@ -7,6 +7,7 @@
 
 #include "dungeon.hpp"
 #include "entity_manager.hpp"
+#include "message_log.hpp"
 #include "ui_window.hpp"
 
 namespace cpprl {
@@ -22,6 +23,7 @@ class Engine {
   GameEntity* player_;
   UiWindow* health_bar_;
   Map* map_;
+  MessageLog* message_log_;
   std::unique_ptr<InputHandler> input_handler_;
   bool game_over_ = false;
 

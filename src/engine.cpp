@@ -18,18 +18,11 @@ Engine::Engine(EntityManager& entities, Dungeon& dungeon)
       player_(nullptr),
       health_bar_(nullptr),
       map_(nullptr),
+      message_log_(nullptr),
       input_handler_(nullptr) {
   generate_map(80, 40);
-  /**
-  // TODO: this is a bit of a hack since the order matters here.
-  // we can't create an input handler until we have a player
-  // but this is hidden since the constructor of the input
-  // handler is calling engine get player. This should be
-  // refactored so only the engine is required in the base
-  // constructor and then the player is passed to a controller
-  // input handler. One way to make this clearer would be to add a spawn player
-  // call
-  */
+  message_log_ = new MessageLog(5);
+  message_log_->add_message("Welcome to cpprl!");
   input_handler_ = std::make_unique<GameInputHandler>(*this, *player_);
 }
 
@@ -84,6 +77,8 @@ void Engine::render(tcod::Console& console) {
     }
   }
   health_bar_->render(console);
+
+  message_log_->render(console, 2, 2, 76, 4);
 }
 
 void Engine::handle_enemy_turns() {
