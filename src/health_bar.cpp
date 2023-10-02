@@ -1,5 +1,8 @@
 #include "health_bar.hpp"
 
+#include <fmt/core.h>
+#include <fmt/format.h>
+
 #include <libtcod/console.hpp>
 
 #include "colours.hpp"
@@ -32,7 +35,7 @@ void HealthBar::render(tcod::Console& console) const {
   tcod::print_rect(
       console,
       {position_.x, position_.y, width_, height_},
-      "HP",
+      fmt::format("HP: {}/{}", health_.hp, health_.max_hp),
       WHITE,
       std::nullopt,
       TCOD_CENTER);

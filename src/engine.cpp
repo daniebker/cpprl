@@ -65,7 +65,7 @@ void Engine::generate_map(int width, int height) {
   }
   player_ = &entities_.spawn_player(rooms[0].get_center());
   map_->compute_fov(player_->get_position(), 4);
-  health_bar_ = new HealthBar(20, 1, {2, 2}, player_->get_defense_component());
+  health_bar_ = new HealthBar(20, 1, {2, 36}, player_->get_defense_component());
 }
 
 void Engine::render(tcod::Console& console) {
