@@ -9,7 +9,8 @@ void DieEvent::execute() {
   if (entity_.get_name() == "player") {
     engine_.handle_player_death();
   }
-  std::cout << util::capitalize(entity_.get_name()) << " has died!\n";
+  engine_.get_message_log().add_message(
+      fmt::format("{} has died!", util::capitalize(entity_.get_name())));
   entity_.die();
 }
 }  // namespace cpprl
