@@ -40,6 +40,7 @@ class Engine {
   GameEntity& get_player() { return *player_; }
   void handle_player_death();
   void reset_game();
+  MessageLog& get_message_log() { return *message_log_; }
 };
 }  // namespace cpprl
 #endif

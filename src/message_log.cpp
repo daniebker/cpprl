@@ -18,7 +18,7 @@ void MessageLog::add_message(Message message, bool stack) {
 }
 
 void MessageLog::add_message(
-    std::string_view text, tcod::ColorRGB color, bool stack) {
+    std::string text, tcod::ColorRGB color, bool stack) {
   add_message(Message{text, color, 1}, stack);
 }
 
@@ -35,10 +35,11 @@ void MessageLog::render_messages(
     if (y_offset >= height) {
       break;
     }
+    std::string text = message.full_text();
     tcod::print_rect(
         console,
         {x, y + y_offset, width, height},
-        message.text_,
+        message.full_text(),
         message.colour_,
         std::nullopt,
         TCOD_LEFT);

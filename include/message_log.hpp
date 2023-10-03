@@ -16,10 +16,10 @@ struct Message {
   tcod::ColorRGB colour_;
   int count_;
 
-  Message(std::string_view text, tcod::ColorRGB color = WHITE, int count = 1)
+  Message(std::string text, tcod::ColorRGB color = WHITE, int count = 1)
       : text_(text), colour_(color), count_(count) {}
 
-  std::string full_text() {
+  std::string full_text() const {
     return count_ > 1 ? fmt::format("{} (x{})", text_, count_) : text_;
   }
 };
@@ -48,7 +48,7 @@ class MessageLog {
   }
   void add_message(Message message, bool stack);
   void add_message(
-      std::string_view text, tcod::ColorRGB color = WHITE, bool stack = true);
+      std::string text, tcod::ColorRGB color = WHITE, bool stack = true);
 
   /**
    * Renders a log message in the given area.

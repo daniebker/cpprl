@@ -20,9 +20,9 @@ Engine::Engine(EntityManager& entities, Dungeon& dungeon)
       map_(nullptr),
       message_log_(nullptr),
       input_handler_(nullptr) {
-  generate_map(80, 40);
+  generate_map(80, 35);
   message_log_ = new MessageLog(5);
-  message_log_->add_message("Welcome to cpprl!");
+  message_log_->add_message("Welcome to your eternal doom!", RED);
   input_handler_ = std::make_unique<GameInputHandler>(*this, *player_);
 }
 
@@ -78,7 +78,7 @@ void Engine::render(tcod::Console& console) {
   }
   health_bar_->render(console);
 
-  message_log_->render(console, 2, 2, 76, 4);
+  message_log_->render(console, 23, 35, 45, 5);
 }
 
 void Engine::handle_enemy_turns() {
