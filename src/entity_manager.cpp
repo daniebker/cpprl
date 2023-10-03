@@ -51,6 +51,18 @@ GameEntity& EntityManager::spawn_player(Vector2D position) {
   return player;
 }
 
+std::vector<GameEntity*> EntityManager::get_entities_at(Vector2D position) {
+  std::vector<GameEntity*> entities_at_position;
+  entities_at_position.reserve(entities_.size());
+  for (auto& entity : entities_) {
+    if (entity.get_position() == position) {
+      entities_at_position.push_back(&entity);
+    }
+  }
+  entities_at_position.shrink_to_fit();
+  return entities_at_position;
+}
+
 GameEntity* EntityManager::get_blocking_entity_at(Vector2D position) {
   for (auto& entity : entities_) {
     if (entity.is_blocking() && entity.get_position() == position) {

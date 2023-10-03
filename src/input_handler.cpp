@@ -19,9 +19,13 @@ EngineEvent& InputHandler::handle_input(SDL_Event event) {
 };
 
 EngineEvent& GameInputHandler::handle_input(SDL_Event event) {
+  // TODO: Move this to its own handler.
+  //  probably want an event handler which has
+  //  input handler for keyboard and another for mouse
   if (event.type == SDL_MOUSEMOTION) {
     g_context.convert_event_coordinates(event);
     engine_.get_controller().cursor = {event.motion.x, event.motion.y};
+    engine_.get_map()->set_target_tile({event.motion.x, event.motion.y});
     return noop;
   }
 

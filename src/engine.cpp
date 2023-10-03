@@ -103,6 +103,20 @@ void Engine::render() {
   health_bar_->render(g_console);
 
   message_log_->render(g_console, 23, 35, 45, 5);
+  auto entities_at = entities_->get_entities_at(controller_.cursor);
+  if (entities_at.size() > 0) {
+    std::string names;
+    for (auto& entity : entities_at) {
+      names += entity->get_name() + ", ";
+    }
+    tcod::print_rect(
+        g_console,
+        {controller_.cursor.x, controller_.cursor.y - 1, 20, 1},
+        names,
+        WHITE,
+        std::nullopt,
+        TCOD_LEFT);
+  }
   g_context.present(g_console);
 }
 

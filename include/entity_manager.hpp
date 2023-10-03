@@ -12,6 +12,7 @@ class EntityManager {
   EntityManager() : entities_(){};
   void clear();
   GameEntity* get_blocking_entity_at(Vector2D position);
+  std::vector<GameEntity*> get_entities_at(Vector2D position);
   void place_entities(RectangularRoom room, int max_monsters_per_room);
   GameEntity& spawn(const GameEntity& entity);
   GameEntity& spawn(const GameEntity& entity, Vector2D position);

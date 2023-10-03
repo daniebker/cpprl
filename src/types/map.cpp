@@ -76,5 +76,7 @@ void Map::render(tcod::Console& console) {
       }
     }
   }
+  if (is_in_fov(target_tile_)) {
+  }
 }
 }  // namespace cpprl
