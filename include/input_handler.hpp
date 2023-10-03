@@ -7,6 +7,7 @@
 #include "events/directional_command.hpp"
 #include "events/engine_event.hpp"
 #include "events/quit_command.hpp"
+#include "globals.hpp"
 
 namespace cpprl {
 
@@ -17,14 +18,14 @@ class InputHandler {
  public:
   InputHandler(Engine& engine)
       : engine_(engine), quitCommand(engine), noop(engine){};
-  virtual EngineEvent& handle_input(SDL_Keycode key);
+  virtual EngineEvent& handle_input(SDL_Event event);
 
  protected:
   Engine& engine_;
+  NoOpEvent noop;
 
  private:
   QuitCommand quitCommand;
-  NoOpEvent noop;
 };
 
 class GameInputHandler final : public InputHandler {
@@ -50,7 +51,7 @@ class GameInputHandler final : public InputHandler {
         buttonDownRight(engine_, controllableEntity, Vector2D{1, 1}),
         buttonDownLeft(engine_, controllableEntity, Vector2D{-1, 1}){};
 
-  virtual EngineEvent& handle_input(SDL_Keycode key) override;
+  virtual EngineEvent& handle_input(SDL_Event event) override;
 };
 
 class MenuInputHandler final : public InputHandler {
@@ -60,7 +61,7 @@ class MenuInputHandler final : public InputHandler {
  public:
   MenuInputHandler(Engine& engine)
       : InputHandler(engine), resetGameCommand(engine){};
-  virtual EngineEvent& handle_input(SDL_Keycode key) override;
+  virtual EngineEvent& handle_input(SDL_Event event) override;
 };
 
 }  // namespace cpprl

@@ -51,6 +51,7 @@ class Map {
   TileGraphic& get_floor_tile() { return floor_tile_; }
   /** Render the map */
   void render(tcod::Console& console);
+  void set_target_tile(Vector2D position) { target_tile_ = position; }
 
  private:
   /** The wall tile */
@@ -64,6 +65,7 @@ class Map {
   /** The tcod map */
   TCODMap tcod_map_;
   std::vector<RectangularRoom> _rooms;
+  Vector2D target_tile_ = {0, 0};
 };
 
 }  // namespace cpprl

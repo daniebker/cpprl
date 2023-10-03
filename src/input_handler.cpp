@@ -1,12 +1,13 @@
-#include "../include/input_handler.hpp"
+#include "input_handler.hpp"
 
-#include "../include/engine.hpp"
-#include "../include/events/directional_command.hpp"
-#include "../include/events/quit_command.hpp"
+#include "engine.hpp"
+#include "events/directional_command.hpp"
+#include "events/quit_command.hpp"
 
 namespace cpprl {
 
-EngineEvent& InputHandler::handle_input(SDL_Keycode key) {
+EngineEvent& InputHandler::handle_input(SDL_Event event) {
+  SDL_Keycode key = event.key.keysym.sym;
   switch (key) {
     case SDLK_ESCAPE:
       return quitCommand;
@@ -17,7 +18,15 @@ EngineEvent& InputHandler::handle_input(SDL_Keycode key) {
   }
 };
 
-EngineEvent& GameInputHandler::handle_input(SDL_Keycode key) {
+EngineEvent& GameInputHandler::handle_input(SDL_Event event) {
+  if (event.type == SDL_MOUSEMOTION) {
+    g_context.convert_event_coordinates(event);
+    engine_.get_controller().cursor = {event.motion.x, event.motion.y};
+    return noop;
+  }
+
+  SDL_Keycode key = event.key.keysym.sym;
+
   switch (key) {
     case SDLK_e:
       return buttonUpRight;
@@ -47,20 +56,20 @@ EngineEvent& GameInputHandler::handle_input(SDL_Keycode key) {
     case SDLK_RIGHT:
       return buttonRight;
       break;
-    case SDL_MOUSEMOTION:
     default:
-      return InputHandler::handle_input(key);
+      return InputHandler::handle_input(event);
       break;
   }
 };
 
-EngineEvent& MenuInputHandler::handle_input(SDL_Keycode key) {
+EngineEvent& MenuInputHandler::handle_input(SDL_Event event) {
+  SDL_Keycode key = event.key.keysym.sym;
   switch (key) {
     case SDLK_RETURN:
       return resetGameCommand;
       break;
     default:
-      return InputHandler::handle_input(key);
+      return InputHandler::handle_input(event);
       break;
   }
 };

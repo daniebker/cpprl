@@ -58,11 +58,13 @@ void Engine::handle_events() {
 #endif
   while (SDL_PollEvent(&event)) {
     if (event.type == SDL_KEYDOWN) {
-      EngineEvent& command = input_handler_->handle_input(event.key.keysym.sym);
+      EngineEvent& command = input_handler_->handle_input(event);
       command.execute();
       if (!game_over_) {
         handle_enemy_turns();
       }
+    } else if (event.type == SDL_MOUSEMOTION) {
+      input_handler_->handle_input(event);
     } else if (event.type == SDL_QUIT) {
       std::exit(EXIT_SUCCESS);
     }

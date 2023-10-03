@@ -8,6 +8,7 @@
 #include "controller.hpp"
 #include "dungeon.hpp"
 #include "entity_manager.hpp"
+#include "globals.hpp"
 #include "message_log.hpp"
 #include "ui_window.hpp"
 
@@ -16,10 +17,6 @@ namespace cpprl {
 class InputHandler;
 class GameEntity;
 class Map;
-
-static tcod::Console g_console;  // The global console object.
-static tcod::Context g_context;  // The global libtcod context.
-
 
 class Engine {
  private:
@@ -48,6 +45,7 @@ class Engine {
   void handle_player_death();
   void reset_game();
   MessageLog& get_message_log() { return *message_log_; }
+  Controller& get_controller() { return controller_; }
 };
 }  // namespace cpprl
 #endif
