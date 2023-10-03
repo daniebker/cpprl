@@ -5,6 +5,7 @@
 #include <libtcod.hpp>
 #include <list>
 
+#include "controller.hpp"
 #include "dungeon.hpp"
 #include "entity_manager.hpp"
 #include "message_log.hpp"
@@ -16,26 +17,32 @@ class InputHandler;
 class GameEntity;
 class Map;
 
+static tcod::Console g_console;  // The global console object.
+static tcod::Context g_context;  // The global libtcod context.
+
+
 class Engine {
  private:
-  Dungeon& dungeon_;
-  EntityManager entities_;
+  std::unique_ptr<Dungeon> dungeon_;
+  std::unique_ptr<EntityManager> entities_;
   GameEntity* player_;
   UiWindow* health_bar_;
   Map* map_;
   MessageLog* message_log_;
   std::unique_ptr<InputHandler> input_handler_;
+  tcod::Context context_;
+  Controller controller_;
   bool game_over_ = false;
 
   void generate_map(int width, int height);
   void handle_enemy_turns();
 
  public:
-  Engine(EntityManager& entities, Dungeon& dungeon);
+  Engine(int argc, char** argv);
   ~Engine();
-  void handle_events(SDL_Event& event);
-  EntityManager& get_entities() { return entities_; };
-  void render(tcod::Console& console);
+  void handle_events();
+  EntityManager& get_entities() { return *entities_; };
+  void render();
   Map* get_map() { return map_; }
   GameEntity& get_player() { return *player_; }
   void handle_player_death();

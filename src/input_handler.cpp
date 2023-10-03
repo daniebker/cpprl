@@ -47,6 +47,7 @@ EngineEvent& GameInputHandler::handle_input(SDL_Keycode key) {
     case SDLK_RIGHT:
       return buttonRight;
       break;
+    case SDL_MOUSEMOTION:
     default:
       return InputHandler::handle_input(key);
       break;
