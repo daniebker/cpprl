@@ -1,5 +1,7 @@
 #include "message_log.hpp"
 
+#include "colours.hpp"
+
 namespace cpprl {
 
 void MessageLog::add_message(Message message, bool stack) {
@@ -27,6 +29,7 @@ void MessageLog::render(
   render_messages(console, x, y, width, height);
 }
 
+// TODO: Bug where it's not overlaying correctly
 void MessageLog::render_messages(
     tcod::Console& console, int x, int y, int width, int height) const {
   int y_offset = 0;
@@ -47,7 +50,7 @@ void MessageLog::render_messages(
         {x, y - y_offset, width, line_height},
         message.full_text(),
         message.colour_,
-        std::nullopt,
+        BLACK_DARK,
         TCOD_LEFT);
     y_offset++;
   }

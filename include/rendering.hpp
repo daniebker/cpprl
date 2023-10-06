@@ -37,6 +37,7 @@ class TCODRenderer final : public Renderer {
     params.console = g_console.get();
     g_context = tcod::Context{params};
   };
+
   virtual void render(SpriteComponent sprite, TransformComponent transform);
 };
 }  // namespace cpprl

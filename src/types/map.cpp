@@ -71,8 +71,7 @@ void Map::render(tcod::Console& console) {
         console.at({x, y}) =
             isFloor ? get_floor_tile().dark : get_wall_tile().dark;
       } else {
-        console.at({x, y}) = TCOD_ConsoleTile{
-            ' ', tcod::ColorRGB{0, 0, 0}, tcod::ColorRGB{0, 0, 0}};
+        console.at({x, y}) = TCOD_ConsoleTile{' ', BLACK_DARK, BLACK_DARK};
       }
     }
   }

@@ -85,9 +85,6 @@ void Engine::render() {
     }
   }
   health_bar_->render(g_console);
-  if (show_history_view_) {
-    history_window_->render(g_console);
-  }
 
   message_log_->render(g_console, 23, 35, 45, 5);
   auto entities_at = entities_->get_entities_at(controller_.cursor);
@@ -103,6 +100,10 @@ void Engine::render() {
         WHITE,
         std::nullopt,
         TCOD_LEFT);
+  }
+  if (show_history_view_) {
+    // TODO: bug where not overlayig the message log
+    history_window_->render(g_console);
   }
   g_context.present(g_console);
 }
