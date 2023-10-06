@@ -15,6 +15,7 @@
 namespace cpprl {
 
 class InputHandler;
+class GameInputHandler;
 class GameEntity;
 class Map;
 
@@ -30,7 +31,9 @@ class Engine {
   std::unique_ptr<InputHandler> input_handler_;
   tcod::Context context_;
   Controller controller_;
+  bool is_paused_ = false;
   bool game_over_ = false;
+  bool show_history_view_ = false;
 
   void generate_map(int width, int height);
   void handle_enemy_turns();
@@ -47,6 +50,9 @@ class Engine {
   void reset_game();
   MessageLog& get_message_log() { return *message_log_; }
   Controller& get_controller() { return controller_; }
+  void toggle_pause() { is_paused_ = !is_paused_; }
+  void toggle_history_view() { show_history_view_ = !show_history_view_; }
+  void set_input_handler(std::unique_ptr<InputHandler> input_handler);
 };
 }  // namespace cpprl
 #endif

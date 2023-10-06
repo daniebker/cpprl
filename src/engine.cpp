@@ -46,15 +46,6 @@ Engine::Engine(int argc, char** argv)
   generate_map(80, 35);
   message_log_ = new MessageLog();
   message_log_->add_message("Welcome to your eternal doom!", RED);
-  message_log_->add_message("Welcome to your eternal DOOM!", RED);
-  message_log_->add_message("Welcome to your eternal DOOOM!", RED);
-  message_log_->add_message("Welcome to your eternal DOOOOOOM!", RED);
-  message_log_->add_message("Welcome to your eternal DOOOOOOOOOM!", RED);
-  message_log_->add_message(
-      "And what happens if we have a really really really really really really "
-      "really really really reallu "
-      "looooooooooooooooooooooooooooooooooooooooooooooooooooong message o",
-      RED);
   history_window_ = new HistoryWindow(80, 40, {22, 10}, *message_log_);
   input_handler_ = std::make_unique<GameInputHandler>(*this, *player_);
 }
@@ -72,7 +63,7 @@ void Engine::handle_events() {
     if (event.type == SDL_KEYDOWN) {
       EngineEvent& command = input_handler_->handle_input(event);
       command.execute();
-      if (!game_over_) {
+      if (!game_over_ && !is_paused_) {
         handle_enemy_turns();
       }
     } else if (event.type == SDL_MOUSEMOTION) {
@@ -113,7 +104,9 @@ void Engine::render() {
     }
   }
   health_bar_->render(g_console);
-  history_window_->render(g_console);
+  if (show_history_view_) {
+    history_window_->render(g_console);
+  }
 
   message_log_->render(g_console, 23, 35, 45, 5);
   auto entities_at = entities_->get_entities_at(controller_.cursor);
@@ -151,7 +144,7 @@ void Engine::reset_game() {
   // player is already freed?
   // delete player_;
   entities_->clear();
-  delete health_bar_;
+  // delete health_bar_;
   delete map_;
   dungeon_ = nullptr;
   entities_ = nullptr;
@@ -159,6 +152,10 @@ void Engine::reset_game() {
   map_ = nullptr;
   health_bar_ = nullptr;
   generate_map(80, 40);
-  input_handler_ = std::make_unique<GameInputHandler>(*this, *player_);
+  set_input_handler(std::make_unique<GameInputHandler>(*this, *player_));
+}
+
+void Engine::set_input_handler(std::unique_ptr<InputHandler> input_handler) {
+  input_handler_ = std::move(input_handler);
 }
 }  // namespace cpprl

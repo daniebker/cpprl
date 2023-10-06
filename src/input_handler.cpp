@@ -60,6 +60,9 @@ EngineEvent& GameInputHandler::handle_input(SDL_Event event) {
     case SDLK_RIGHT:
       return buttonRight;
       break;
+    case SDLK_v:
+      return viewHistoryCommand;
+      break;
     default:
       return InputHandler::handle_input(event);
       break;
@@ -77,4 +80,16 @@ EngineEvent& MenuInputHandler::handle_input(SDL_Event event) {
       break;
   }
 };
+
+EngineEvent& HistoryViewInputHandler::handle_input(SDL_Event event) {
+  SDL_Keycode key = event.key.keysym.sym;
+  switch (key) {
+    case SDLK_q:
+      return closeViewCommand_;
+      break;
+    default:
+      return InputHandler::handle_input(event);
+      break;
+  }
+}
 }  // namespace cpprl
