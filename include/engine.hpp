@@ -10,6 +10,7 @@
 #include "entity_manager.hpp"
 #include "globals.hpp"
 #include "message_log.hpp"
+#include "rendering.hpp"
 #include "ui_window.hpp"
 
 namespace cpprl {
@@ -29,6 +30,7 @@ class Engine {
   MessageLog* message_log_;
   UiWindow* history_window_;
   std::unique_ptr<InputHandler> input_handler_;
+  std::unique_ptr<Renderer> renderer_;
   tcod::Context context_;
   Controller controller_;
   bool is_paused_ = false;

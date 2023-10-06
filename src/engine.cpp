@@ -1,4 +1,5 @@
-#include "../include/engine.hpp"
+
+#include "engine.hpp"
 
 #include <SDL2/SDL.h>
 
@@ -22,27 +23,11 @@ Engine::Engine(int argc, char** argv)
       map_(nullptr),
       message_log_(nullptr),
       history_window_(nullptr),
-      input_handler_(nullptr) {
+      input_handler_(nullptr),
+      renderer_(nullptr) {
   dungeon_ = std::make_unique<Dungeon>();
   entities_ = std::make_unique<EntityManager>();
-  auto params = TCOD_ContextParams{};
-  params.tcod_version = TCOD_COMPILEDVERSION;
-  params.argc = argc;
-  params.argv = argv;
-  params.renderer_type = TCOD_RENDERER_SDL2;
-  params.vsync = 1;
-  params.sdl_window_flags = SDL_WINDOW_RESIZABLE;
-  params.window_title = "rogue_like";
-
-  auto tileset = tcod::load_tilesheet(
-      cpprl::util::get_data_dir() / "dejavu16x16_gs_tc.png",
-      {32, 8},
-      tcod::CHARMAP_TCOD);
-  params.tileset = tileset.get();
-  g_console = tcod::Console{80, 40};
-  params.console = g_console.get();
-
-  g_context = tcod::Context(params);
+  renderer_ = std::make_unique<TCODRenderer>(argc, argv);
   generate_map(80, 35);
   message_log_ = new MessageLog();
   message_log_->add_message("Welcome to your eternal doom!", RED);
@@ -89,18 +74,14 @@ void Engine::generate_map(int width, int height) {
 }
 
 void Engine::render() {
-  map_->compute_fov(player_->get_position(), 10);
+  map_->compute_fov(player_->get_transform_component().position, 10);
   map_->render(g_console);
 
   for (GameEntity entity : *entities_) {
     // TODO: Entity should have a render function
-    if (map_->is_in_fov(entity.get_position())) {
-      tcod::print(
-          g_console,
-          entity.get_position(),
-          entity.get_symbol(),
-          entity.get_colour(),
-          std::nullopt);
+    if (map_->is_in_fov(entity.get_transform_component().position)) {
+      renderer_->render(
+          entity.get_sprite_component(), entity.get_transform_component());
     }
   }
   health_bar_->render(g_console);

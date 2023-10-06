@@ -13,18 +13,27 @@ class GameEntity {
  public:
   GameEntity(
       std::string name,
-      Vector2D position,
-      std::string_view symbol,
-      const tcod::ColorRGB& colour,
       bool blocker,
+      TransformComponent transformComponent,
+      SpriteComponent spriteComponent,
       AttackComponent attackComponent,
       DefenseComponent defenseComponent);
 
   void move(Vector2D& vector2D);
-  std::string_view get_symbol() { return symbol_; };
-  tcod::ColorRGB get_colour() { return colour_; };
-  Vector2D get_position() { return position_; };
-  void set_position(Vector2D position) { position_ = position; };
+  [[deprecated("Use get_sprite_component()")]] std::string_view get_symbol() {
+    return spriteComponent_.symbol;
+  };
+  [[deprecated("Use get_sprite_component()")]] tcod::ColorRGB get_colour() {
+    return spriteComponent_.colour;
+  };
+  [[deprecated("Use get_transform_component()")]] Vector2D get_position() {
+    return transformComponent_.position;
+  };
+  void set_position(Vector2D position) {
+    transformComponent_.position = position;
+  };
+  TransformComponent& get_transform_component() { return transformComponent_; };
+  SpriteComponent& get_sprite_component() { return spriteComponent_; };
   bool is_blocking() { return blocker_; };
   std::string get_name() { return name_; };
   void act(Engine& engine);
@@ -37,17 +46,19 @@ class GameEntity {
 
  private:
   std::string name_;
-  Vector2D position_;
-  std::string_view symbol_;
-  tcod::ColorRGB colour_;
+  // PhysicsComponent physicsComponent_;
   bool blocker_;
+  TransformComponent transformComponent_;
+  SpriteComponent spriteComponent_;
   AttackComponent attackComponent_;
   DefenseComponent defenseComponent_;
 };
 
-static const GameEntity PLAYER{"player", {0, 0}, "@", RED, true, {5}, {2, 30}};
-static const GameEntity ORC{"orc", {0, 0}, "o", WHITE, true, {3}, {0, 10}};
-static const GameEntity TROLL{"troll", {0, 0}, "T", WHITE, true, {4}, {1, 16}};
+static const GameEntity PLAYER{
+    "player", true, {0, 0}, {"@", RED}, {5}, {2, 30}};
+static const GameEntity ORC{"orc", true, {0, 0}, {"o", WHITE}, {3}, {0, 10}};
+static const GameEntity TROLL{
+    "troll", true, {0, 0}, {"T", WHITE}, {4}, {1, 16}};
 }  // namespace cpprl
 
 #endif

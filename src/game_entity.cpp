@@ -8,21 +8,19 @@
 namespace cpprl {
 GameEntity::GameEntity(
     std::string name,
-    Vector2D position,
-    std::string_view symbol,
-    const tcod::ColorRGB& colour,
     bool blocker,
+    TransformComponent transformComponent,
+    SpriteComponent spriteComponent,
     AttackComponent attackComponent,
     DefenseComponent defenseComponent)
     : name_(name),
-      position_(position),
-      symbol_(symbol),
-      colour_(colour),
+      transformComponent_(transformComponent),
+      spriteComponent_(spriteComponent),
       blocker_(blocker),
       attackComponent_(attackComponent),
       defenseComponent_(defenseComponent) {}
 
-void GameEntity::move(cpprl::Vector2D& vector2D) { position_ = vector2D; }
+void GameEntity::move(cpprl::Vector2D& vector2D) { set_position(vector2D); }
 
 void GameEntity::act(Engine& engine) {
   if (name_ != "player") {
@@ -33,7 +31,7 @@ void GameEntity::act(Engine& engine) {
 
 void GameEntity::die() {
   blocker_ = false;
-  symbol_ = "%";
-  colour_ = DARK_RED;
+  spriteComponent_.symbol = "%";
+  spriteComponent_.colour = DARK_RED;
 }
 }  // namespace cpprl
