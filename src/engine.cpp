@@ -29,7 +29,7 @@ Engine::Engine(int argc, char** argv)
   entities_ = std::make_unique<EntityManager>();
   renderer_ = std::make_unique<TCODRenderer>(argc, argv);
   generate_map(80, 35);
-  message_log_ = new MessageLog();
+  message_log_ = std::make_unique<MessageLog>();
   message_log_->add_message("Welcome to your eternal doom!", RED);
   history_window_ = new HistoryWindow(80, 40, {22, 10}, *message_log_);
   input_handler_ = std::make_unique<GameInputHandler>(*this, *player_);

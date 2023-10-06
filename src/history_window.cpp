@@ -8,6 +8,14 @@ void HistoryWindow::render(tcod::Console& parent_console) const {
   auto messages = message_log_.get_messages();
 
   console_->clear();
+  static constexpr std::array<int, 9> LEGEND = {
+      '0', '1', '2', '3', ' ', '5', '.', '_', '8'};
+  tcod::draw_frame(
+      *console_,
+      {0, 0, console_->getWidth(), console_->getHeight()},
+      LEGEND,
+      WHITE,
+      BLACK);
 
   int y_offset = console_->getHeight() - 1;
   for (auto it = messages.rbegin(); it != messages.rend(); ++it) {
@@ -40,6 +48,6 @@ void HistoryWindow::render(tcod::Console& parent_console) const {
       {4, -4},
       {0, 0, console_->getWidth(), console_->getHeight()},
       1.0f,
-      0.2f);
+      1.0f);
 }
 }  // namespace cpprl

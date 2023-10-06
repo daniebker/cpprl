@@ -27,7 +27,7 @@ class Engine {
   GameEntity* player_;
   UiWindow* health_bar_;
   Map* map_;
-  MessageLog* message_log_;
+  std::unique_ptr<MessageLog> message_log_;
   UiWindow* history_window_;
   std::unique_ptr<InputHandler> input_handler_;
   std::unique_ptr<Renderer> renderer_;
