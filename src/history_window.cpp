@@ -9,7 +9,7 @@ void HistoryWindow::render(tcod::Console& parent_console) const {
 
   console_->clear();
   static constexpr std::array<int, 9> LEGEND = {
-      '0', '1', '2', '3', ' ', '5', '.', '_', '8'};
+      '+', '-', '+', '|', ' ', '|', '+', '-', '+'};
   tcod::draw_frame(
       *console_,
       {0, 0, console_->getWidth(), console_->getHeight()},
@@ -27,11 +27,11 @@ void HistoryWindow::render(tcod::Console& parent_console) const {
     }
     {
       auto line =
-          std::make_unique<TCODConsole>(console_->getWidth(), line_height);
+          std::make_unique<TCODConsole>(console_->getWidth() - 2, line_height);
 
       tcod::print_rect(
           *console_,
-          {0, 0 + y_offset, console_->getWidth(), line_height},
+          {1, -1 + y_offset, console_->getWidth() - 1, line_height},
           it->full_text(),
           it->colour_,
           std::nullopt,
@@ -45,8 +45,8 @@ void HistoryWindow::render(tcod::Console& parent_console) const {
   tcod::blit(
       parent_console,
       *console_,
-      {4, -4},
-      {0, 0, console_->getWidth(), console_->getHeight()},
+      {3, 3},
+      {position_.x, position_.y, console_->getWidth(), console_->getHeight()},
       1.0f,
       1.0f);
 }
