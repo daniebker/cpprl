@@ -7,6 +7,7 @@
 
 #include "events/engine_event.hpp"
 #include "health_bar.hpp"
+#include "history_window.hpp"
 #include "input_handler.hpp"
 #include "types/math.hpp"
 #include "util.hpp"
@@ -20,6 +21,7 @@ Engine::Engine(int argc, char** argv)
       health_bar_(nullptr),
       map_(nullptr),
       message_log_(nullptr),
+      history_window_(nullptr),
       input_handler_(nullptr) {
   dungeon_ = std::make_unique<Dungeon>();
   entities_ = std::make_unique<EntityManager>();
@@ -42,8 +44,18 @@ Engine::Engine(int argc, char** argv)
 
   g_context = tcod::Context(params);
   generate_map(80, 35);
-  message_log_ = new MessageLog(5);
+  message_log_ = new MessageLog();
   message_log_->add_message("Welcome to your eternal doom!", RED);
+  message_log_->add_message("Welcome to your eternal DOOM!", RED);
+  message_log_->add_message("Welcome to your eternal DOOOM!", RED);
+  message_log_->add_message("Welcome to your eternal DOOOOOOM!", RED);
+  message_log_->add_message("Welcome to your eternal DOOOOOOOOOM!", RED);
+  message_log_->add_message(
+      "And what happens if we have a really really really really really really "
+      "really really really reallu "
+      "looooooooooooooooooooooooooooooooooooooooooooooooooooong message o",
+      RED);
+  history_window_ = new HistoryWindow(80, 40, {22, 10}, *message_log_);
   input_handler_ = std::make_unique<GameInputHandler>(*this, *player_);
 }
 
@@ -101,6 +113,7 @@ void Engine::render() {
     }
   }
   health_bar_->render(g_console);
+  history_window_->render(g_console);
 
   message_log_->render(g_console, 23, 35, 45, 5);
   auto entities_at = entities_->get_entities_at(controller_.cursor);

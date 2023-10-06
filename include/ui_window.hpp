@@ -11,13 +11,14 @@ class TCODConsole;
 namespace cpprl {
 class UiWindow {
  protected:
-  Vector2D position_;
   int width_, height_;
+  Vector2D position_;
+  std::unique_ptr<TCODConsole> console_;
 
  public:
   UiWindow(std::size_t width, std::size_t height, Vector2D position);
 
-  virtual void render(tcod::Console& console) const;
+  virtual void render(tcod::Console& parent_console) const;
 };
 }  // namespace cpprl
 

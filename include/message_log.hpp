@@ -51,6 +51,11 @@ class MessageLog {
       std::string text, tcod::ColorRGB color = WHITE, bool stack = true);
 
   /**
+   * Get the messages in this log
+   */
+  std::vector<Message> get_messages() const { return messages_; }
+
+  /**
    * Renders a log message in the given area.
    */
   void render(

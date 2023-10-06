@@ -32,18 +32,24 @@ void MessageLog::render_messages(
   int y_offset = 0;
   for (auto it = messages_.rbegin(); it != messages_.rend(); ++it) {
     const Message& message = *it;
+    int line_height = tcod::get_height_rect(width, it->full_text());
+
+    if (line_height > 1) {
+      y_offset += line_height - 1;
+    }
+
     if (y_offset >= height) {
       break;
     }
     std::string text = message.full_text();
     tcod::print_rect(
         console,
-        {x, y + y_offset, width, height},
+        {x, y - y_offset, width, line_height},
         message.full_text(),
         message.colour_,
         std::nullopt,
         TCOD_LEFT);
-    y_offset += 1;
+    y_offset++;
   }
 }
 }  // namespace cpprl
