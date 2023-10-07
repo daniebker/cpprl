@@ -1,64 +1,89 @@
 #ifndef GAME_ENTITY_H
 #define GAME_ENTITY_H
+
 #include <libtcod.hpp>
 #include <string_view>
 
+#include "basic_ai_component.hpp"
 #include "colours.hpp"
 #include "components.hpp"
 #include "types/math.hpp"
 
 namespace cpprl {
 class Engine;
-class GameEntity {
- public:
-  GameEntity(
-      std::string name,
-      bool blocker,
-      TransformComponent transformComponent,
-      SpriteComponent spriteComponent,
-      AttackComponent attackComponent,
-      DefenseComponent defenseComponent);
-
-  void move(Vector2D& vector2D);
-  [[deprecated("Use get_sprite_component()")]] std::string_view get_symbol() {
-    return spriteComponent_.symbol;
-  };
-  [[deprecated("Use get_sprite_component()")]] tcod::ColorRGB get_colour() {
-    return spriteComponent_.colour;
-  };
-  [[deprecated("Use get_transform_component()")]] Vector2D get_position() {
-    return transformComponent_.position;
-  };
-  void set_position(Vector2D position) {
-    transformComponent_.position = position;
-  };
-  TransformComponent& get_transform_component() { return transformComponent_; };
-  SpriteComponent& get_sprite_component() { return spriteComponent_; };
-  bool is_blocking() { return blocker_; };
-  std::string get_name() { return name_; };
-  void act(Engine& engine);
-  void die();
-  bool is_dead() { return defenseComponent_.hp <= 0; };
-  bool is_not_dead() { return !is_dead(); };
-  AttackComponent& get_attack_component() { return attackComponent_; };
-  DefenseComponent& get_defense_component() { return defenseComponent_; };
-  void take_damage(int damage) { defenseComponent_.hp -= damage; };
-
- private:
+class Entity {
+ protected:
   std::string name_;
   // PhysicsComponent physicsComponent_;
   bool blocker_;
-  TransformComponent transformComponent_;
-  SpriteComponent spriteComponent_;
-  AttackComponent attackComponent_;
-  DefenseComponent defenseComponent_;
+  TransformComponent* transformComponent_;
+  ASCIIComponent* asciiComponent_;
+  AttackComponent* attackComponent_;
+  DefenseComponent* defenseComponent_;
+  ConsumableComponent* consumableComponent_;
+  AIComponent* aiComponent_;
+  Container* container_;
+
+ public:
+  Entity(
+      std::string name,
+      bool blocker,
+      TransformComponent* transformComponent,
+      ASCIIComponent* asciiComponent)
+      : name_(name),
+        blocker_(blocker),
+        transformComponent_(std::move(transformComponent)),
+        asciiComponent_(std::move(asciiComponent)),
+        attackComponent_(nullptr),
+        defenseComponent_(nullptr),
+        consumableComponent_(nullptr),
+        aiComponent_(nullptr),
+        container_(nullptr) {}
+
+  ~Entity() {
+    if (attackComponent_) delete attackComponent_;
+    if (defenseComponent_) delete defenseComponent_;
+    if (consumableComponent_) delete consumableComponent_;
+    if (aiComponent_) delete aiComponent_;
+    if (container_) delete container_;
+    if (transformComponent_) delete transformComponent_;
+    if (asciiComponent_) delete asciiComponent_;
+  };
+
+  TransformComponent* get_transform_component() { return transformComponent_; };
+  ASCIIComponent* get_sprite_component() { return asciiComponent_; };
+  AttackComponent* get_attack_component() { return attackComponent_; };
+  DefenseComponent* get_defense_component() { return defenseComponent_; };
+  ConsumableComponent* get_consumable_component() {
+    return consumableComponent_;
+  };
+   AIComponent* get_ai_component() { return aiComponent_; };
+   Container* get_container() { return container_; };
+
+   bool is_blocking() { return blocker_; };
+   std::string get_name() { return name_; };
+
+   void update(Engine& engine);
+   void set_blocking(bool blocker) { blocker_ = blocker; };
+   void set_name(std::string name) { name_ = name; };
+   void set_ascii_component(ASCIIComponent* asciiComponent) {
+     asciiComponent_ = asciiComponent;
+   };
+   void set_defense_component(DefenseComponent* defenseComponent) {
+     defenseComponent_ = defenseComponent;
+   };
+  void set_attack_component(AttackComponent* attackComponent) {
+    attackComponent_ = attackComponent;
+  };
+  void set_consumable_component(ConsumableComponent* consumableComponent) {
+    consumableComponent_ = consumableComponent;
+  };
+  void set_ai_component(AIComponent* aiComponent) {
+    aiComponent_ = aiComponent;
+  };
+  void set_container(Container* container) { container_ = container; };
 };
 
-static const GameEntity PLAYER{
-    "player", true, {0, 0}, {"@", RED}, {5}, {2, 30}};
-static const GameEntity ORC{"orc", true, {0, 0}, {"o", WHITE}, {3}, {0, 10}};
-static const GameEntity TROLL{
-    "troll", true, {0, 0}, {"T", WHITE}, {4}, {1, 16}};
 }  // namespace cpprl
 
 #endif

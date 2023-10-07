@@ -6,7 +6,7 @@ namespace cpprl {
 
 class MeleeCommand : DirectionalCommand {
  public:
-  MeleeCommand(Engine& engine, GameEntity& entity, Vector2D target_vector)
+  MeleeCommand(Engine& engine, Entity* entity, Vector2D target_vector)
       : DirectionalCommand(engine, entity, target_vector){};
   void execute();
 };

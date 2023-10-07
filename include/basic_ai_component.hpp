@@ -3,29 +3,19 @@
 
 namespace cpprl {
 class Engine;
-class GameEntity;
+class Entity;
 
-class BasicAIComponent {
+class AIComponent {
  public:
-  virtual ~BasicAIComponent() = default;
-  virtual void update(Engine& engine) = 0;
+  AIComponent(){};
+  virtual ~AIComponent() = default;
+  virtual void update(Engine& engine, Entity* entity) = 0;
 };
 
-class BaseBasicAI : BasicAIComponent {
+class HostileAI final : public AIComponent {
  public:
-  BaseBasicAI(GameEntity& entity) : entity_(entity) {}
-  virtual ~BaseBasicAI() = default;
-  virtual void update(Engine& engine) = 0;
-
- protected:
-  GameEntity& entity_;
-};
-
-class HostileAI : BaseBasicAI {
- public:
-  HostileAI(GameEntity& entity) : BaseBasicAI(entity) {}
-  virtual ~HostileAI() = default;
-  virtual void update(Engine& engine) override;
+  HostileAI() : AIComponent(){};
+  void update(Engine& engine, Entity* entity) override;
 };
 }  // namespace cpprl
 

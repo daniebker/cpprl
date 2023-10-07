@@ -16,4 +16,9 @@ static constexpr auto BLUE = tcod::ColorRGB{0, 0, 255};
 static constexpr auto DARK_BLUE = tcod::ColorRGB{0, 0, 191};
 
 static constexpr auto BAR_TEXT = WHITE;
+static constexpr auto INVALID = tcod::ColorRGB{0xFF, 0xFF, 0x00};
+static constexpr auto IMPOSSIBLE = tcod::ColorRGB(0x80, 0x80, 0x80);
+static constexpr auto ERROR = tcod::ColorRGB(0xFF, 0x40, 0x40);
+static constexpr auto HEALTH_RECOVERED = tcod::ColorRGB(0x0, 0xFF, 0x0);
+
 }  // namespace cpprl

@@ -22,16 +22,17 @@ bool can_path_to_target(tcod::BresenhamLine& path, Engine& engine) {
   return true;
 }
 
-void HostileAI::update(Engine& engine) {
-  Vector2D position = entity_.get_position();
+void HostileAI::update(Engine& engine, Entity* entity) {
+  Vector2D position = entity->get_transform_component()->get_position();
   if (engine.get_map()->is_in_fov(position)) {
-    GameEntity& player = engine.get_player();
-    Vector2D player_position = player.get_position();
+    Entity* player = engine.get_player();
+    Vector2D player_position =
+        player->get_transform_component()->get_position();
     Vector2D delta = player_position - position;
 
     int distance = std::max(std::abs(delta.x), std::abs(delta.y));
     if (distance <= 1) {
-      auto melee_command = MeleeCommand(engine, entity_, delta);
+      auto melee_command = MeleeCommand(engine, entity, delta);
       melee_command.execute();
     }
 
@@ -42,7 +43,7 @@ void HostileAI::update(Engine& engine) {
       auto dest = path[0];
       auto destination = Vector2D{dest[0], dest[1]} - position;
 
-      auto action = MovementCommand(engine, entity_, destination);
+      auto action = MovementCommand(engine, entity, destination);
       action.execute();
 
       return;

@@ -11,6 +11,6 @@ void DieEvent::execute() {
   }
   engine_.get_message_log().add_message(
       fmt::format("{} has died!", util::capitalize(entity_.get_name())));
-  entity_.die();
+  entity_.get_defense_component()->die(entity_);
 }
 }  // namespace cpprl

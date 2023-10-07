@@ -13,9 +13,9 @@ HealthBar::HealthBar(
     int width, int height, Vector2D position, DefenseComponent& defense)
     : UiWindow(width, height, position), health_(defense) {}
 
-void HealthBar::render(tcod::Console& console) const {
-  const auto bar_width =
-      (int)((float)health_.hp / (float)health_.max_hp * (float)width_);
+void HealthBar::render(tcod::Console& console) {
+  const auto bar_width = (int)((float)health_.get_hp() /
+                               (float)health_.get_max_hp() * (float)width_);
   tcod::draw_rect(
       console,
       {position_.x, position_.y, width_, height_},
@@ -35,7 +35,7 @@ void HealthBar::render(tcod::Console& console) const {
   tcod::print_rect(
       console,
       {position_.x, position_.y, width_, height_},
-      fmt::format("HP: {}/{}", health_.hp, health_.max_hp),
+      fmt::format("HP: {}/{}", health_.get_hp(), health_.get_max_hp()),
       WHITE,
       std::nullopt,
       TCOD_CENTER);

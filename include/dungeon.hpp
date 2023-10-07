@@ -1,4 +1,5 @@
-#pragma once
+#ifndef DUNGEON_HPP
+#define DUNGEON_HPP
 
 #include <vector>
 
@@ -24,3 +25,5 @@ class Dungeon {
   Map* generate(DungeonConfig config);
 };
 }  // namespace cpprl
+
+#endif

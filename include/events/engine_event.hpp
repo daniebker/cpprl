@@ -1,6 +1,7 @@
-#pragma once
+#ifndef ENGINE_EVENT_HPP
+#define ENGINE_EVENT_HPP
 
-#include "../engine.hpp"
+#include "engine.hpp"
 
 namespace cpprl {
 class EngineEvent {
@@ -25,3 +26,5 @@ class ResetGameCommand : public EngineEvent {
   void execute() override { engine_.reset_game(); }
 };
 }  // namespace cpprl
+
+#endif
