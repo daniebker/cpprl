@@ -84,6 +84,21 @@ EngineEvent& MenuInputHandler::handle_input(SDL_Event event) {
 EngineEvent& HistoryViewInputHandler::handle_input(SDL_Event event) {
   SDL_Keycode key = event.key.keysym.sym;
   switch (key) {
+    case SDLK_j:
+      return scrollDownCommand_;
+      break;
+    case SDLK_k:
+      return scrollUpCommand_;
+      break;
+    case SDLK_HOME:
+      return jumpToHome_;
+      break;
+    case SDLK_PAGEUP:
+      return jumpUpCommand_;
+      break;
+    case SDLK_PAGEDOWN:
+      return jumpDownCommand_;
+      break;
     case SDLK_q:
       return closeViewCommand_;
       break;
@@ -92,4 +107,5 @@ EngineEvent& HistoryViewInputHandler::handle_input(SDL_Event event) {
       break;
   }
 }
+
 }  // namespace cpprl

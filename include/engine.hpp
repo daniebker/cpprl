@@ -55,6 +55,7 @@ class Engine {
   void toggle_pause() { is_paused_ = !is_paused_; }
   void toggle_history_view() { show_history_view_ = !show_history_view_; }
   void set_input_handler(std::unique_ptr<InputHandler> input_handler);
+  void scroll_current_view(int scroll_amount);
 };
 }  // namespace cpprl
 #endif

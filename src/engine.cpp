@@ -31,6 +31,13 @@ Engine::Engine(int argc, char** argv)
   generate_map(80, 35);
   message_log_ = std::make_unique<MessageLog>();
   message_log_->add_message("Welcome to your eternal doom!", RED);
+  message_log_->add_message("May you travel safe", RED);
+  message_log_->add_message(
+      "Use W, A, S, D, Q, E, Z, C to move around the map. ", RED);
+  message_log_->add_message("Press ESC to quit.", RED);
+  message_log_->add_message("V opens your message log.", RED);
+  message_log_->add_message(
+      "Use J, K, PG U, PG D to scroll through messages. Use Q to quit.", RED);
   history_window_ = new HistoryWindow(80, 40, {0, 0}, *message_log_);
   input_handler_ = std::make_unique<GameInputHandler>(*this, *player_);
 }
@@ -101,8 +108,8 @@ void Engine::render() {
         std::nullopt,
         TCOD_LEFT);
   }
+  // Print window overlays last.
   if (show_history_view_) {
-    // TODO: bug where not overlayig the message log
     history_window_->render(g_console);
   }
   g_context.present(g_console);
@@ -139,5 +146,10 @@ void Engine::reset_game() {
 
 void Engine::set_input_handler(std::unique_ptr<InputHandler> input_handler) {
   input_handler_ = std::move(input_handler);
+}
+void Engine::scroll_current_view(int scroll_amount) {
+  if (show_history_view_) {
+    history_window_->set_cursor(history_window_->get_cursor() + scroll_amount);
+  }
 }
 }  // namespace cpprl

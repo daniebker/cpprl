@@ -8,6 +8,7 @@
 #include "events/directional_command.hpp"
 #include "events/engine_event.hpp"
 #include "events/quit_command.hpp"
+#include "events/scroll_command.hpp"
 #include "events/view_history_command.hpp"
 #include "globals.hpp"
 
@@ -71,10 +72,22 @@ class MenuInputHandler final : public InputHandler {
 class HistoryViewInputHandler final : public InputHandler {
  private:
   CloseViewCommand closeViewCommand_;
+  ScrollCommand scrollDownCommand_;
+  ScrollCommand scrollUpCommand_;
+  ScrollCommand jumpUpCommand_;
+  ScrollCommand jumpDownCommand_;
+  ScrollCommand jumpToHome_;
 
  public:
   HistoryViewInputHandler(Engine& engine)
-      : InputHandler(engine), closeViewCommand_(engine){};
+      : InputHandler(engine),
+        closeViewCommand_(engine),
+        scrollDownCommand_(engine, -1),
+        scrollUpCommand_(engine, 1),
+        jumpUpCommand_(engine, -10),
+        jumpDownCommand_(engine, 10),
+        jumpToHome_(engine, 0){};
+
   virtual EngineEvent& handle_input(SDL_Event event) override;
 };
 

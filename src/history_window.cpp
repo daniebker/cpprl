@@ -1,11 +1,18 @@
 #include "history_window.hpp"
 
+#include <algorithm>
+
 #include "colours.hpp"
 
 namespace cpprl {
 
 void HistoryWindow::render(tcod::Console& parent_console) const {
-  auto messages = message_log_.get_messages();
+  std::vector<Message> allMessages(message_log_.get_messages());
+  int allMessagesIntSize = static_cast<int>(allMessages.size());
+  int start = std::min(allMessagesIntSize, cursor_);
+
+  std::vector<Message> messages =
+      std::vector<Message>(allMessages.rbegin() + start, allMessages.rend());
 
   console_->clear();
 
@@ -15,7 +22,7 @@ void HistoryWindow::render(tcod::Console& parent_console) const {
   static constexpr int BORDER_VERTICAL = 0x2502;  // '│' in Unicode
   static constexpr int BORDER_SPACE = 0x0020;  // Space character
   static constexpr int BORDER_BOTTOM_LEFT = 0x2514;  // '└' in Unicode
-  static constexpr int BORDER_BOTTOM_RIGHT = 0x2518;  // '┘' in Unicode
+  static constexpr int BORDER_BOTTOM_RIGHT = 0x2518;  // '┘' in Unicod+ cursor_e
 
   static constexpr std::array<int, 9> LEGEND = {
       BORDER_TOP_LEFT,
@@ -44,7 +51,7 @@ void HistoryWindow::render(tcod::Console& parent_console) const {
       TCOD_CENTER);
 
   int y_offset = console_->getHeight() - 1;
-  for (auto it = messages.rbegin(); it != messages.rend(); ++it) {
+  for (auto it = messages.begin(); it != messages.end(); ++it) {
     int line_height =
         tcod::get_height_rect(console_->getWidth(), it->full_text());
 
@@ -64,7 +71,7 @@ void HistoryWindow::render(tcod::Console& parent_console) const {
           TCOD_LEFT);
     }
     --y_offset;
-    if (y_offset < 0) {
+    if (y_offset <= 0) {
       break;
     }
   }

@@ -8,7 +8,8 @@ UiWindow::UiWindow(std::size_t width, std::size_t height, Vector2D position)
     : width_(width),
       height_(height),
       position_(position),
-      console_(new TCODConsole(width, height)) {}
+      console_(new TCODConsole(width, height)),
+      cursor_(0) {}
 
 void UiWindow::render(tcod::Console& parent_console) const {
   // no op
