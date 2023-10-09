@@ -45,7 +45,7 @@ void HistoryWindow::render(tcod::Console& parent_console) const {
   tcod::print_rect(
       *console_,
       {0, 0, console_->getWidth(), 1},
-      "Message Log",
+      "┤Message history├",
       WHITE,
       BLACK,
       TCOD_CENTER);
