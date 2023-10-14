@@ -170,6 +170,7 @@ void Engine::set_input_handler(EventHandler* input_handler) {
   delete input_handler_;
   input_handler_ = input_handler;
 }
+
 void Engine::scroll_current_view(int scroll_amount) {
   if (show_view_) {
     current_window_->set_cursor(current_window_->get_cursor() + scroll_amount);
