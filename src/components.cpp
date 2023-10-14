@@ -1,5 +1,7 @@
 #include "components.hpp"
 
+#include <fmt/core.h>
+
 #include <algorithm>
 
 #include "exceptions.hpp"
@@ -59,27 +61,30 @@ bool ConsumableComponent::pick_up(Entity* owner, Entity* wearer) {
   }
   return false;
 }
-bool ConsumableComponent::use(Entity* owner, Entity* wearer) {
+
+ActionResult ConsumableComponent::use(Entity* owner, Entity* wearer) {
   if (wearer->get_container()) {
     wearer->get_container()->remove(owner);
-    return true;
+    return {true, ""};
   }
-  return false;
+  return {false, ""};
 }
 
 HealingConsumable::HealingConsumable(int amount) : amount_(amount){};
 
-bool HealingConsumable::use(Entity* owner, Entity* wearer) {
+ActionResult HealingConsumable::use(Entity* owner, Entity* wearer) {
   if (!wearer->get_defense_component()) {
-    return false;
+    return {false, "There's nothing to heal."};
   }
 
   int amount_healed = wearer->get_defense_component()->heal(amount_);
   if (amount_healed > 0) {
-    return ConsumableComponent::use(owner, wearer);
+    ActionResult result = ConsumableComponent::use(owner, wearer);
+    result.message = fmt::format("You healed for {} HP.", amount_healed);
+    return result;
   }
 
-  throw Impossible("You are already at full health.");
+  return {false, "You are already at full health."};
 }
 
 }  // namespace cpprl

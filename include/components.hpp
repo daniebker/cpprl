@@ -8,6 +8,10 @@
 
 namespace cpprl {
 class Entity;
+struct ActionResult {
+  bool success;
+  std::string message;
+};
 class AttackComponent {
  public:
   AttackComponent(int damage) : damage_(damage) {}
@@ -80,13 +84,13 @@ class ConsumableComponent {
  public:
   virtual ~ConsumableComponent() = default;
   bool pick_up(Entity* owner, Entity* wearer);
-  virtual bool use(Entity* owner, Entity* wearer);
+  virtual ActionResult use(Entity* owner, Entity* wearer);
 };
 
 class HealingConsumable final : public ConsumableComponent {
  public:
   HealingConsumable(int amount);
-  bool use(Entity* owner, Entity* wearer);
+  ActionResult use(Entity* owner, Entity* wearer);
 
  private:
   int amount_;

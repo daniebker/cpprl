@@ -49,10 +49,11 @@ void UseItemCommand::execute() {
   if (!consumable_component) {
     throw Impossible("There's nothing to use.");
   }
-  try {
-    consumable_component->use(item, entity_);
-  } catch (Impossible& e) {
-    engine_.get_message_log().add_message(e.what(), WHITE);
+  ActionResult result = consumable_component->use(item, entity_);
+  if (result.success) {
+    engine_.get_message_log().add_message(result.message, WHITE);
+  } else {
+    throw Impossible(result.message.c_str());
   }
 }
 }  // namespace cpprl
