@@ -2,13 +2,17 @@
 
 #include <SDL2/SDL.h>
 
+#include "util.hpp"
+
 namespace cpprl {
 
 void EntityManager::clear() { entities_.clear(); }
 
-void EntityManager::place_entities(RectangularRoom room, int max_monsters_per_room) {
+void EntityManager::place_entities(
+    RectangularRoom room, int max_monsters_per_room, int max_items_per_room) {
   auto* random = TCODRandom::getInstance();
   int number_of_monsters = random->getInt(0, max_monsters_per_room);
+  int number_of_items = random->getInt(0, max_items_per_room);
 
   for (int i = 0; i < number_of_monsters; i++) {
     Vector2D bottom_left, top_right;
@@ -16,59 +20,108 @@ void EntityManager::place_entities(RectangularRoom room, int max_monsters_per_ro
     int x = random->getInt(bottom_left.x + 1, top_right.x - 1);
     int y = random->getInt(bottom_left.y + 1, top_right.y - 1);
 
-    // Check theres no other monster on this position in the room
-    auto iterator = std::find_if(entities_.begin(), entities_.end(), [x, y](GameEntity& entity) {
-      return entity.get_position() == Vector2D{x, y};
-    });
+    auto iterator = util::find_entity_at(entities_, x, y);
 
     if (iterator != entities_.end()) {
       continue;
     }
 
     if (random->getFloat(0.0f, 1.0f) < 0.8f) {
-      spawn(ORC, {x, y});
+      Entity* entity = new Entity(
+          "orc",
+          true,
+          new TransformComponent(x, y),
+          new ASCIIComponent("o", WHITE, 1));
+      entity->set_defense_component(new DefenseComponent(0, 10));
+      entity->set_attack_component(new AttackComponent(3));
+      entity->set_ai_component(new HostileAI());
+      spawn(entity);
     } else {
-      spawn(TROLL, {x, y});
+      Entity* entity = new Entity(
+          "troll",
+          true,
+          new TransformComponent(x, y),
+          new ASCIIComponent("T", WHITE, 1));
+      entity->set_attack_component(new AttackComponent(4));
+      entity->set_defense_component(new DefenseComponent(1, 16));
+      entity->set_ai_component(new HostileAI());
+      spawn(entity);
     }
   }
-  entities_.shrink_to_fit();
+
+  for (int i = 0; i < number_of_items; i++) {
+    Vector2D bottom_left, top_right;
+    std::tie(bottom_left, top_right) = room.innerBounds();
+    int x = random->getInt(bottom_left.x + 1, top_right.x - 1);
+    int y = random->getInt(bottom_left.y + 1, top_right.y - 1);
+
+    auto iterator = util::find_entity_at(entities_, x, y);
+
+    if (iterator != entities_.end()) {
+      continue;
+    }
+    Entity* entity = new Entity(
+        "healing potion",
+        false,
+        new TransformComponent(x, y),
+        new ASCIIComponent("!", DARK_RED, 0));
+    entity->set_consumable_component(new HealingConsumable(10));
+    spawn(entity);
+  }
 }
 
-GameEntity& EntityManager::spawn(const GameEntity& src) { return entities_.emplace_back(src); }
+Entity* EntityManager::spawn(Entity* src) {
+  return entities_.emplace_back(src);
+}
 
-GameEntity& EntityManager::spawn(const GameEntity& src, Vector2D position) {
-  auto& entity = spawn(src);
+Entity* EntityManager::spawn(Entity* src, Vector2D position) {
+  Entity* entity = spawn(src);
 
-  if (position != entity.get_position()) {
-    entity.set_position(position);
+  if (position != entity->get_transform_component()->get_position()) {
+    entity->get_transform_component()->move(position);
   }
 
   return entity;
 }
 
-GameEntity& EntityManager::spawn_player(Vector2D position) {
-  auto& player = spawn(PLAYER, position);
-  return player;
-}
-
-std::vector<GameEntity*> EntityManager::get_entities_at(Vector2D position) {
-  std::vector<GameEntity*> entities_at_position;
+std::vector<Entity*> EntityManager::get_entities_at(Vector2D position) {
+  std::vector<Entity*> entities_at_position;
   entities_at_position.reserve(entities_.size());
   for (auto& entity : entities_) {
-    if (entity.get_position() == position) {
-      entities_at_position.push_back(&entity);
+    if (entity->get_transform_component()->get_position() == position) {
+      entities_at_position.push_back(entity);
     }
   }
   entities_at_position.shrink_to_fit();
   return entities_at_position;
 }
 
-GameEntity* EntityManager::get_blocking_entity_at(Vector2D position) {
-  for (auto& entity : entities_) {
-    if (entity.is_blocking() && entity.get_position() == position) {
-      return &entity;
+Entity* EntityManager::get_blocking_entity_at(Vector2D position) {
+  for (Entity* entity : entities_) {
+    if (entity->is_blocking() &&
+        entity->get_transform_component()->get_position() == position) {
+      return entity;
     }
   }
   return nullptr;
+}
+
+Entity* EntityManager::get_non_blocking_entity_at(Vector2D position) {
+  for (Entity* entity : entities_) {
+    if (!entity->is_blocking() &&
+        entity->get_transform_component()->get_position() == position) {
+      return entity;
+    }
+  }
+  return nullptr;
+}
+
+void EntityManager::remove(Entity* entity) {
+  entities_.erase(
+      std::remove_if(
+          entities_.begin(),
+          entities_.end(),
+          [&entity](const Entity* e) { return e == entity; }),
+      entities_.end());
 }
 }  // namespace cpprl

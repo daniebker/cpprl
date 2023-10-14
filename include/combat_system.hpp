@@ -4,10 +4,11 @@
 #include "game_entity.hpp"
 
 namespace cpprl::combat_system {
-auto handle_attack = [](GameEntity& attacker, GameEntity& target) -> int {
-  int damage = attacker.get_attack_component().damage - target.get_defense_component().defense;
+auto handle_attack = [](Entity& attacker, Entity& target) -> int {
+  int damage = attacker.get_attack_component()->get_damage() -
+               target.get_defense_component()->get_defense();
   if (damage > 0) {
-    target.take_damage(damage);
+    target.get_defense_component()->take_damage(damage);
     return damage;
   }
   return 0;

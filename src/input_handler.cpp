@@ -6,7 +6,7 @@
 
 namespace cpprl {
 
-EngineEvent& InputHandler::handle_input(SDL_Event event) {
+EngineEvent& EventHandler::handle_sdl_event(SDL_Event event) noexcept {
   SDL_Keycode key = event.key.keysym.sym;
   switch (key) {
     case SDLK_ESCAPE:
@@ -18,7 +18,7 @@ EngineEvent& InputHandler::handle_input(SDL_Event event) {
   }
 };
 
-EngineEvent& GameInputHandler::handle_input(SDL_Event event) {
+EngineEvent& GameInputHandler::handle_sdl_event(SDL_Event event) noexcept {
   // TODO: Move this to its own handler.
   //  probably want an event handler which has
   //  input handler for keyboard and another for mouse
@@ -63,25 +63,31 @@ EngineEvent& GameInputHandler::handle_input(SDL_Event event) {
     case SDLK_v:
       return viewHistoryCommand;
       break;
+    case SDLK_g:
+      return pickupCommand_;
+      break;
+    case SDLK_i:
+      return inventoryCommand_;
+      break;
     default:
-      return InputHandler::handle_input(event);
+      return EventHandler::handle_sdl_event(event);
       break;
   }
 };
 
-EngineEvent& MenuInputHandler::handle_input(SDL_Event event) {
+EngineEvent& MenuInputHandler::handle_sdl_event(SDL_Event event) noexcept {
   SDL_Keycode key = event.key.keysym.sym;
   switch (key) {
     case SDLK_RETURN:
       return resetGameCommand;
       break;
     default:
-      return InputHandler::handle_input(event);
+      return EventHandler::handle_sdl_event(event);
       break;
   }
 };
 
-EngineEvent& HistoryViewInputHandler::handle_input(SDL_Event event) {
+EngineEvent& GuiInputHandler::handle_sdl_event(SDL_Event event) noexcept {
   SDL_Keycode key = event.key.keysym.sym;
   switch (key) {
     case SDLK_j:
@@ -103,7 +109,29 @@ EngineEvent& HistoryViewInputHandler::handle_input(SDL_Event event) {
       return closeViewCommand_;
       break;
     default:
-      return InputHandler::handle_input(event);
+      return EventHandler::handle_sdl_event(event);
+      break;
+  }
+}
+
+EngineEvent& HistoryViewInputHandler::handle_sdl_event(
+    SDL_Event event) noexcept {
+  SDL_Keycode key = event.key.keysym.sym;
+  switch (key) {
+    default:
+      return GuiInputHandler::handle_sdl_event(event);
+      break;
+  }
+}
+
+EngineEvent& InventoryInputHandler::handle_sdl_event(SDL_Event event) noexcept {
+  SDL_Keycode key = event.key.keysym.sym;
+  switch (key) {
+    case (SDLK_RETURN):
+      return selectItemCommand_;
+      break;
+    default:
+      return GuiInputHandler::handle_sdl_event(event);
       break;
   }
 }

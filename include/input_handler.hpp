@@ -8,8 +8,6 @@
 #include "events/directional_command.hpp"
 #include "events/engine_event.hpp"
 #include "events/quit_command.hpp"
-#include "events/scroll_command.hpp"
-#include "events/view_history_command.hpp"
 #include "globals.hpp"
 
 namespace cpprl {
@@ -17,11 +15,12 @@ namespace cpprl {
 class Engine;
 class EngineEvent;
 
-class InputHandler {
+class EventHandler {
  public:
-  InputHandler(Engine& engine)
+  EventHandler(Engine& engine)
       : engine_(engine), noop(engine), quitCommand(engine){};
-  virtual EngineEvent& handle_input(SDL_Event event);
+  virtual ~EventHandler() = default;
+  virtual EngineEvent& handle_sdl_event(SDL_Event event) noexcept = 0;
 
  protected:
   Engine& engine_;
@@ -31,7 +30,7 @@ class InputHandler {
   QuitCommand quitCommand;
 };
 
-class GameInputHandler final : public InputHandler {
+class GameInputHandler final : public EventHandler {
  private:
   DirectionalCommand buttonRight;
   DirectionalCommand buttonUp;
@@ -42,10 +41,12 @@ class GameInputHandler final : public InputHandler {
   DirectionalCommand buttonDownRight;
   DirectionalCommand buttonDownLeft;
   ViewHistoryCommand viewHistoryCommand;
+  PickupCommand pickupCommand_;
+  InventoryCommand inventoryCommand_;
 
  public:
-  GameInputHandler(Engine& engine, GameEntity& controllableEntity)
-      : InputHandler(engine),
+  GameInputHandler(Engine& engine, Entity* controllableEntity)
+      : EventHandler(engine),
         buttonRight(engine_, controllableEntity, Vector2D{1, 0}),
         buttonUp(engine_, controllableEntity, Vector2D{0, -1}),
         buttonDown(engine_, controllableEntity, Vector2D{0, 1}),
@@ -54,23 +55,25 @@ class GameInputHandler final : public InputHandler {
         buttonLeft(engine_, controllableEntity, Vector2D{-1, 0}),
         buttonDownRight(engine_, controllableEntity, Vector2D{1, 1}),
         buttonDownLeft(engine_, controllableEntity, Vector2D{-1, 1}),
-        viewHistoryCommand(engine_){};
+        viewHistoryCommand(engine_),
+        pickupCommand_(engine, controllableEntity),
+        inventoryCommand_(engine, controllableEntity){};
 
-  virtual EngineEvent& handle_input(SDL_Event event) override;
+  virtual EngineEvent& handle_sdl_event(SDL_Event event) noexcept override;
 };
 
-class MenuInputHandler final : public InputHandler {
+class MenuInputHandler final : public EventHandler {
  private:
   ResetGameCommand resetGameCommand;
 
  public:
   MenuInputHandler(Engine& engine)
-      : InputHandler(engine), resetGameCommand(engine){};
-  virtual EngineEvent& handle_input(SDL_Event event) override;
+      : EventHandler(engine), resetGameCommand(engine){};
+  virtual EngineEvent& handle_sdl_event(SDL_Event event) noexcept override;
 };
 
-class HistoryViewInputHandler final : public InputHandler {
- private:
+class GuiInputHandler : public EventHandler {
+ protected:
   CloseViewCommand closeViewCommand_;
   ScrollCommand scrollDownCommand_;
   ScrollCommand scrollUpCommand_;
@@ -79,8 +82,8 @@ class HistoryViewInputHandler final : public InputHandler {
   ScrollCommand jumpToHome_;
 
  public:
-  HistoryViewInputHandler(Engine& engine)
-      : InputHandler(engine),
+  GuiInputHandler(Engine& engine)
+      : EventHandler(engine),
         closeViewCommand_(engine),
         scrollDownCommand_(engine, -1),
         scrollUpCommand_(engine, 1),
@@ -88,7 +91,24 @@ class HistoryViewInputHandler final : public InputHandler {
         jumpDownCommand_(engine, 10),
         jumpToHome_(engine, 0){};
 
-  virtual EngineEvent& handle_input(SDL_Event event) override;
+  virtual EngineEvent& handle_sdl_event(SDL_Event event) noexcept override;
+};
+
+class HistoryViewInputHandler final : public GuiInputHandler {
+ public:
+  HistoryViewInputHandler(Engine& engine) : GuiInputHandler(engine){};
+
+  virtual EngineEvent& handle_sdl_event(SDL_Event event) noexcept override;
+};
+
+class InventoryInputHandler final : public GuiInputHandler {
+ private:
+  SelectItemCommand selectItemCommand_;
+
+ public:
+  InventoryInputHandler(Engine& engine, Entity* entity)
+      : GuiInputHandler(engine), selectItemCommand_(engine, entity){};
+  EngineEvent& handle_sdl_event(SDL_Event event) noexcept override;
 };
 
 }  // namespace cpprl

@@ -5,6 +5,14 @@
 #include "types/math.hpp"
 
 namespace cpprl::util {
+template <typename T>
+inline auto find_entity_at(std::vector<T>& vec, int x, int y) {
+  auto iterator = std::find_if(vec.begin(), vec.end(), [x, y](T& entity) {
+    return entity->get_transform_component()->get_position() == Vector2D{x, y};
+  });
+  return iterator;
+}
+
 inline auto get_data_dir() -> std::filesystem::path {
   static auto root_directory =
       std::filesystem::path{"."};  // Begin at the working directory.
@@ -18,6 +26,7 @@ inline auto get_data_dir() -> std::filesystem::path {
   }
   return root_directory / "data";
 };
+
 inline std::string capitalize(const std::string& string) {
   auto ret = string;
   auto ch = ret[0];
