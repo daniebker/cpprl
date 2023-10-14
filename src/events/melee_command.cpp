@@ -13,33 +13,34 @@
 namespace cpprl {
 
 void MeleeCommand::execute() {
-  auto targetPos = entity_.get_position() + move_vector_;
-  auto* target = engine_.get_entities().get_blocking_entity_at(targetPos);
+  auto targetPos =
+      entity_->get_transform_component()->get_position() + move_vector_;
+  Entity* target = engine_.get_entities().get_blocking_entity_at(targetPos);
 
   tcod::ColorRGB attack_colour = WHITE;
-  if (entity_.get_name() != "player") {
+  if (entity_->get_name() != "player") {
     attack_colour = RED;
   }
 
   if (target) {
-    int damage = combat_system::handle_attack(entity_, *target);
+    int damage = combat_system::handle_attack(*entity_, *target);
     if (damage > 0) {
       std::string message = fmt::format(
           "{} attacks {} for {} hit points.",
-          util::capitalize(entity_.get_name()),
+          util::capitalize(entity_->get_name()),
           util::capitalize(target->get_name()),
           damage);
 
       engine_.get_message_log().add_message(message, attack_colour, true);
 
-      if (target->is_dead()) {
+      if (target->get_defense_component()->is_dead()) {
         auto action = DieEvent(engine_, *target);
         action.execute();
       }
     } else {
       std::string message = fmt::format(
           "{} attacks {} but does no damage.",
-          util::capitalize(entity_.get_name()),
+          util::capitalize(entity_->get_name()),
           util::capitalize(target->get_name()));
 
       engine_.get_message_log().add_message(message, attack_colour, true);

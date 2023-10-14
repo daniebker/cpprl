@@ -14,10 +14,11 @@ class Renderer {
  public:
   Renderer() {}
 
-  virtual void render(SpriteComponent sprite, TransformComponent transform) = 0;
+  virtual void render(
+      ASCIIComponent& sprite, TransformComponent& transform) = 0;
 };
 
-class TCODRenderer final : public Renderer {
+class TCODRenderer : public Renderer {
  public:
   TCODRenderer(int argc, char** argv) : Renderer() {
     g_console = tcod::Console{80, 40};
@@ -38,7 +39,7 @@ class TCODRenderer final : public Renderer {
     g_context = tcod::Context{params};
   };
 
-  virtual void render(SpriteComponent sprite, TransformComponent transform);
+  virtual void render(ASCIIComponent& sprite, TransformComponent& transform);
 };
 }  // namespace cpprl
 #endif

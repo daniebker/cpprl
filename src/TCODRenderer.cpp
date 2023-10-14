@@ -2,12 +2,12 @@
 
 namespace cpprl {
 void TCODRenderer::render(
-    SpriteComponent sprite, TransformComponent transform) {
+    ASCIIComponent& sprite, TransformComponent& transform) {
   tcod::print(
       g_console,
-      transform.position,
-      sprite.symbol,
-      sprite.colour,
+      transform.get_position(),
+      sprite.get_symbol(),
+      sprite.get_colour(),
       std::nullopt);
 }
 }  // namespace cpprl

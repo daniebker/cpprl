@@ -6,8 +6,8 @@ namespace cpprl {
 
 void CloseViewCommand::execute() {
   engine_.toggle_pause();
-  engine_.toggle_history_view();
+  engine_.toggle_view();
   engine_.set_input_handler(
-      std::make_unique<GameInputHandler>(engine_, engine_.get_player()));
+      new GameInputHandler(engine_, engine_.get_player()));
 }
 }  // namespace cpprl

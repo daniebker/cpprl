@@ -11,18 +11,21 @@ class EntityManager {
  public:
   EntityManager() : entities_(){};
   void clear();
-  GameEntity* get_blocking_entity_at(Vector2D position);
-  std::vector<GameEntity*> get_entities_at(Vector2D position);
-  void place_entities(RectangularRoom room, int max_monsters_per_room);
-  GameEntity& spawn(const GameEntity& entity);
-  GameEntity& spawn(const GameEntity& entity, Vector2D position);
-  GameEntity& spawn_player(Vector2D position);
+  Entity* get_blocking_entity_at(Vector2D position);
+  Entity* get_non_blocking_entity_at(Vector2D position);
+  std::vector<Entity*> get_entities_at(Vector2D position);
+  void place_entities(
+      RectangularRoom room, int max_monsters_per_room, int max_items_per_room);
+  Entity* spawn(Entity* entity);
+  Entity* spawn(Entity* entity, Vector2D position);
   void reserve(size_t size) { entities_.reserve(size); }
+  void shrink_to_fit() { entities_.shrink_to_fit(); }
+  void remove(Entity* entity);
 
-  GameEntity& at(int index) { return entities_.at(index); }
+  Entity& at(int index) { return *entities_.at(index); }
 
-  using iterator = std::vector<GameEntity>::iterator;
-  using const_iterator = std::vector<GameEntity>::const_iterator;
+  using iterator = std::vector<Entity*>::iterator;
+  using const_iterator = std::vector<Entity*>::const_iterator;
 
   iterator begin() { return entities_.begin(); }
 
@@ -33,6 +36,6 @@ class EntityManager {
   const_iterator end() const { return entities_.end(); }
 
  private:
-  std::vector<GameEntity> entities_;
+  std::vector<Entity*> entities_;
 };
 }  // namespace cpprl
