@@ -108,7 +108,8 @@ jobs:
           retention-days: 7
           if-no-files-found: error
       # If a tag is pushed then a new archives are uploaded to GitHub Releases automatically.
-       - name: Create Release
+       name: Create Release
+         if: startsWith(github.ref, 'refs/tags/')
          id: create_release
          uses: actions/create-release@v1
          env:
@@ -116,17 +117,17 @@ jobs:
          with:
            tag_name: ${{ github.ref }}
            release_name: Release ${{ github.ref }}
-           draft: false
+           draft: true
            prerelease: false
-      # name: Upload release
-      #   if: startsWith(github.ref, 'refs/tags/')
-      #   uses: svenstaro/upload-release-action@v2
-      #   with:
-      #     repo_token: ${{ secrets.GITHUB_TOKEN }}
-      #     file: ${{ env.archive-name }}*
-      #     file_glob: true
-      #     tag: ${{ github.ref }}
-      #     overwrite: true
+       # name: Upload release
+       #   if: startsWith(github.ref, 'refs/tags/')
+       #   uses: svenstaro/upload-release-action@v2
+       #   with:
+       #     repo_token: ${{ secrets.GITHUB_TOKEN }}
+       #     file: ${{ env.archive-name }}*
+       #     file_glob: true
+       #     tag: ${{ github.ref }}
+       #     overwrite: true
 
   # emscripten:
   #   runs-on: ubuntu-latest
