@@ -112,7 +112,8 @@ jobs:
         if: startsWith(github.ref, 'refs/tags/')
         uses: svenstaro/upload-release-action@v2
         with:
-          file: ${{ env.archive-name }}.*
+          repo_token: ${{ secrets.GITHUB_TOKEN }}
+          file: ${{ env.archive-name }}*
           file_glob: true
           tag: ${{ github.ref }}
           overwrite: true
