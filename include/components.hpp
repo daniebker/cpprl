@@ -8,6 +8,7 @@
 
 namespace cpprl {
 class Entity;
+class Engine;
 struct ActionResult {
   bool success;
   std::string message;
@@ -84,16 +85,26 @@ class ConsumableComponent {
  public:
   virtual ~ConsumableComponent() = default;
   bool pick_up(Entity* owner, Entity* wearer);
-  virtual ActionResult use(Entity* owner, Entity* wearer);
+  virtual ActionResult use(Entity* owner, Entity* wearer, Engine& engine);
 };
 
 class HealingConsumable final : public ConsumableComponent {
  public:
   HealingConsumable(int amount);
-  ActionResult use(Entity* owner, Entity* wearer);
+  ActionResult use(Entity* owner, Entity* wearer, Engine& engine);
 
  private:
   int amount_;
+};
+
+class LightningBolt final : public ConsumableComponent {
+ private:
+  float range_, damage_;
+
+ public:
+  LightningBolt(float range, float damage) : range_(range), damage_(damage) {}
+  ~LightningBolt() = default;
+  ActionResult use(Entity* owner, Entity* wearer, Engine& engine);
 };
 }  // namespace cpprl
 #endif

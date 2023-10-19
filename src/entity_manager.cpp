@@ -124,4 +124,21 @@ void EntityManager::remove(Entity* entity) {
           [&entity](const Entity* e) { return e == entity; }),
       entities_.end());
 }
+
+Entity* EntityManager::get_closest_monster(
+    Vector2D position, float range) const {
+  Entity* closest = nullptr;
+  float best_distance = 1E6f;
+  for (Entity* entity : entities_) {
+    if (entity->get_ai_component() && entity->get_defense_component()) {
+      float distance = position.distance_to(
+          entity->get_transform_component()->get_position());
+      if (distance < best_distance && (distance <= range || range == 0.0f)) {
+        best_distance = distance;
+        closest = entity;
+      }
+    }
+  }
+  return closest;
+}
 }  // namespace cpprl

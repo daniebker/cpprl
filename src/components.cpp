@@ -6,6 +6,8 @@
 
 #include "exceptions.hpp"
 #include "game_entity.hpp"
+#include "globals.hpp"
+#include "main.hpp"
 
 namespace cpprl {
 int DefenseComponent::heal(int amount) {
@@ -62,7 +64,7 @@ bool ConsumableComponent::pick_up(Entity* owner, Entity* wearer) {
   return false;
 }
 
-ActionResult ConsumableComponent::use(Entity* owner, Entity* wearer) {
+ActionResult ConsumableComponent::use(Entity* owner, Entity* wearer, Engine&) {
   if (wearer->get_container()) {
     wearer->get_container()->remove(owner);
     return {true, ""};
@@ -72,19 +74,38 @@ ActionResult ConsumableComponent::use(Entity* owner, Entity* wearer) {
 
 HealingConsumable::HealingConsumable(int amount) : amount_(amount){};
 
-ActionResult HealingConsumable::use(Entity* owner, Entity* wearer) {
+ActionResult HealingConsumable::use(
+    Entity* owner, Entity* wearer, Engine& engine) {
   if (!wearer->get_defense_component()) {
     return {false, "There's nothing to heal."};
   }
 
   int amount_healed = wearer->get_defense_component()->heal(amount_);
   if (amount_healed > 0) {
-    ActionResult result = ConsumableComponent::use(owner, wearer);
+    ActionResult result = ConsumableComponent::use(owner, wearer, engine);
     result.message = fmt::format("You healed for {} HP.", amount_healed);
     return result;
   }
 
   return {false, "You are already at full health."};
+}
+
+ActionResult LightningBolt::use(Entity* owner, Entity* wearer, Engine& engine) {
+  Entity* closest_monster = nullptr;
+  closest_monster = engine.get_entities().get_closest_monster(
+      wearer->get_transform_component()->get_position(), range_);
+  if (!closest_monster) {
+    return {false, "No enemy is close enough to strike."};
+  }
+  closest_monster->get_defense_component()->take_damage(damage_);
+  ConsumableComponent::use(owner, wearer, engine);
+  return {
+      true,
+      fmt::format(
+          "A lightning bolt strikes the {} with a loud "
+          "thunder! The damage is {} hit points.",
+          closest_monster->get_name(),
+          damage_)};
 }
 
 }  // namespace cpprl

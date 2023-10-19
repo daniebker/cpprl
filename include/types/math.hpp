@@ -2,6 +2,7 @@
 #define TYPES_MATH_HPP
 
 #include <array>
+#include <cmath>
 
 namespace cpprl {
 
@@ -18,6 +19,9 @@ struct Vector2D {
   Vector2D operator/(int scalar) const noexcept { return {x / scalar, y / scalar}; }
   bool operator==(const Vector2D& other) const noexcept { return x == other.x && y == other.y; }
   bool operator!=(const Vector2D& other) const noexcept { return !(*this == other); }
+  float distance_to(const Vector2D& other) const noexcept {
+    return std::sqrt(std::pow(x - other.x, 2) + std::pow(y - other.y, 2));
+  }
 
   int x;
   int y;

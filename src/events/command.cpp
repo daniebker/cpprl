@@ -49,7 +49,7 @@ void UseItemCommand::execute() {
   if (!consumable_component) {
     throw Impossible("There's nothing to use.");
   }
-  ActionResult result = consumable_component->use(item, entity_);
+  ActionResult result = consumable_component->use(item, entity_, engine_);
   if (result.success) {
     engine_.get_message_log().add_message(result.message, WHITE);
   } else {

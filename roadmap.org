@@ -1,12 +1,30 @@
 #+title: Roadmap
 
-* TODO v0.1.0
-** TODO [[https://github.com/daniebker/cpprl/issues/6][#6]] Ranged Scrolls
+#+BEGIN: clocktable :scope file :maxlevel 2 :link t
+#+CAPTION: Clock summary at [2023-10-16 Mon 14:12]
+| Headline              | Time   |      |
+|-----------------------+--------+------|
+| *Total time*          | *0:30* |      |
+|-----------------------+--------+------|
+| [[file:/home/dan/src/cpprl/roadmap.org::*v0.1.0][v0.1.0]]                | 0:30   |      |
+| \_  [[file:/home/dan/src/cpprl/roadmap.org::*\[\[https://github.com/daniebker/cpprl/issues/6\]\[#6\]\] Ranged Scrolls][#6 Ranged Scrolls]] |        | 0:30 |
+#+END:
+
+
+* STRT v0.1.0: Complete The Tutorials
+** STRT [[https://github.com/daniebker/cpprl/issues/6][#6]] Ranged Scrolls
+:LOGBOOK:
+CLOCK: [2023-10-16 Mon 13:40]--[2023-10-16 Mon 14:46] =>  1:06
+- Add LightningBolt class as a consumable item. Passing the engine from the command to the consumable.
+:END:
 
 - [[https://rogueliketutorials.com/tutorials/tcod/v2/part-9/][python tutorial]]
 - [[https://www.roguebasin.com/index.php/Complete_roguelike_tutorial_using_C%2B%2B_and_libtcod_-_part_9:_spells_and_ranged_combat][roguebasin]]
 ** TODO [[https://github.com/daniebker/cpprl/issues/5][#5]] Inventory not scrolling
-** STRT [[https://github.com/daniebker/cpprl/issues/8][#8]] Fix permissions issue when publishing a release
+** DONE [[https://github.com/daniebker/cpprl/issues/8][#8]] Fix permissions issue when publishing a release
+:LOGBOOK:
+- State "DONE"       from "STRT"       [2023-10-16 Mon 13:43]
+:END:
 - tried adding ~permissions:~ but it still failed.
 ** TODO [[https://github.com/daniebker/cpprl/issues/4][#4]]
 ** TODO [[https://github.com/daniebker/cpprl/issues/3][#3]]

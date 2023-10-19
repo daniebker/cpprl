@@ -60,6 +60,12 @@ class Entity {
    AIComponent* get_ai_component() { return aiComponent_; };
    Container* get_container() { return container_; };
 
+   // TODO: not sure this belongs here
+   float get_distance_to(Entity* other) {
+     return transformComponent_->get_position().distance_to(
+         other->get_transform_component()->get_position());
+   };
+
    bool is_blocking() { return blocker_; };
    std::string get_name() { return name_; };
 
