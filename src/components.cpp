@@ -4,6 +4,8 @@
 
 #include <algorithm>
 
+#include "combat_system.hpp"
+#include "events/die_event.hpp"
 #include "exceptions.hpp"
 #include "game_entity.hpp"
 #include "globals.hpp"
@@ -97,15 +99,28 @@ ActionResult LightningBolt::use(Entity* owner, Entity* wearer, Engine& engine) {
   if (!closest_monster) {
     return {false, "No enemy is close enough to strike."};
   }
-  closest_monster->get_defense_component()->take_damage(damage_);
+  // closest_monster->get_defense_component()->take_damage(damage_);
+  int inflicted = combat_system::handle_spell(damage_, *closest_monster);
   ConsumableComponent::use(owner, wearer, engine);
-  return {
-      true,
-      fmt::format(
-          "A lightning bolt strikes the {} with a loud "
-          "thunder! The damage is {} hit points.",
-          closest_monster->get_name(),
-          damage_)};
+  if (inflicted > 0) {
+    if (closest_monster->get_defense_component()->is_dead()) {
+      auto action = DieEvent(engine, *closest_monster);
+      action.execute();
+    }
+    return {
+        true,
+        fmt::format(
+            "A lightning bolt strikes the {} with a loud "
+            "thunder! The damage is {} hit points.",
+            closest_monster->get_name(),
+            damage_)};
+  } else {
+    return {
+        true,
+        fmt::format(
+            "The lightning bolt hits the {} but does no damage.",
+            closest_monster->get_name())};
+  }
 }
 
 }  // namespace cpprl

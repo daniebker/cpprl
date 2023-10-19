@@ -60,13 +60,24 @@ void EntityManager::place_entities(
     if (iterator != entities_.end()) {
       continue;
     }
-    Entity* entity = new Entity(
-        "healing potion",
-        false,
-        new TransformComponent(x, y),
-        new ASCIIComponent("!", DARK_RED, 0));
-    entity->set_consumable_component(new HealingConsumable(10));
-    spawn(entity);
+
+    int dice = random->getInt(0, 100);
+    if (dice <= 70) {
+      Entity* entity = new Entity(
+          "healing potion",
+          false,
+          new TransformComponent(x, y),
+          new ASCIIComponent("!", DARK_RED, 0));
+      entity->set_consumable_component(new HealingConsumable(10));
+      spawn(entity);
+    } else if (dice <= 70 + 10) {
+      Entity* entity = new Entity(
+          "Lightning Scroll",
+          false,
+          new TransformComponent(x, y),
+          new ASCIIComponent("#", DARK_RED, 0));
+      entity->set_consumable_component(new LightningBolt(5, 20));
+    }
   }
 }
 

@@ -95,6 +95,13 @@ void Engine::generate_map(int width, int height) {
       new ASCIIComponent("!", WHITE, 1));
   first_potion->set_consumable_component(new HealingConsumable(10));
   entity->get_container()->add(first_potion);
+  Entity* firstScroll = new Entity(
+      "Lightning Scroll",
+      false,
+      new TransformComponent({0, 0}),
+      new ASCIIComponent("#", DARK_RED, 0));
+  firstScroll->set_consumable_component(new LightningBolt(5, 20));
+  entity->get_container()->add(firstScroll);
   player_ = entities_->spawn(entity);
 
   map_->compute_fov(player_->get_transform_component()->get_position(), 4);
