@@ -106,5 +106,17 @@ class LightningBolt final : public ConsumableComponent {
   ~LightningBolt() = default;
   ActionResult use(Entity* owner, Entity* wearer, Engine& engine);
 };
+
+class FireSpell final : public ConsumableComponent {
+ private:
+  float max_range_, damage_;
+
+ public:
+  FireSpell(float max_range, float damage)
+      : max_range_(max_range), damage_(damage) {}
+  ~FireSpell() = default;
+
+  ActionResult use(Entity* owner, Entity* Wearer, Engine& engine);
+};
 }  // namespace cpprl
 #endif

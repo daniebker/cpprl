@@ -18,6 +18,33 @@ EngineEvent& EventHandler::handle_sdl_event(SDL_Event event) noexcept {
   }
 };
 
+EngineEvent& TargetingInputHandler::handle_sdl_event(SDL_Event event) noexcept {
+  if (event.type == SDL_MOUSEMOTION) {
+    g_context.convert_event_coordinates(event);
+    auto mouse_input_event =
+        MouseInputEvent{engine_, {event.motion.x, event.motion.y}};
+    return mouse_input_event;
+  }
+
+  else if (event.type == SDL_MOUSEBUTTONDOWN) {
+    g_context.convert_event_coordinates(event);
+    auto mouse_click_event =
+        MouseClickEvent{engine_, {event.motion.x, event.motion.y}};
+    return mouse_click_event;
+  } else if (event.type == SDL_KEYDOWN) {
+    SDL_Keycode key = event.key.keysym.sym;
+    switch (key) {
+      case SDLK_q:
+        return exit_targeting_mode_command_;
+        break;
+      default:
+        return noop;
+        break;
+    }
+  }
+  return noop;
+};
+
 EngineEvent& GameInputHandler::handle_sdl_event(SDL_Event event) noexcept {
   // TODO: Move this to its own handler.
   //  probably want an event handler which has
@@ -25,7 +52,7 @@ EngineEvent& GameInputHandler::handle_sdl_event(SDL_Event event) noexcept {
   if (event.type == SDL_MOUSEMOTION) {
     g_context.convert_event_coordinates(event);
     engine_.get_controller().cursor = {event.motion.x, event.motion.y};
-    engine_.get_map()->set_target_tile({event.motion.x, event.motion.y});
+    engine_.get_map()->set_highlight_tile({event.motion.x, event.motion.y});
     return noop;
   }
 

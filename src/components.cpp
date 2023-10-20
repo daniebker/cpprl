@@ -123,4 +123,31 @@ ActionResult LightningBolt::use(Entity* owner, Entity* wearer, Engine& engine) {
   }
 }
 
+ActionResult FireSpell::use(Entity* owner, Entity* wearer, Engine& engine) {
+  bool result = engine.set_targeting_tile(max_range_);
+
+  // TODO: not going to work because we assume always used.
+  ConsumableComponent::use(owner, wearer, engine);
+  for (Entity* entity : engine.get_entities()) {
+    if (entity->get_defense_component() &&
+        entity->get_defense_component()->is_not_dead() &&
+        entity->get_transform_component()->get_position().distance_to(
+            engine.get_map()->get_target_tile()) <= max_range_) {
+      engine.get_message_log().add_message(
+          fmt::format(
+              "The {} gets burned for {} hit points.",
+              entity->get_name(),
+              damage_),
+          RED);
+      int inflicted = combat_system::handle_spell(damage_, *entity);
+      if (inflicted > 0) {
+        // TODO: this is repeated everywhere. Put it in take_damage
+        if (entity->get_defense_component()->is_dead()) {
+          auto action = DieEvent(engine, *entity);
+          action.execute();
+        }
+      }
+    }
+  }
+}
 }  // namespace cpprl

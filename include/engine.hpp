@@ -36,6 +36,8 @@ class Engine {
   bool is_paused_ = false;
   bool game_over_ = false;
   bool show_view_ = false;
+  bool targeting_mode_ = false;
+  Vector2D targeting_tile_ = {0, 0};
 
   void generate_map(int width, int height);
   void handle_enemy_turns();
@@ -60,6 +62,8 @@ class Engine {
     current_window_ = current_window;
   };
   void scroll_current_view(int scroll_amount);
+  void toggle_targeting_mode() { targeting_mode_ = !targeting_mode_; }
+  bool set_targeting_tile(float max_range = 0.0f);
 };
 }  // namespace cpprl
 #endif

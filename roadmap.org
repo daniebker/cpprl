@@ -1,19 +1,21 @@
 #+title: Roadmap
 
 #+BEGIN: clocktable :scope file :maxlevel 2 :link t
-#+CAPTION: Clock summary at [2023-10-16 Mon 14:12]
-| Headline              | Time   |      |
-|-----------------------+--------+------|
-| *Total time*          | *0:30* |      |
-|-----------------------+--------+------|
-| [[file:/home/dan/src/cpprl/roadmap.org::*v0.1.0][v0.1.0]]                | 0:30   |      |
-| \_  [[file:/home/dan/src/cpprl/roadmap.org::*\[\[https://github.com/daniebker/cpprl/issues/6\]\[#6\]\] Ranged Scrolls][#6 Ranged Scrolls]] |        | 0:30 |
+#+CAPTION: Clock summary at [2023-10-20 Fri 08:01]
+| Headline                       | Time   |      |
+|--------------------------------+--------+------|
+| *Total time*                   | *3:31* |      |
+|--------------------------------+--------+------|
+| [[file:/Users/dbaker/src/cpprl/roadmap.org::*v0.1.0: Complete The Tutorials][v0.1.0: Complete The Tutorials]] | 3:31   |      |
+| \_  [[file:/Users/dbaker/src/cpprl/roadmap.org::*\[\[https://github.com/daniebker/cpprl/issues/6\]\[#6\]\] Ranged Scrolls][#6 Ranged Scrolls]]          |        | 3:31 |
 #+END:
 
 
 * STRT v0.1.0: Complete The Tutorials
 ** STRT [[https://github.com/daniebker/cpprl/issues/6][#6]] Ranged Scrolls
 :LOGBOOK:
+CLOCK: [2023-10-19 Thu 18:30]--[2023-10-19 Fri 20:55] =>  2:25
+- Craching on select tiles
 CLOCK: [2023-10-16 Mon 13:40]--[2023-10-16 Mon 14:46] =>  1:06
 - Add LightningBolt class as a consumable item. Passing the engine from the command to the consumable.
 :END:

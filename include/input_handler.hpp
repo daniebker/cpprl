@@ -30,6 +30,16 @@ class EventHandler {
   QuitCommand quitCommand;
 };
 
+class TargetingInputHandler final : public EventHandler {
+ private:
+  ExitTargetingModeCommand exit_targeting_mode_command_;
+
+ public:
+  TargetingInputHandler(Engine& engine)
+      : EventHandler(engine), exit_targeting_mode_command_(engine){};
+  virtual EngineEvent& handle_sdl_event(SDL_Event event) noexcept override;
+};
+
 class GameInputHandler final : public EventHandler {
  private:
   DirectionalCommand buttonRight;

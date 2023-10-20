@@ -9,6 +9,7 @@ Map::Map(int width, int height)
   wall_tile_.light = TCOD_ConsoleTile{'#', WHITE, BLACK};
   wall_tile_.dark = TCOD_ConsoleTile{'#', GREY, BLACK};
   floor_tile_.light = TCOD_ConsoleTile{'.', WHITE, BLACK};
+  floor_tile_.target = TCOD_ConsoleTile{'.', TEAL, BLACK};
   floor_tile_.dark = TCOD_ConsoleTile{'.', GREY, BLACK};
 }
 
@@ -56,17 +57,30 @@ bool Map::is_explored(Vector2D position) {
   return tiles_.at(position).explored;
 }
 
+bool Map::set_target_tile(Vector2D position, Entity& player) {
+  if (is_in_fov(position) &&
+      (max_range_ == 0 ||
+       player.get_transform_component()->get_position().distance_to(position) <=
+           max_range_)) {
+    target_tile_ = position;
+    return true;
+  }
+  return false;
+}
+
 void Map::render(tcod::Console& console) {
   console.clear();
-  // TODO: Should happen in the map render function
+
   for (int y{0}; y < get_height(); ++y) {
     for (int x{0}; x < get_width(); ++x) {
       if (!console.in_bounds({x, y})) continue;
       bool isFloor = get_tiles().at({x, y}).type == TileType::floor;
       if (is_in_fov({x, y})) {
         set_is_explored({x, y});
-        console.at({x, y}) =
-            isFloor ? get_floor_tile().light : get_wall_tile().light;
+        // if mode is targeting change the tile colours to highlight
+        TCOD_ConsoleTile floor =
+            target_mode_ ? get_floor_tile().target : get_floor_tile().light;
+        console.at({x, y}) = isFloor ? floor : get_wall_tile().light;
       } else if (is_explored({x, y})) {
         console.at({x, y}) =
             isFloor ? get_floor_tile().dark : get_wall_tile().dark;

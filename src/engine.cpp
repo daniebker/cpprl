@@ -62,6 +62,7 @@ void Engine::handle_events() {
       } catch (const Impossible& impossible) {
         message_log_->add_message(impossible.what(), RED);
       }
+      // TODO: is this needed?
     } else if (event.type == SDL_MOUSEMOTION) {
       input_handler_->handle_sdl_event(event);
     } else if (event.type == SDL_QUIT) {
@@ -96,11 +97,11 @@ void Engine::generate_map(int width, int height) {
   first_potion->set_consumable_component(new HealingConsumable(10));
   entity->get_container()->add(first_potion);
   Entity* firstScroll = new Entity(
-      "Lightning Scroll",
+      "Fire Scroll",
       false,
       new TransformComponent({0, 0}),
       new ASCIIComponent("#", DARK_RED, 0));
-  firstScroll->set_consumable_component(new LightningBolt(5, 20));
+  firstScroll->set_consumable_component(new FireSpell(5, 20));
   entity->get_container()->add(firstScroll);
   player_ = entities_->spawn(entity);
 
@@ -181,6 +182,21 @@ void Engine::set_input_handler(EventHandler* input_handler) {
 void Engine::scroll_current_view(int scroll_amount) {
   if (show_view_) {
     current_window_->set_cursor(current_window_->get_cursor() + scroll_amount);
+  }
+}
+bool Engine::set_targeting_tile(float max_range) {
+  input_handler_ = new TargetingInputHandler(*this);
+  targeting_mode_ = !targeting_mode_;
+  map_->toggle_target_mode(max_range);
+  SDL_WaitEvent(nullptr);
+  SDL_Event event;
+  while (SDL_PollEvent(&event)) {
+    EngineEvent& command = input_handler_->handle_sdl_event(event);
+    command.execute();
+    Engine::render();
+    if (!targeting_mode_) {
+      return true;
+    }
   }
 }
 }  // namespace cpprl

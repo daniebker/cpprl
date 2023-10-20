@@ -25,6 +25,32 @@ class ResetGameCommand : public EngineEvent {
   ResetGameCommand(Engine& engine) : EngineEvent(engine) {}
   void execute() override { engine_.reset_game(); }
 };
+
+class MouseInputEvent final : public EngineEvent {
+ private:
+  Vector2D position_;
+
+ public:
+  MouseInputEvent(Engine& engine, Vector2D position)
+      : EngineEvent(engine), position_(position) {}
+  void execute() override;
+};
+
+class MouseClickEvent final : public EngineEvent {
+ private:
+  Vector2D position_;
+
+ public:
+  MouseClickEvent(Engine& engine, Vector2D position)
+      : EngineEvent(engine), position_(position) {}
+  void execute() override;
+};
+
+class ExitTargetingModeCommand final : public EngineEvent {
+ public:
+  ExitTargetingModeCommand(Engine& engine) : EngineEvent(engine) {}
+  void execute() override;
+};
 }  // namespace cpprl
 
 #endif

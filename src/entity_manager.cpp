@@ -77,6 +77,13 @@ void EntityManager::place_entities(
           new TransformComponent(x, y),
           new ASCIIComponent("#", DARK_RED, 0));
       entity->set_consumable_component(new LightningBolt(5, 20));
+    } else if (dice <= 70 + 10 + 10) {
+      Entity* entity = new Entity(
+          "Fire Scroll",
+          false,
+          new TransformComponent(x, y),
+          new ASCIIComponent("#", DARK_RED, 0));
+      entity->set_consumable_component(new FireSpell(5, 20));
     }
   }
 }
