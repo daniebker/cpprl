@@ -8,7 +8,7 @@ class MovementCommand : public DirectionalCommand {
  public:
   MovementCommand(Engine& engine, Entity* entity, Vector2D move_vector)
       : DirectionalCommand(engine, entity, move_vector){};
-  virtual void execute();
+  virtual CommandResult execute();
 };
 }  // namespace cpprl
 

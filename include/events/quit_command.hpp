@@ -6,7 +6,7 @@ namespace cpprl {
 class QuitCommand : public EngineEvent {
  public:
   QuitCommand(Engine& engine) : EngineEvent(engine){};
-  virtual void execute();
+  virtual CommandResult execute();
 };
 }  // namespace cpprl
 

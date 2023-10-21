@@ -8,7 +8,7 @@ namespace cpprl {
 class CloseViewCommand final : public EngineEvent {
  public:
   CloseViewCommand(Engine& engine) : EngineEvent(engine){};
-  virtual void execute() override;
+  virtual CommandResult execute() override;
 };
 }  // namespace cpprl
 

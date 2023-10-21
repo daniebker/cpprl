@@ -1,9 +1,11 @@
 #ifndef ENGINE_EVENT_HPP
 #define ENGINE_EVENT_HPP
 
-#include "engine.hpp"
+#include "types/math.hpp"
+#include "types/state_result.hpp"
 
 namespace cpprl {
+class Engine;
 class EngineEvent {
  protected:
   Engine& engine_;
@@ -11,19 +13,19 @@ class EngineEvent {
  public:
   EngineEvent(Engine& engine) : engine_(engine) {}
   virtual ~EngineEvent() {}
-  virtual void execute() = 0;
+  virtual CommandResult execute() = 0;
 };
 
 class NoOpEvent : public EngineEvent {
  public:
   NoOpEvent(Engine& engine) : EngineEvent(engine) {}
-  void execute() override {}
+  CommandResult execute() override { return {}; }
 };
 
 class ResetGameCommand : public EngineEvent {
  public:
   ResetGameCommand(Engine& engine) : EngineEvent(engine) {}
-  void execute() override { engine_.reset_game(); }
+  CommandResult execute() override { return Reset{}; }
 };
 
 class MouseInputEvent final : public EngineEvent {
@@ -33,7 +35,7 @@ class MouseInputEvent final : public EngineEvent {
  public:
   MouseInputEvent(Engine& engine, Vector2D position)
       : EngineEvent(engine), position_(position) {}
-  void execute() override;
+  CommandResult execute() override;
 };
 
 class MouseClickEvent final : public EngineEvent {
@@ -43,13 +45,13 @@ class MouseClickEvent final : public EngineEvent {
  public:
   MouseClickEvent(Engine& engine, Vector2D position)
       : EngineEvent(engine), position_(position) {}
-  void execute() override;
+  CommandResult execute() override;
 };
 
 class ExitTargetingModeCommand final : public EngineEvent {
  public:
   ExitTargetingModeCommand(Engine& engine) : EngineEvent(engine) {}
-  void execute() override;
+  CommandResult execute() override;
 };
 }  // namespace cpprl
 

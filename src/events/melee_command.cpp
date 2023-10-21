@@ -12,7 +12,7 @@
 #include "util.hpp"
 namespace cpprl {
 
-void MeleeCommand::execute() {
+CommandResult MeleeCommand::execute() {
   auto targetPos =
       entity_->get_transform_component()->get_position() + move_vector_;
   Entity* target = engine_.get_entities().get_blocking_entity_at(targetPos);
@@ -46,5 +46,6 @@ void MeleeCommand::execute() {
       engine_.get_message_log().add_message(message, attack_colour, true);
     }
   }
+  return EndTurn{};
 };
 }  // namespace cpprl

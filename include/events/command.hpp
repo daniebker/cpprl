@@ -2,9 +2,10 @@
 #define COMMAND_H
 
 #include "engine.hpp"
-#include "engine_event.hpp"
+#include "events/engine_event.hpp"
 #include "game_entity.hpp"
 #include "types/map.hpp"
+#include "types/state_result.hpp"
 
 namespace cpprl {
 class Command : public EngineEvent {
@@ -15,14 +16,14 @@ class Command : public EngineEvent {
   Command(Engine& engine, Entity* entity)
       : EngineEvent(engine), entity_(entity) {}
   virtual ~Command() {}
-  virtual void execute()  = 0;
+  virtual CommandResult execute() = 0;
 };
 
 class ScrollCommand : public EngineEvent {
  public:
   ScrollCommand(Engine& engine, int scroll_amount)
       : EngineEvent(engine), scroll_amount_(scroll_amount){};
-  virtual void execute() ;
+  virtual CommandResult execute();
 
  private:
   int scroll_amount_;
@@ -31,25 +32,25 @@ class ScrollCommand : public EngineEvent {
 class ViewHistoryCommand : public EngineEvent {
  public:
   ViewHistoryCommand(Engine& engine) : EngineEvent(engine){};
-  virtual void execute() ;
+  virtual CommandResult execute();
 };
 
 class PickupCommand : public Command {
  public:
   PickupCommand(Engine& engine, Entity* entity) : Command(engine, entity){};
-  virtual void execute() ;
+  virtual CommandResult execute();
 };
 
 class InventoryCommand final : public Command {
  public:
   InventoryCommand(Engine& engine, Entity* entity) : Command(engine, entity) {}
-  void execute()  override;
+  CommandResult execute() override;
 };
 
 class SelectItemCommand final : public Command {
  public:
   SelectItemCommand(Engine& engine, Entity* entity) : Command(engine, entity) {}
-  void execute() override;
+  CommandResult execute() override;
 };
 
 class UseItemCommand final : public Command {
@@ -59,7 +60,7 @@ class UseItemCommand final : public Command {
  public:
   UseItemCommand(Engine& engine, Entity* entity, int item_index)
       : Command(engine, entity), item_index_(item_index) {}
-  void execute() override;
+  CommandResult execute() override;
 };
 }  // namespace cpprl
 #endif

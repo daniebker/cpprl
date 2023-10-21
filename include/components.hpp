@@ -4,15 +4,24 @@
 #include <libtcod.hpp>
 #include <string_view>
 
+#include "state.hpp"
 #include "types/math.hpp"
 
 namespace cpprl {
 class Entity;
 class Engine;
-struct ActionResult {
-  bool success;
+struct Success {};
+
+struct Failure {
   std::string message;
 };
+
+struct Poll {
+  std::unique_ptr<State> new_state;
+};
+
+using ActionResult = std::variant<Success, Failure, Poll>;
+
 class AttackComponent {
  public:
   AttackComponent(int damage) : damage_(damage) {}

@@ -11,7 +11,7 @@ class DieEvent : public EngineEvent {
   DieEvent(Engine& engine, Entity& entity)
       : EngineEvent(engine), entity_(entity) {}
   virtual ~DieEvent() = default;
-  virtual void execute() override;
+  virtual CommandResult execute() override;
 
  private:
   Entity& entity_;

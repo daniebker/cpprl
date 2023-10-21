@@ -6,7 +6,7 @@
 
 namespace cpprl {
 
-void MovementCommand::execute() {
+CommandResult MovementCommand::execute() {
   Vector2D new_position =
       entity_->get_transform_component()->get_position() + move_vector_;
   auto map = engine_.get_map();
@@ -16,7 +16,7 @@ void MovementCommand::execute() {
   }
 
   if (engine_.get_entities().get_blocking_entity_at(new_position)) {
-    return;
+    return EndTurn{};
   }
 
   if (map->is_walkable(new_position)) {
@@ -24,5 +24,6 @@ void MovementCommand::execute() {
   } else {
     throw Impossible("You can't walk on that.");
   }
+  return EndTurn{};
 }
 }  // namespace cpprl

@@ -3,5 +3,5 @@
 #include "iostream"
 
 namespace cpprl {
-void QuitCommand::execute() { std::exit(0); }
+CommandResult QuitCommand::execute() { return Quit{}; }
 }  // namespace cpprl

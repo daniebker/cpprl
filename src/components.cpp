@@ -69,9 +69,9 @@ bool ConsumableComponent::pick_up(Entity* owner, Entity* wearer) {
 ActionResult ConsumableComponent::use(Entity* owner, Entity* wearer, Engine&) {
   if (wearer->get_container()) {
     wearer->get_container()->remove(owner);
-    return {true, ""};
+    return Success{};
   }
-  return {false, ""};
+  return Failure{""};
 }
 
 HealingConsumable::HealingConsumable(int amount) : amount_(amount){};
@@ -79,14 +79,15 @@ HealingConsumable::HealingConsumable(int amount) : amount_(amount){};
 ActionResult HealingConsumable::use(
     Entity* owner, Entity* wearer, Engine& engine) {
   if (!wearer->get_defense_component()) {
-    return {false, "There's nothing to heal."};
+    return Failure{"There's nothing to heal."};
   }
 
   int amount_healed = wearer->get_defense_component()->heal(amount_);
   if (amount_healed > 0) {
-    ActionResult result = ConsumableComponent::use(owner, wearer, engine);
-    result.message = fmt::format("You healed for {} HP.", amount_healed);
-    return result;
+    ConsumableComponent::use(owner, wearer, engine);
+    std::string message = fmt::format("You healed for {} HP.", amount_healed);
+    engine.get_message_log().add_message(message, GREEN);
+    return Success{};
   }
 
   return {false, "You are already at full health."};
@@ -97,7 +98,7 @@ ActionResult LightningBolt::use(Entity* owner, Entity* wearer, Engine& engine) {
   closest_monster = engine.get_entities().get_closest_monster(
       wearer->get_transform_component()->get_position(), range_);
   if (!closest_monster) {
-    return {false, "No enemy is close enough to strike."};
+    return Failure{"No enemy is close enough to strike."};
   }
   // closest_monster->get_defense_component()->take_damage(damage_);
   int inflicted = combat_system::handle_spell(damage_, *closest_monster);
@@ -107,13 +108,15 @@ ActionResult LightningBolt::use(Entity* owner, Entity* wearer, Engine& engine) {
       auto action = DieEvent(engine, *closest_monster);
       action.execute();
     }
-    return {
-        true,
+    engine.get_message_log().add_message(
         fmt::format(
             "A lightning bolt strikes the {} with a loud "
             "thunder! The damage is {} hit points.",
             closest_monster->get_name(),
-            damage_)};
+            damage_),
+        GREEN);
+
+    return Success{};
   } else {
     return {
         true,
@@ -124,30 +127,32 @@ ActionResult LightningBolt::use(Entity* owner, Entity* wearer, Engine& engine) {
 }
 
 ActionResult FireSpell::use(Entity* owner, Entity* wearer, Engine& engine) {
-  bool result = engine.set_targeting_tile(max_range_);
-
-  // TODO: not going to work because we assume always used.
-  ConsumableComponent::use(owner, wearer, engine);
-  for (Entity* entity : engine.get_entities()) {
-    if (entity->get_defense_component() &&
-        entity->get_defense_component()->is_not_dead() &&
-        entity->get_transform_component()->get_position().distance_to(
-            engine.get_map()->get_target_tile()) <= max_range_) {
-      engine.get_message_log().add_message(
-          fmt::format(
-              "The {} gets burned for {} hit points.",
-              entity->get_name(),
-              damage_),
-          RED);
-      int inflicted = combat_system::handle_spell(damage_, *entity);
-      if (inflicted > 0) {
-        // TODO: this is repeated everywhere. Put it in take_damage
-        if (entity->get_defense_component()->is_dead()) {
-          auto action = DieEvent(engine, *entity);
-          action.execute();
+  std::function<void()> on_pick = [&]() {
+    // TODO: not going to work because we assume always used.
+    ConsumableComponent::use(owner, wearer, engine);
+    for (Entity* entity : engine.get_entities()) {
+      if (entity->get_defense_component() &&
+          entity->get_defense_component()->is_not_dead() &&
+          entity->get_transform_component()->get_position().distance_to(
+              engine.get_map()->get_target_tile()) <= max_range_) {
+        engine.get_message_log().add_message(
+            fmt::format(
+                "The {} gets burned for {} hit points.",
+                entity->get_name(),
+                damage_),
+            RED);
+        int inflicted = combat_system::handle_spell(damage_, *entity);
+        if (inflicted > 0) {
+          // TODO: this is repeated everywhere. Put it in take_damage
+          if (entity->get_defense_component()->is_dead()) {
+            auto action = DieEvent(engine, *entity);
+            action.execute();
+          }
         }
       }
     }
-  }
+  };
+  // engine.set_targeting_tile(max_range_, on_pick);
+  return Poll{std::make_unique<PickTileAOEState>(on_pick, max_range_)};
 }
 }  // namespace cpprl

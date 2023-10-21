@@ -1,12 +1,16 @@
 #include "events/engine_event.hpp"
 
+#include "engine.hpp"
+
 namespace cpprl {
 
-void MouseInputEvent::execute() {
+CommandResult MouseInputEvent::execute() {
   engine_.get_controller().cursor = position_;
   engine_.get_map()->set_highlight_tile(position_);
+  return {};
 }
-void MouseClickEvent::execute() {
+
+CommandResult MouseClickEvent::execute() {
   engine_.get_controller().cursor = position_;
   // engine_.get_map()->set_highlight_tile(position_);
   bool success =
@@ -14,7 +18,11 @@ void MouseClickEvent::execute() {
   if (success) {
     engine_.toggle_targeting_mode();
   }
+  return {};
 }
 
-void ExitTargetingModeCommand::execute() { engine_.toggle_targeting_mode(); }
+CommandResult ExitTargetingModeCommand::execute() {
+  engine_.toggle_targeting_mode();
+  return {};
+}
 }  // namespace cpprl

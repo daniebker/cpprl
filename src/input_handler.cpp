@@ -10,7 +10,7 @@ EngineEvent& EventHandler::handle_sdl_event(SDL_Event event) noexcept {
   SDL_Keycode key = event.key.keysym.sym;
   switch (key) {
     case SDLK_ESCAPE:
-      return quitCommand;
+      return quitCommand_;
       break;
     default:
       return noop;

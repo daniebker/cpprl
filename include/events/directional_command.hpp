@@ -11,6 +11,6 @@ class DirectionalCommand : public Command {
  public:
   DirectionalCommand(Engine& engine, Entity* entity, Vector2D move_vector)
       : Command(engine, entity), move_vector_(move_vector){};
-  virtual void execute();
+  virtual CommandResult execute();
 };
 }  // namespace cpprl

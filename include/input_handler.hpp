@@ -18,7 +18,7 @@ class EngineEvent;
 class EventHandler {
  public:
   EventHandler(Engine& engine)
-      : engine_(engine), noop(engine), quitCommand(engine){};
+      : engine_(engine), noop(engine), quitCommand_(engine){};
   virtual ~EventHandler() = default;
   virtual EngineEvent& handle_sdl_event(SDL_Event event) noexcept = 0;
 
@@ -27,7 +27,7 @@ class EventHandler {
   NoOpEvent noop;
 
  private:
-  QuitCommand quitCommand;
+  QuitCommand quitCommand_;
 };
 
 class TargetingInputHandler final : public EventHandler {
@@ -95,8 +95,8 @@ class GuiInputHandler : public EventHandler {
   GuiInputHandler(Engine& engine)
       : EventHandler(engine),
         closeViewCommand_(engine),
-        scrollDownCommand_(engine, -1),
-        scrollUpCommand_(engine, 1),
+        scrollDownCommand_(engine, 1),
+        scrollUpCommand_(engine, -1),
         jumpUpCommand_(engine, -10),
         jumpDownCommand_(engine, 10),
         jumpToHome_(engine, 0){};

@@ -5,16 +5,16 @@
 
 namespace cpprl {
 
-void DirectionalCommand::execute() {
+CommandResult DirectionalCommand::execute() {
   auto targetPos =
       entity_->get_transform_component()->get_position() + move_vector_;
 
   if (engine_.get_entities().get_blocking_entity_at(targetPos)) {
     auto action = MeleeCommand(engine_, entity_, move_vector_);
-    action.execute();
+    return action.execute();
   } else {
     auto action = MovementCommand(engine_, entity_, move_vector_);
-    action.execute();
+    return action.execute();
   }
 }
 }  // namespace cpprl

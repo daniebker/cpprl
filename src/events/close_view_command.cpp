@@ -4,10 +4,11 @@
 
 namespace cpprl {
 
-void CloseViewCommand::execute() {
+CommandResult CloseViewCommand::execute() {
   engine_.toggle_pause();
   engine_.toggle_view();
   engine_.set_input_handler(
       new GameInputHandler(engine_, engine_.get_player()));
+  return {};
 }
 }  // namespace cpprl
