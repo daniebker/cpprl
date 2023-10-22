@@ -46,7 +46,7 @@ Engine::Engine(int argc, char** argv)
   //     "Use J, K, PG U, PG D to scroll through messages. Use Q to quit.",
   //     RED);
   // input_handler_ = new GameInputHandler(*this, player_);
-  world_->generate_map(80, 40);
+  world_->generate_map(80, 35);
   engine_state_->on_enter();
 }
 Engine::~Engine() {
@@ -90,7 +90,11 @@ void Engine::handle_events() {
   }
 }
 
-void Engine::render() { world_->render(*renderer_); }
+void Engine::render() {
+  world_->render(*renderer_);
+  engine_state_->render(*renderer_);
+  g_context.present(g_console);
+}
 
 // void Engine::handle_enemy_turns() {}
 

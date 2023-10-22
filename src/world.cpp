@@ -98,7 +98,6 @@ void World::render(Renderer& renderer) {
   // if (show_view_) {
   //   current_window_->render(g_console);
   // }
-  g_context.present(g_console);
 }
 
 void World::handle_enemy_turns() {
@@ -114,7 +113,7 @@ void World::handle_enemy_turns() {
 void World::reset() {}
 
 void World::scroll_current_view(int scroll_amount) {
-  if (show_view_) {
+  if (current_window_) {
     current_window_->set_cursor(current_window_->get_cursor() + scroll_amount);
   }
 }

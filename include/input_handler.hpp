@@ -6,6 +6,7 @@
 
 #include "events/command.hpp"
 #include "globals.hpp"
+#include "gui.hpp"
 #include "types/world_fwd.hpp"
 
 namespace cpprl {
@@ -77,14 +78,15 @@ class GuiInputHandler : public EventHandler {
   ScrollCommand jumpToHome_;
 
  public:
-  GuiInputHandler(World& world);
+  GuiInputHandler(World& world, UiWindow& ui_window);
 
   virtual EngineEvent& handle_sdl_event(SDL_Event event) noexcept override;
 };
 
 class HistoryViewInputHandler final : public GuiInputHandler {
  public:
-  HistoryViewInputHandler(World& world) : GuiInputHandler(world){};
+  HistoryViewInputHandler(World& world, UiWindow& ui_window)
+      : GuiInputHandler(world, ui_window){};
 
   virtual EngineEvent& handle_sdl_event(SDL_Event event) noexcept override;
 };
@@ -94,8 +96,9 @@ class InventoryInputHandler final : public GuiInputHandler {
   SelectItemCommand selectItemCommand_;
 
  public:
-  InventoryInputHandler(World& world, Entity* entity)
-      : GuiInputHandler(world), selectItemCommand_(world, entity){};
+  InventoryInputHandler(World& world, Entity* entity, UiWindow& ui_window)
+      : GuiInputHandler(world, ui_window),
+        selectItemCommand_(world, entity, ui_window){};
   EngineEvent& handle_sdl_event(SDL_Event event) noexcept override;
 };
 

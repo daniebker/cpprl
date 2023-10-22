@@ -10,6 +10,7 @@
 
 namespace cpprl {
 class Renderer;
+class UiWindow;
 class State {
  protected:
   World& world_;
@@ -48,10 +49,33 @@ class PickTileAOEState final : public State {
   void on_exit() override;
 };
 
-class ViewMessageLogHistoryState final : public State {
- private:
+class GuiViewState : public State {
+ protected:
+  UiWindow* window_;
+
  public:
-  ViewMessageLogHistoryState(World& world) : State(world) {}
+  GuiViewState(World& world, UiWindow* window)
+      : State(world), window_(window) {}
+  void on_enter() override;
+  StateResult on_update(SDL_Event& sdl_event) override = 0;
+  void render(Renderer& renderer) override;
+  void on_exit() override = 0;
+};
+
+class ViewMessageHistoryState final : public GuiViewState {
+ public:
+  ViewMessageHistoryState(World& world, UiWindow* window)
+      : GuiViewState(world, window) {}
+  void on_enter() override;
+  StateResult on_update(SDL_Event& sdl_event) override;
+  void render(Renderer& renderer) override;
+  void on_exit() override;
+};
+
+class ViewInventoryState final : public GuiViewState {
+ public:
+  ViewInventoryState(World& world, UiWindow* window)
+      : GuiViewState(world, window) {}
   void on_enter() override;
   StateResult on_update(SDL_Event& sdl_event) override;
   void render(Renderer& renderer) override;

@@ -14,7 +14,11 @@
 * STRT v0.1.0: Complete The Tutorials
 ** STRT [[https://github.com/daniebker/cpprl/issues/6][#6]] Ranged Scrolls
 :LOGBOOK:
-CLOCK: [2023-10-22 Sun 10:04]
+CLOCK: [2023-10-22 Sun 15:07]
+CLOCK: [2023-10-22 Sun 10:44]--[2023-10-22 Sun 14:46] =>  4:02
+- Finally got it working.
+CLOCK: [2023-10-22 Sun 10:04]--[2023-10-22 Sun 10:43] =>  0:39
+- Break. Renaming and moving files around.
 CLOCK: [2023-10-19 Thu 18:30]--[2023-10-19 Fri 20:55] =>  2:25
 - Craching on select tiles
 CLOCK: [2023-10-16 Mon 13:40]--[2023-10-16 Mon 14:46] =>  1:06

@@ -7,6 +7,7 @@
 #include "types/world_fwd.hpp"
 
 namespace cpprl {
+class UiWindow;
 
 class EngineEvent {
  protected:
@@ -30,11 +31,14 @@ class Command : public EngineEvent {
 
 class ScrollCommand : public EngineEvent {
  public:
-  ScrollCommand(World& world, int scroll_amount)
-      : EngineEvent(world), scroll_amount_(scroll_amount){};
+  ScrollCommand(World& world, UiWindow& ui_window, int scroll_amount)
+      : EngineEvent(world),
+        ui_window_(ui_window),
+        scroll_amount_(scroll_amount){};
   virtual StateResult execute();
 
  private:
+  UiWindow& ui_window_;
   int scroll_amount_;
 };
 
@@ -57,8 +61,12 @@ class InventoryCommand final : public Command {
 };
 
 class SelectItemCommand final : public Command {
+ private:
+  UiWindow& ui_window_;
+
  public:
-  SelectItemCommand(World& world, Entity* entity) : Command(world, entity) {}
+  SelectItemCommand(World& world, Entity* entity, UiWindow& ui_window)
+      : Command(world, entity), ui_window_(ui_window) {}
   StateResult execute() override;
 };
 

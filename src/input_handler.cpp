@@ -2,6 +2,7 @@
 
 #include "engine.hpp"
 #include "events/command.hpp"
+#include "gui.hpp"
 #include "world.hpp"
 
 namespace cpprl {
@@ -127,14 +128,14 @@ EngineEvent& MenuInputHandler::handle_sdl_event(SDL_Event event) noexcept {
   }
 };
 
-GuiInputHandler::GuiInputHandler(World& world)
+GuiInputHandler::GuiInputHandler(World& world, UiWindow& ui_window)
     : EventHandler(world),
       closeViewCommand_(world),
-      scrollDownCommand_(world, 1),
-      scrollUpCommand_(world, -1),
-      jumpUpCommand_(world, -10),
-      jumpDownCommand_(world, 10),
-      jumpToHome_(world, 0){};
+      scrollDownCommand_(world, ui_window, 1),
+      scrollUpCommand_(world, ui_window, -1),
+      jumpUpCommand_(world, ui_window, -10),
+      jumpDownCommand_(world, ui_window, 10),
+      jumpToHome_(world, ui_window, 0){};
 
 EngineEvent& GuiInputHandler::handle_sdl_event(SDL_Event event) noexcept {
   SDL_Keycode key = event.key.keysym.sym;

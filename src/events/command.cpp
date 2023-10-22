@@ -27,31 +27,30 @@ StateResult PickupCommand::execute() {
 }
 
 StateResult ScrollCommand::execute() {
-  world_.scroll_current_view(scroll_amount_);
+  ui_window_.set_cursor(ui_window_.get_cursor() + scroll_amount_);
+  // world_.scroll_current_view(scroll_amount_);
   return {};
 }
 
 StateResult ViewHistoryCommand::execute() {
-  world_.toggle_pause();
-  world_.toggle_view();
-  world_.set_current_view(new HistoryWindow(
-      80, 40, {0, 0}, world_.get_message_log(), "Message Log"));
+  // world_.toggle_pause();
+  // world_.toggle_view();
+  // world_.set_current_view();
+
   // world_.set_input_handler(new HistoryViewInputHandler(world_));
-  return {};
+  return Change{std::make_unique<ViewMessageHistoryState>(
+      world_,
+      new HistoryWindow(
+          80, 40, {0, 0}, world_.get_message_log(), "Message Log"))};
 }
 
 StateResult InventoryCommand::execute() {
-  world_.toggle_pause();
-  world_.toggle_view();
-  // world_.set_make_unique<GameInputHandler>(world_, world_.get_player());
-  world_.set_current_view(
-      new InventoryWindow(40, 20, {0, 0}, entity_, "Inventory"));
-  // world_.set_input_handler(new InventoryInputHandler(world_, entity_));
-  return {};
+  return Change{std::make_unique<ViewInventoryState>(
+      world_, new InventoryWindow(40, 20, {0, 0}, entity_, "Inventory"))};
 }
 
 StateResult SelectItemCommand::execute() {
-  int cursor_ = world_.get_current_view().get_cursor();
+  int cursor_ = ui_window_.get_cursor();
   auto use_item_command =
       std::make_unique<UseItemCommand>(world_, entity_, cursor_);
   return use_item_command->execute();
@@ -80,7 +79,7 @@ StateResult CloseViewCommand::execute() {
   world_.toggle_view();
   // world_.set_input_handler(new GameInputHandler(world_,
   // world_.get_player()));
-  return {};
+  return Change{std::make_unique<InGameState>(world_)};
 }
 
 StateResult DieEvent::execute() {
