@@ -46,6 +46,8 @@ Engine::Engine(int argc, char** argv)
   //     "Use J, K, PG U, PG D to scroll through messages. Use Q to quit.",
   //     RED);
   // input_handler_ = new GameInputHandler(*this, player_);
+  world_->generate_map(80, 40);
+  engine_state_->on_enter();
 }
 Engine::~Engine() {
   // delete dungeon_;
