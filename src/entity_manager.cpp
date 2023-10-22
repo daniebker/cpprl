@@ -2,6 +2,9 @@
 
 #include <SDL2/SDL.h>
 
+#include "basic_ai_component.hpp"
+#include "colours.hpp"
+#include "components.hpp"
 #include "util.hpp"
 
 namespace cpprl {

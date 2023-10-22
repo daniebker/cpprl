@@ -22,7 +22,8 @@ class Dungeon {
 
  public:
   Dungeon(){};
-  Map* generate(DungeonConfig config);
+  ~Dungeon() = default;
+  std::unique_ptr<Map> generate(DungeonConfig config);
 };
 }  // namespace cpprl
 

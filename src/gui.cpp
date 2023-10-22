@@ -3,6 +3,8 @@
 #include <algorithm>
 
 #include "colours.hpp"
+#include "components.hpp"
+#include "game_entity.hpp"
 
 namespace cpprl {
 

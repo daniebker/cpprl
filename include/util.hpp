@@ -2,6 +2,7 @@
 #define UTIL_HPP
 #include <string>
 
+#include "components.hpp"
 #include "types/math.hpp"
 
 namespace cpprl::util {

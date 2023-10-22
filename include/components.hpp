@@ -3,24 +3,14 @@
 
 #include <libtcod.hpp>
 #include <string_view>
+#include <variant>
 
-#include "state.hpp"
+#include "types/action_result.hpp"
+#include "types/entity_fwd.hpp"
 #include "types/math.hpp"
+#include "types/world_fwd.hpp"
 
 namespace cpprl {
-class Entity;
-class Engine;
-struct Success {};
-
-struct Failure {
-  std::string message;
-};
-
-struct Poll {
-  std::unique_ptr<State> new_state;
-};
-
-using ActionResult = std::variant<Success, Failure, Poll>;
 
 class AttackComponent {
  public:
@@ -94,13 +84,13 @@ class ConsumableComponent {
  public:
   virtual ~ConsumableComponent() = default;
   bool pick_up(Entity* owner, Entity* wearer);
-  virtual ActionResult use(Entity* owner, Entity* wearer, Engine& engine);
+  virtual ActionResult use(Entity* owner, Entity* wearer, World& world);
 };
 
 class HealingConsumable final : public ConsumableComponent {
  public:
   HealingConsumable(int amount);
-  ActionResult use(Entity* owner, Entity* wearer, Engine& engine);
+  ActionResult use(Entity* owner, Entity* wearer, World& world);
 
  private:
   int amount_;
@@ -113,7 +103,7 @@ class LightningBolt final : public ConsumableComponent {
  public:
   LightningBolt(float range, float damage) : range_(range), damage_(damage) {}
   ~LightningBolt() = default;
-  ActionResult use(Entity* owner, Entity* wearer, Engine& engine);
+  ActionResult use(Entity* owner, Entity* wearer, World& world);
 };
 
 class FireSpell final : public ConsumableComponent {
@@ -125,7 +115,7 @@ class FireSpell final : public ConsumableComponent {
       : max_range_(max_range), damage_(damage) {}
   ~FireSpell() = default;
 
-  ActionResult use(Entity* owner, Entity* Wearer, Engine& engine);
+  ActionResult use(Entity* owner, Entity* Wearer, World& world);
 };
 }  // namespace cpprl
 #endif

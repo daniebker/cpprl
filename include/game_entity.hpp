@@ -4,13 +4,19 @@
 #include <libtcod.hpp>
 #include <string_view>
 
-#include "basic_ai_component.hpp"
-#include "colours.hpp"
-#include "components.hpp"
 #include "types/math.hpp"
+#include "types/world_fwd.hpp"
 
 namespace cpprl {
-class Engine;
+
+class TransformComponent;
+class ASCIIComponent;
+class AttackComponent;
+class DefenseComponent;
+class ConsumableComponent;
+class AIComponent;
+class Container;
+
 class Entity {
  protected:
   std::string name_;
@@ -29,26 +35,9 @@ class Entity {
       std::string name,
       bool blocker,
       TransformComponent* transformComponent,
-      ASCIIComponent* asciiComponent)
-      : name_(name),
-        blocker_(blocker),
-        transformComponent_(std::move(transformComponent)),
-        asciiComponent_(std::move(asciiComponent)),
-        attackComponent_(nullptr),
-        defenseComponent_(nullptr),
-        consumableComponent_(nullptr),
-        aiComponent_(nullptr),
-        container_(nullptr) {}
+      ASCIIComponent* asciiComponent);
 
-  ~Entity() {
-    if (attackComponent_) delete attackComponent_;
-    if (defenseComponent_) delete defenseComponent_;
-    if (consumableComponent_) delete consumableComponent_;
-    if (aiComponent_) delete aiComponent_;
-    if (container_) delete container_;
-    if (transformComponent_) delete transformComponent_;
-    if (asciiComponent_) delete asciiComponent_;
-  };
+  ~Entity();
 
   TransformComponent* get_transform_component() { return transformComponent_; };
   ASCIIComponent* get_sprite_component() { return asciiComponent_; };
@@ -57,27 +46,23 @@ class Entity {
   ConsumableComponent* get_consumable_component() {
     return consumableComponent_;
   };
-   AIComponent* get_ai_component() { return aiComponent_; };
-   Container* get_container() { return container_; };
+  AIComponent* get_ai_component() { return aiComponent_; };
+  Container* get_container() { return container_; };
 
-   // TODO: not sure this belongs here
-   float get_distance_to(Entity* other) {
-     return transformComponent_->get_position().distance_to(
-         other->get_transform_component()->get_position());
-   };
+  float get_distance_to(Entity* other);
 
-   bool is_blocking() { return blocker_; };
-   std::string get_name() { return name_; };
+  bool is_blocking() { return blocker_; };
+  std::string get_name() { return name_; };
 
-   void update(Engine& engine);
-   void set_blocking(bool blocker) { blocker_ = blocker; };
-   void set_name(std::string name) { name_ = name; };
-   void set_ascii_component(ASCIIComponent* asciiComponent) {
-     asciiComponent_ = asciiComponent;
-   };
-   void set_defense_component(DefenseComponent* defenseComponent) {
-     defenseComponent_ = defenseComponent;
-   };
+  void update(World& world);
+  void set_blocking(bool blocker) { blocker_ = blocker; };
+  void set_name(std::string name) { name_ = name; };
+  void set_ascii_component(ASCIIComponent* asciiComponent) {
+    asciiComponent_ = asciiComponent;
+  };
+  void set_defense_component(DefenseComponent* defenseComponent) {
+    defenseComponent_ = defenseComponent;
+  };
   void set_attack_component(AttackComponent* attackComponent) {
     attackComponent_ = attackComponent;
   };

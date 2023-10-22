@@ -1,4 +1,7 @@
-#include "../../include/types/map.hpp"
+#include "types/map.hpp"
+
+#include "colours.hpp"
+#include "components.hpp"
 
 namespace cpprl {
 Map::Map(int width, int height)

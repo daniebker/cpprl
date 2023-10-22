@@ -6,11 +6,12 @@
 #include <iostream>
 #include <memory>
 
-#include "events/engine_event.hpp"
+#include "events/command.hpp"
 #include "exceptions.hpp"
 #include "gui.hpp"
 #include "health_bar.hpp"
 #include "input_handler.hpp"
+#include "state.hpp"
 #include "types/math.hpp"
 #include "types/state_result.hpp"
 #include "util.hpp"
@@ -22,17 +23,17 @@ Engine::Engine(int argc, char** argv)
     :  // dungeon_(nullptr),
        // entities_(nullptr),
        // player_(nullptr),
-      health_bar_(nullptr),
+      // health_bar_(nullptr),
       // map_(nullptr),
       // message_log_(nullptr),
       // current_window_(nullptr),
       // input_handler_(nullptr),
-      renderer_(nullptr),
-      engine_state_(std::make_unique<InGameState>(*_world)),
-      world_(std::make_unique<World>()) {
+      renderer_(std::make_unique<TCODRenderer>(argc, argv)),
+      world_(std::make_unique<World>()),
+      engine_state_(std::make_unique<InGameState>(*world_)) {
   // dungeon_ = std::make_unique<Dungeon>();
   // entities_ = std::make_unique<EntityManager>();
-  renderer_ = std::make_unique<TCODRenderer>(argc, argv);
+  // renderer_ = std::make_unique<TCODRenderer>(argc, argv);
   // generate_map(80, 35);
   // // message_log_ = std::make_unique<MessageLog>();
   // message_log_->add_message("Welcome to your eternal doom!", RED);
@@ -46,6 +47,15 @@ Engine::Engine(int argc, char** argv)
   //     RED);
   // input_handler_ = new GameInputHandler(*this, player_);
 }
+Engine::~Engine() {
+  // delete dungeon_;
+  // delete entities_;
+  // delete health_bar_;
+  // delete map_;
+  // delete message_log_;
+  // delete current_window_;
+  // delete input_handler_;
+}
 
 void Engine::handle_events() {
 #ifndef __EMSCRIPTEN__
@@ -57,7 +67,7 @@ void Engine::handle_events() {
   while (SDL_PollEvent(&event)) {
     // call on_update of state which can return change
     if (event.type == SDL_KEYDOWN) {
-      CommandResult result = engine_state_->on_update(event);
+      StateResult result = engine_state_->on_update(event);
       if (std::holds_alternative<std::monostate>(result)) {
       } else if (std::holds_alternative<Change>(result)) {
         engine_state_->on_exit();
@@ -66,7 +76,7 @@ void Engine::handle_events() {
       } else if (std::holds_alternative<Reset>(result)) {
         reset_game();
       } else if (std::holds_alternative<EndTurn>(result)) {
-        handle_enemy_turns();
+        world_->handle_enemy_turns();
       } else if (std::holds_alternative<Quit>(result)) {
         std::exit(EXIT_SUCCESS);
       }
@@ -78,15 +88,15 @@ void Engine::handle_events() {
   }
 }
 
-void Engine::render() { world_->render(); }
+void Engine::render() { world_->render(*renderer_); }
 
-void Engine::handle_enemy_turns() {}
+// void Engine::handle_enemy_turns() {}
 
-void Engine::handle_player_death() {
-  game_over_ = true;
-  delete input_handler_;
-  input_handler_ = new MenuInputHandler(*this);
-}
+// void Engine::handle_player_death() {
+//   game_over_ = true;
+//   delete input_handler_;
+//   input_handler_ = new MenuInputHandler(*this);
+// }
 
 void Engine::reset_game() {
   // game_over_ = false;
@@ -104,30 +114,31 @@ void Engine::reset_game() {
   // set_input_handler(new GameInputHandler(*this, player_));
 }
 
-void Engine::set_input_handler(EventHandler* input_handler) {
-  delete input_handler_;
-  input_handler_ = input_handler;
-}
+// void Engine::set_input_handler(EventHandler* input_handler) {
+//   delete input_handler_;
+//   input_handler_ = input_handler;
+// }
 
-void Engine::scroll_current_view(int scroll_amount) {
-  if (show_view_) {
-    current_window_->set_cursor(current_window_->get_cursor() + scroll_amount);
-  }
-}
+// void Engine::scroll_current_view(int scroll_amount) {
+//   if (show_view_) {
+//     current_window_->set_cursor(current_window_->get_cursor() +
+//     scroll_amount);
+//   }
+// }
 
-// TODO: move this to state, then add a callback to calc damage.
-void Engine::set_targeting_tile(
-    float max_range, std::function<void()> callback) {
-  input_handler_ = new TargetingInputHandler(*this);
-  targeting_mode_ = !targeting_mode_;
-  map_->toggle_target_mode(max_range);
-  // SDL_WaitEvent(nullptr);
-  // SDL_Event event;
-  // EngineEvent& command = input_handler_->handle_sdl_event(event);
-  // command.execute();
-  // Engine::render();
-  // if (!targeting_mode_) {
-  //   callback();
-  // }
-}
+// // TODO: move this to state, then add a callback to calc damage.
+// void Engine::set_targeting_tile(
+//     float max_range, std::function<void()> callback) {
+//   input_handler_ = new TargetingInputHandler(*this);
+//   targeting_mode_ = !targeting_mode_;
+//   map_->toggle_target_mode(max_range);
+//   // SDL_WaitEvent(nullptr);
+//   // SDL_Event event;
+//   // EngineEvent& command = input_handler_->handle_sdl_event(event);
+//   // command.execute();
+//   // Engine::render();
+//   // if (!targeting_mode_) {
+//   //   callback();
+//   // }
+// }
 }  // namespace cpprl

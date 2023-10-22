@@ -1,8 +1,8 @@
 #include "input_handler.hpp"
 
 #include "engine.hpp"
-#include "events/directional_command.hpp"
-#include "events/quit_command.hpp"
+#include "events/command.hpp"
+#include "world.hpp"
 
 namespace cpprl {
 
@@ -22,14 +22,14 @@ EngineEvent& TargetingInputHandler::handle_sdl_event(SDL_Event event) noexcept {
   if (event.type == SDL_MOUSEMOTION) {
     g_context.convert_event_coordinates(event);
     auto mouse_input_event =
-        MouseInputEvent{engine_, {event.motion.x, event.motion.y}};
+        MouseInputEvent{world_, {event.motion.x, event.motion.y}};
     return mouse_input_event;
   }
 
   else if (event.type == SDL_MOUSEBUTTONDOWN) {
     g_context.convert_event_coordinates(event);
     auto mouse_click_event =
-        MouseClickEvent{engine_, {event.motion.x, event.motion.y}};
+        MouseClickEvent{world_, {event.motion.x, event.motion.y}};
     return mouse_click_event;
   } else if (event.type == SDL_KEYDOWN) {
     SDL_Keycode key = event.key.keysym.sym;
@@ -45,14 +45,27 @@ EngineEvent& TargetingInputHandler::handle_sdl_event(SDL_Event event) noexcept {
   return noop;
 };
 
+GameInputHandler::GameInputHandler(World& world, Entity* controllable_entity)
+    : EventHandler(world),
+      buttonRight(world_, controllable_entity, Vector2D{1, 0}),
+      buttonUp(world_, controllable_entity, Vector2D{0, -1}),
+      buttonDown(world_, controllable_entity, Vector2D{0, 1}),
+      buttonUpRight(world_, controllable_entity, Vector2D{1, -1}),
+      buttonUpLeft(world_, controllable_entity, Vector2D{-1, -1}),
+      buttonLeft(world_, controllable_entity, Vector2D{-1, 0}),
+      buttonDownRight(world_, controllable_entity, Vector2D{1, 1}),
+      buttonDownLeft(world_, controllable_entity, Vector2D{-1, 1}),
+      viewHistoryCommand(world_),
+      pickupCommand_(world, controllable_entity),
+      inventoryCommand_(world, controllable_entity){};
+
 EngineEvent& GameInputHandler::handle_sdl_event(SDL_Event event) noexcept {
   // TODO: Move this to its own handler.
   //  probably want an event handler which has
   //  input handler for keyboard and another for mouse
   if (event.type == SDL_MOUSEMOTION) {
     g_context.convert_event_coordinates(event);
-    engine_.get_controller().cursor = {event.motion.x, event.motion.y};
-    engine_.get_map()->set_highlight_tile({event.motion.x, event.motion.y});
+    world_.get_map().set_highlight_tile({event.motion.x, event.motion.y});
     return noop;
   }
 
@@ -113,6 +126,15 @@ EngineEvent& MenuInputHandler::handle_sdl_event(SDL_Event event) noexcept {
       break;
   }
 };
+
+GuiInputHandler::GuiInputHandler(World& world)
+    : EventHandler(world),
+      closeViewCommand_(world),
+      scrollDownCommand_(world, 1),
+      scrollUpCommand_(world, -1),
+      jumpUpCommand_(world, -10),
+      jumpDownCommand_(world, 10),
+      jumpToHome_(world, 0){};
 
 EngineEvent& GuiInputHandler::handle_sdl_event(SDL_Event event) noexcept {
   SDL_Keycode key = event.key.keysym.sym;

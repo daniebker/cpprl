@@ -1,29 +1,38 @@
 #ifndef COMMAND_H
 #define COMMAND_H
 
-#include "engine.hpp"
-#include "events/engine_event.hpp"
-#include "game_entity.hpp"
-#include "types/map.hpp"
+#include "types/entity_fwd.hpp"
+#include "types/math.hpp"
 #include "types/state_result.hpp"
+#include "types/world_fwd.hpp"
 
 namespace cpprl {
+
+class EngineEvent {
+ protected:
+  World& world_;
+
+ public:
+  EngineEvent(World& world) : world_(world) {}
+  virtual ~EngineEvent() {}
+  virtual StateResult execute() = 0;
+};
+
 class Command : public EngineEvent {
  protected:
   Entity* entity_;
 
  public:
-  Command(Engine& engine, Entity* entity)
-      : EngineEvent(engine), entity_(entity) {}
+  Command(World& world, Entity* entity) : EngineEvent(world), entity_(entity) {}
   virtual ~Command() {}
-  virtual CommandResult execute() = 0;
+  virtual StateResult execute() = 0;
 };
 
 class ScrollCommand : public EngineEvent {
  public:
-  ScrollCommand(Engine& engine, int scroll_amount)
-      : EngineEvent(engine), scroll_amount_(scroll_amount){};
-  virtual CommandResult execute();
+  ScrollCommand(World& world, int scroll_amount)
+      : EngineEvent(world), scroll_amount_(scroll_amount){};
+  virtual StateResult execute();
 
  private:
   int scroll_amount_;
@@ -31,26 +40,26 @@ class ScrollCommand : public EngineEvent {
 
 class ViewHistoryCommand : public EngineEvent {
  public:
-  ViewHistoryCommand(Engine& engine) : EngineEvent(engine){};
-  virtual CommandResult execute();
+  ViewHistoryCommand(World& world) : EngineEvent(world){};
+  virtual StateResult execute();
 };
 
 class PickupCommand : public Command {
  public:
-  PickupCommand(Engine& engine, Entity* entity) : Command(engine, entity){};
-  virtual CommandResult execute();
+  PickupCommand(World& world, Entity* entity) : Command(world, entity){};
+  virtual StateResult execute();
 };
 
 class InventoryCommand final : public Command {
  public:
-  InventoryCommand(Engine& engine, Entity* entity) : Command(engine, entity) {}
-  CommandResult execute() override;
+  InventoryCommand(World& world, Entity* entity) : Command(world, entity) {}
+  StateResult execute() override;
 };
 
 class SelectItemCommand final : public Command {
  public:
-  SelectItemCommand(Engine& engine, Entity* entity) : Command(engine, entity) {}
-  CommandResult execute() override;
+  SelectItemCommand(World& world, Entity* entity) : Command(world, entity) {}
+  StateResult execute() override;
 };
 
 class UseItemCommand final : public Command {
@@ -58,9 +67,93 @@ class UseItemCommand final : public Command {
   int item_index_;
 
  public:
-  UseItemCommand(Engine& engine, Entity* entity, int item_index)
-      : Command(engine, entity), item_index_(item_index) {}
-  CommandResult execute() override;
+  UseItemCommand(World& world, Entity* entity, int item_index)
+      : Command(world, entity), item_index_(item_index) {}
+  StateResult execute() override;
+};
+
+class CloseViewCommand final : public EngineEvent {
+ public:
+  CloseViewCommand(World& world) : EngineEvent(world){};
+  virtual StateResult execute() override;
+};
+
+class DieEvent : public EngineEvent {
+ public:
+  DieEvent(World& world, Entity* entity)
+      : EngineEvent(world), entity_(entity) {}
+  virtual ~DieEvent() = default;
+  virtual StateResult execute() override;
+
+ private:
+  Entity* entity_;
+};
+
+class DirectionalCommand : public Command {
+ protected:
+  Vector2D move_vector_;
+
+ public:
+  DirectionalCommand(World& world, Entity* entity, Vector2D move_vector)
+      : Command(world, entity), move_vector_(move_vector){};
+  virtual StateResult execute();
+};
+
+class NoOpEvent : public EngineEvent {
+ public:
+  NoOpEvent(World& world) : EngineEvent(world) {}
+  StateResult execute() override { return {}; }
+};
+
+class ResetGameCommand : public EngineEvent {
+ public:
+  ResetGameCommand(World& world) : EngineEvent(world) {}
+  StateResult execute() override { return Reset{}; }
+};
+
+class MouseInputEvent final : public EngineEvent {
+ private:
+  Vector2D position_;
+
+ public:
+  MouseInputEvent(World& world, Vector2D position)
+      : EngineEvent(world), position_(position) {}
+  StateResult execute() override;
+};
+
+class MouseClickEvent final : public EngineEvent {
+ private:
+  Vector2D position_;
+
+ public:
+  MouseClickEvent(World& world, Vector2D position)
+      : EngineEvent(world), position_(position) {}
+  StateResult execute() override;
+};
+
+class ExitTargetingModeCommand final : public EngineEvent {
+ public:
+  ExitTargetingModeCommand(World& world) : EngineEvent(world) {}
+  StateResult execute() override;
+};
+
+class MeleeCommand : DirectionalCommand {
+ public:
+  MeleeCommand(World& world, Entity* entity, Vector2D target_vector)
+      : DirectionalCommand(world, entity, target_vector){};
+  StateResult execute();
+};
+
+class MovementCommand : public DirectionalCommand {
+ public:
+  MovementCommand(World& world, Entity* entity, Vector2D move_vector)
+      : DirectionalCommand(world, entity, move_vector){};
+  virtual StateResult execute();
+};
+class QuitCommand : public EngineEvent {
+ public:
+  QuitCommand(World& world) : EngineEvent(world){};
+  virtual StateResult execute();
 };
 }  // namespace cpprl
 #endif

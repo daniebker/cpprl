@@ -1,7 +1,31 @@
 #include "world.hpp"
 
+#include "controller.hpp"
+#include "dungeon.hpp"
+#include "entity_manager.hpp"
+#include "game_entity.hpp"
+#include "health_bar.hpp"
+
 namespace cpprl {
-World::generate_map(int width, int height) {
+World::World()
+    : entities_(std::make_unique<EntityManager>()),
+      player_(nullptr),
+      current_window_(nullptr),
+      show_view_(false) {
+  controller_ = std::make_unique<Controller>();
+  dungeon_ = std::make_unique<Dungeon>();
+  message_log_ = std::make_unique<MessageLog>();
+
+  message_log_->add_message("Welcome to your eternal doom!", RED);
+  message_log_->add_message("May you travel safe", RED);
+  message_log_->add_message(
+      "Use W, A, S, D, Q, E, Z, C to move around the map. ", RED);
+  message_log_->add_message("Press ESC to quit.", RED);
+  message_log_->add_message("V opens your message log.", RED);
+  message_log_->add_message(
+      "Use J, K, PG U, PG D to scroll through messages. Use Q to quit.", RED);
+}
+void World::generate_map(int width, int height) {
   map_ = dungeon_->generate(DungeonConfig{30, 6, 10, width, height, 2});
 
   std::vector<RectangularRoom> rooms = map_->get_rooms();
@@ -36,45 +60,48 @@ World::generate_map(int width, int height) {
   player_ = entities_->spawn(entity);
 
   map_->compute_fov(player_->get_transform_component()->get_position(), 4);
-  health_bar_ =
-      new HealthBar(20, 1, {2, 36}, *player_->get_defense_component());
+  auto& player_defense = *player_->get_defense_component();
+  health_bar_ = new HealthBar(20, 1, {2, 36}, player_defense);
   entities_->shrink_to_fit();
 }
 
-void World::render() {
+void World::render(Renderer& renderer) {
   map_->compute_fov(player_->get_transform_component()->get_position(), 10);
   map_->render(g_console);
 
   for (Entity* entity : *entities_) {
     if (map_->is_in_fov(entity->get_transform_component()->get_position())) {
-      renderer_->render(
+      renderer.render(
           *entity->get_sprite_component(), *entity->get_transform_component());
     }
   }
   health_bar_->render(g_console);
 
   message_log_->render(g_console, 23, 35, 45, 5);
-  auto entities_at = entities_->get_entities_at(controller_.cursor);
+  auto entities_at = entities_->get_entities_at(controller_->cursor);
   if (entities_at.size() > 0) {
     std::string names;
     for (auto& entity : entities_at) {
       names += entity->get_name() + ", ";
       tcod::print_rect(
           g_console,
-          {controller_.cursor.x, controller_.cursor.y - 1, 20, 1},
+          {controller_->cursor.x, controller_->cursor.y - 1, 20, 1},
           names,
           WHITE,
           std::nullopt,
           TCOD_LEFT);
     }
   }
+  // TODO: this can go in state on_render(Renderer& renderer)
+  // World is repsponsible for rendering the current world
+  // but states can render an overlay
   // if (show_view_) {
   //   current_window_->render(g_console);
   // }
   g_context.present(g_console);
 }
 
-void World::handle_eney_turns() {
+void World::handle_enemy_turns() {
   for (Entity* entity : *entities_) {
     if (entity->get_ai_component() &&
         entity->get_defense_component()->is_not_dead()) {
@@ -82,6 +109,20 @@ void World::handle_eney_turns() {
       entity->update(*this);
     }
   }
+}
+
+void World::reset() {}
+
+void World::scroll_current_view(int scroll_amount) {
+  if (show_view_) {
+    current_window_->set_cursor(current_window_->get_cursor() + scroll_amount);
+  }
+}
+
+void World::handle_player_death() {
+  // game_over_ = true;
+  // delete input_handler_;
+  // input_handler_ = new MenuInputHandler(*this);
 }
 
 }  // namespace cpprl

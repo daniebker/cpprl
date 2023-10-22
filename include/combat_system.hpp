@@ -1,6 +1,7 @@
 #ifndef INCLUDE_COMBAT_SYSTEM_HPP_
 #define INCLUDE_COMBAT_SYSTEM_HPP_
 
+#include "components.hpp"
 #include "game_entity.hpp"
 
 namespace cpprl::combat_system {

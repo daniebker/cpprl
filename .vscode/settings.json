@@ -140,6 +140,6 @@
     "__std_stream": "cpp"
   },
   "[cpp]": {
-    "editor.defaultFormatter": "ms-vscode.cpptools"
+    "editor.defaultFormatter": "xaver.clang-format"
   }
 }

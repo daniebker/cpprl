@@ -24,7 +24,7 @@ class State;
 class Engine {
  private:
   // std::unique_ptr<Dungeon> dungeon_;
-  UiWindow* health_bar_;
+  // UiWindow* health_bar_;
   // std::unique_ptr<MessageLog> message_log_;
   // UiWindow* current_window_;
   // EventHandler* input_handler_;
@@ -35,8 +35,8 @@ class Engine {
   // bool game_over_ = false;
   // bool show_view_ = false;
   // bool targeting_mode_ = false;
-  std::unique_ptr<State> engine_state_;
   std::unique_ptr<World> world_;
+  std::unique_ptr<State> engine_state_;
 
   void generate_map(int width, int height);
   void handle_enemy_turns();

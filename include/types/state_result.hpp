@@ -1,7 +1,10 @@
 #ifndef STATE_RESULT_HPP
 #define STATE_RESULT_HPP
 
-#include "state_fwd.hpp"
+#include <memory>
+#include <variant>
+
+#include "types/state_fwd.hpp"
 
 namespace cpprl {
 struct Change {
@@ -10,7 +13,6 @@ struct Change {
 struct Reset {};
 struct EndTurn {};
 struct Quit {};
-using CommandResult =
-    std::variant<std::monostate, Change, Reset, EndTurn, Quit>;
+using StateResult = std::variant<std::monostate, Change, Reset, EndTurn, Quit>;
 }  // namespace cpprl
 #endif
