@@ -124,8 +124,7 @@ StateResult MouseClickEvent::execute() {
 }
 
 StateResult ExitTargetingModeCommand::execute() {
-  // world_.toggle_targeting_mode();
-  return {};
+  return Change{std::make_unique<InGameState>(world_)};
 }
 
 StateResult MeleeCommand::execute() {
