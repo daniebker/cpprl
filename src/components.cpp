@@ -106,10 +106,6 @@ ActionResult LightningBolt::use(Entity* owner, Entity* wearer, World& world) {
   int inflicted = combat_system::handle_spell(damage_, *closest_monster);
   ConsumableComponent::use(owner, wearer, world);
   if (inflicted > 0) {
-    if (closest_monster->get_defense_component()->is_dead()) {
-      auto action = DieEvent(world, closest_monster);
-      action.execute();
-    }
     world.get_message_log().add_message(
         fmt::format(
             "A lightning bolt strikes the {} with a loud "
@@ -118,6 +114,10 @@ ActionResult LightningBolt::use(Entity* owner, Entity* wearer, World& world) {
             damage_),
         GREEN);
 
+    if (closest_monster->get_defense_component()->is_dead()) {
+      auto action = DieEvent(world, closest_monster);
+      action.execute();
+    }
     return Success{};
   } else {
     return Failure{fmt::format(
