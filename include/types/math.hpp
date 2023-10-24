@@ -44,6 +44,15 @@ struct Quadrilateral {
   int width;
   int height;
 };
+
+template <typename T>
+inline T euclidean_squared(T x, T y) {
+  return x * x + y * y;
+}
+inline int euclidean_squared(Vector2D vec) {
+  return euclidean_squared(vec.x, vec.y);
+}
+
 }  // namespace cpprl
 
 #endif  // TYPES_MATH_HPP

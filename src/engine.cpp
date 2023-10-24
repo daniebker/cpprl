@@ -20,43 +20,14 @@
 namespace cpprl {
 
 Engine::Engine(int argc, char** argv)
-    :  // dungeon_(nullptr),
-       // entities_(nullptr),
-       // player_(nullptr),
-      // health_bar_(nullptr),
-      // map_(nullptr),
-      // message_log_(nullptr),
-      // current_window_(nullptr),
-      // input_handler_(nullptr),
-      renderer_(std::make_unique<TCODRenderer>(argc, argv)),
+    : renderer_(std::make_unique<TCODRenderer>(argc, argv)),
       world_(std::make_unique<World>()),
       engine_state_(std::make_unique<InGameState>(*world_)) {
-  // dungeon_ = std::make_unique<Dungeon>();
-  // entities_ = std::make_unique<EntityManager>();
-  // renderer_ = std::make_unique<TCODRenderer>(argc, argv);
-  // generate_map(80, 35);
-  // // message_log_ = std::make_unique<MessageLog>();
-  // message_log_->add_message("Welcome to your eternal doom!", RED);
-  // message_log_->add_message("May you travel safe", RED);
-  // message_log_->add_message(
-  //     "Use W, A, S, D, Q, E, Z, C to move around the map. ", RED);
-  // message_log_->add_message("Press ESC to quit.", RED);
-  // message_log_->add_message("V opens your message log.", RED);
-  // message_log_->add_message(
-  //     "Use J, K, PG U, PG D to scroll through messages. Use Q to quit.",
-  //     RED);
-  // input_handler_ = new GameInputHandler(*this, player_);
   world_->generate_map(80, 35);
   engine_state_->on_enter();
 }
 Engine::~Engine() {
-  // delete dungeon_;
-  // delete entities_;
-  // delete health_bar_;
-  // delete map_;
-  // delete message_log_;
-  // delete current_window_;
-  // delete input_handler_;
+
 }
 
 void Engine::handle_events() {
@@ -68,7 +39,8 @@ void Engine::handle_events() {
 #endif
   while (SDL_PollEvent(&event)) {
     // call on_update of state which can return change
-    if (event.type == SDL_KEYDOWN) {
+    if (event.type == SDL_KEYDOWN || event.type == SDL_MOUSEMOTION ||
+        event.type == SDL_MOUSEBUTTONDOWN) {
       StateResult result = engine_state_->on_update(event);
       if (std::holds_alternative<std::monostate>(result)) {
       } else if (std::holds_alternative<Change>(result)) {
@@ -82,8 +54,6 @@ void Engine::handle_events() {
       } else if (std::holds_alternative<Quit>(result)) {
         std::exit(EXIT_SUCCESS);
       }
-    } else if (event.type == SDL_MOUSEMOTION) {
-      // input_handler_->handle_sdl_event(event);
     } else if (event.type == SDL_QUIT) {
       std::exit(EXIT_SUCCESS);
     }

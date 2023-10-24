@@ -6,9 +6,8 @@
 #include "types/map.hpp"
 
 namespace cpprl {
-std::unique_ptr<Map> Dungeon::generate(DungeonConfig dungeon_config) {
-  auto map = std::make_unique<Map>(
-      dungeon_config.map_width, dungeon_config.map_height);
+Map* Dungeon::generate(DungeonConfig dungeon_config) {
+  Map* map = new Map(dungeon_config.map_width, dungeon_config.map_height);
   auto rooms = std::vector<RectangularRoom>{};
 
   auto* random = TCODRandom::getInstance();

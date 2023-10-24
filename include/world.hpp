@@ -17,7 +17,7 @@ class World {
   std::unique_ptr<EntityManager> entities_;
   Entity* player_;
   std::unique_ptr<Dungeon> dungeon_;
-  std::unique_ptr<Map> map_;
+  Map* map_;
   std::unique_ptr<MessageLog> message_log_;
   UiWindow* health_bar_;
   std::unique_ptr<Controller> controller_;
@@ -45,7 +45,7 @@ class World {
   void scroll_current_view(int scroll_amount);
   void toggle_pause() { is_paused_ = !is_paused_; }
   void handle_player_death();
-  void toggle_view() { show_view_ = !show_view_; }
+  [[decltype(show_view_)]] void toggle_view() { show_view_ = !show_view_; }
   // void set_input_handler(EventHandler* input_handler);
   void set_current_view(UiWindow* current_window) {
     current_window_ = std::move(current_window);

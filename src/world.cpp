@@ -10,6 +10,7 @@ namespace cpprl {
 World::World()
     : entities_(std::make_unique<EntityManager>()),
       player_(nullptr),
+      map_(nullptr),
       current_window_(nullptr),
       show_view_(false) {
   controller_ = std::make_unique<Controller>();
@@ -92,12 +93,6 @@ void World::render(Renderer& renderer) {
           TCOD_LEFT);
     }
   }
-  // TODO: this can go in state on_render(Renderer& renderer)
-  // World is repsponsible for rendering the current world
-  // but states can render an overlay
-  // if (show_view_) {
-  //   current_window_->render(g_console);
-  // }
 }
 
 void World::handle_enemy_turns() {

@@ -14,6 +14,7 @@ Map::Map(int width, int height)
   floor_tile_.light = TCOD_ConsoleTile{'.', WHITE, BLACK};
   floor_tile_.target = TCOD_ConsoleTile{'.', TEAL, BLACK};
   floor_tile_.dark = TCOD_ConsoleTile{'.', GREY, BLACK};
+  target_tile_ = Vector2D{0, 0};
 }
 
 Map::~Map() {}
@@ -60,17 +61,6 @@ bool Map::is_explored(Vector2D position) {
   return tiles_.at(position).explored;
 }
 
-bool Map::set_target_tile(Vector2D position, Entity& player) {
-  if (is_in_fov(position) &&
-      (max_range_ == 0 ||
-       player.get_transform_component()->get_position().distance_to(position) <=
-           max_range_)) {
-    target_tile_ = position;
-    return true;
-  }
-  return false;
-}
-
 void Map::render(tcod::Console& console) {
   console.clear();
 
@@ -94,5 +84,9 @@ void Map::render(tcod::Console& console) {
   }
   if (is_in_fov(target_tile_)) {
   }
+}
+
+void Map::set_highlight_tile(Vector2D position) {
+  target_tile_ = position;
 }
 }  // namespace cpprl
