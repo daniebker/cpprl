@@ -87,11 +87,7 @@ StateResult PickTileAOEState::on_update(SDL_Event& event) {
   }
 }
 
-void PickTileAOEState::on_exit() {
-  // TODO: cast the spell
-  // world_.toggle_pause();
-  on_pick_();
-}
+void PickTileAOEState::on_exit() { on_pick_(); }
 void PickTileAOEState::render(Renderer&) {
   auto& map = world_.get_map();
   if (map.get_highlight_tile() != Vector2D{0, 0}) {

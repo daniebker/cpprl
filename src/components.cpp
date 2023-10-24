@@ -127,8 +127,8 @@ ActionResult LightningBolt::use(Entity* owner, Entity* wearer, World& world) {
 }
 
 ActionResult FireSpell::use(Entity* owner, Entity* wearer, World& world) {
-  std::function<void()> on_pick = [&]() {
-    // TODO: not going to work because we assume always used.
+  auto on_pick = [&, owner, wearer]() {
+    // TODO:: when I get here the pointers are garbage.
     ConsumableComponent::use(owner, wearer, world);
     for (Entity* entity : world.get_entities()) {
       if (entity->get_defense_component() &&

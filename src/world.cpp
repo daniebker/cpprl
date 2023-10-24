@@ -3,6 +3,7 @@
 #include "controller.hpp"
 #include "dungeon.hpp"
 #include "entity_manager.hpp"
+#include "exceptions.hpp"
 #include "game_entity.hpp"
 #include "health_bar.hpp"
 
@@ -52,7 +53,7 @@ void World::generate_map(int width, int height) {
   first_potion->set_consumable_component(new HealingConsumable(10));
   entity->get_container()->add(first_potion);
   Entity* firstScroll = new Entity(
-      "Fire Scroll",
+      "Lightning Scroll",
       false,
       new TransformComponent({0, 0}),
       new ASCIIComponent("#", DARK_RED, 0));
@@ -99,8 +100,11 @@ void World::handle_enemy_turns() {
   for (Entity* entity : *entities_) {
     if (entity->get_ai_component() &&
         entity->get_defense_component()->is_not_dead()) {
-      // dance puppet dance!
-      entity->update(*this);
+      try {
+        // dance puppet dance!
+        entity->update(*this);
+      } catch (Impossible&) {
+      }
     }
   }
 }
@@ -114,6 +118,7 @@ void World::scroll_current_view(int scroll_amount) {
 }
 
 void World::handle_player_death() {
+  // TODO: what happens when the player dies?
   // game_over_ = true;
   // delete input_handler_;
   // input_handler_ = new MenuInputHandler(*this);

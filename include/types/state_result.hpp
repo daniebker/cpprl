@@ -13,6 +13,7 @@ struct Change {
 struct Reset {};
 struct EndTurn {};
 struct Quit {};
+struct GameOver {};
 using StateResult = std::variant<std::monostate, Change, Reset, EndTurn, Quit>;
 }  // namespace cpprl
 #endif

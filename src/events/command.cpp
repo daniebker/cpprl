@@ -84,8 +84,9 @@ StateResult CloseViewCommand::execute() {
 
 StateResult DieEvent::execute() {
   if (entity_->get_name() == "player") {
-    world_.handle_player_death();
-    // TODO: return GameOver{}
+    // TODO: add a GameOverState
+    // return Change{std::make_unique<GameOverState>)()};
+    return {};
   }
   world_.get_message_log().add_message(
       fmt::format("{} has died!", util::capitalize(entity_->get_name())));
