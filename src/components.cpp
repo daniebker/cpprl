@@ -4,6 +4,7 @@
 
 #include <algorithm>
 
+#include "basic_ai_component.hpp"
 #include "combat_system.hpp"
 #include "events/command.hpp"
 #include "exceptions.hpp"
@@ -127,6 +128,9 @@ ActionResult LightningBolt::use(Entity* owner, Entity* wearer, World& world) {
 }
 
 ActionResult FireSpell::use(Entity* owner, Entity* wearer, World& world) {
+  // We want everything by reference, except the pointers which
+  // we need by value. I need the memory address of the owner and
+  // wearer in order to update them and have it persist beyond the lambda.
   auto on_pick = [&, owner, wearer]() {
     // TODO:: when I get here the pointers are garbage.
     ConsumableComponent::use(owner, wearer, world);
@@ -153,6 +157,28 @@ ActionResult FireSpell::use(Entity* owner, Entity* wearer, World& world) {
     }
   };
   // world.set_targeting_tile(max_range_, on_pick);
-  return Poll{std::make_unique<PickTileAOEState>(world, on_pick, max_range_)};
+  return Poll{
+      std::make_unique<PickTileAOEState>(world, on_pick, max_range_, aoe_)};
+}
+
+ActionResult ConfusionSpell::use(Entity* owner, Entity* wearer, World& world) {
+  auto on_pick = [&, owner, wearer]() {
+    Entity* target = world.get_entities().get_blocking_entity_at(
+        world.get_map().get_highlight_tile());
+    if (target) {
+      target->set_ai_component(
+          new ConfusionAI(num_turns_, target->get_ai_component()));
+      world.get_message_log().add_message(
+          fmt::format(
+              "The eyes of the {} look vacant, as it starts to "
+              "stumble around!",
+              target->get_name()),
+          GREEN);
+      ConsumableComponent::use(owner, wearer, world);
+    } else {
+      throw Impossible("There is no targetable enemy at that location.");
+    }
+  };
+  return Poll{std::make_unique<PickTileState>(world, on_pick, max_range_)};
 }
 }  // namespace cpprl

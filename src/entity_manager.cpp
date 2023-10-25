@@ -86,7 +86,14 @@ void EntityManager::place_entities(
           false,
           new TransformComponent(x, y),
           new ASCIIComponent("#", DARK_RED, 0));
-      entity->set_consumable_component(new FireSpell(5, 20));
+      entity->set_consumable_component(new FireSpell(5, 3, 20));
+    } else if (dice <= 70 + 10 + 10 + 10) {
+      Entity* entity = new Entity(
+          "Confusion Scroll",
+          false,
+          new TransformComponent(x, y),
+          new ASCIIComponent("#", DARK_RED, 0));
+      entity->set_consumable_component(new ConfusionSpell(3, 5));
     }
   }
 }
@@ -107,7 +114,9 @@ Entity* EntityManager::spawn(Entity* src, Vector2D position) {
 
 std::vector<Entity*> EntityManager::get_entities_at(Vector2D position) {
   std::vector<Entity*> entities_at_position;
-  entities_at_position.reserve(entities_.size());
+  // At max there can be 3? things at a position.
+  // Corpse, Item, Actor...
+  entities_at_position.reserve(3);
   for (auto& entity : entities_) {
     if (entity->get_transform_component()->get_position() == position) {
       entities_at_position.push_back(entity);
@@ -118,7 +127,7 @@ std::vector<Entity*> EntityManager::get_entities_at(Vector2D position) {
 }
 
 Entity* EntityManager::get_blocking_entity_at(Vector2D position) {
-  for (Entity* entity : entities_) {
+ for (Entity* entity : entities_) {
     if (entity->is_blocking() &&
         entity->get_transform_component()->get_position() == position) {
       return entity;

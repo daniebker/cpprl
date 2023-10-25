@@ -32,10 +32,15 @@ EngineEvent* TargetingInputHandler::handle_sdl_event(SDL_Event event) noexcept {
         new MouseClickEvent(world_, {event.motion.x, event.motion.y});
     return mouse_click_event;
   } else if (event.type == SDL_KEYDOWN) {
+    auto mouse_click_event =
+        new MouseClickEvent(world_, {event.motion.x, event.motion.y});
     SDL_Keycode key = event.key.keysym.sym;
     switch (key) {
       case SDLK_q:
         return exit_targeting_mode_command_;
+        break;
+      case SDLK_RETURN:
+        return mouse_click_event;
         break;
       default:
         return noop_;

@@ -57,7 +57,7 @@ void World::generate_map(int width, int height) {
       false,
       new TransformComponent({0, 0}),
       new ASCIIComponent("#", DARK_RED, 0));
-  firstScroll->set_consumable_component(new FireSpell(5, 20));
+  firstScroll->set_consumable_component(new ConfusionSpell(3, 5));
   entity->get_container()->add(firstScroll);
   player_ = entities_->spawn(entity);
 

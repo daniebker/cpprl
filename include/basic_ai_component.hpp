@@ -19,6 +19,18 @@ class HostileAI final : public AIComponent {
   HostileAI() : AIComponent(){};
   void update(World& world, Entity* entity) override;
 };
+
+class ConfusionAI final : public AIComponent {
+ private:
+  int num_turns_;
+  AIComponent* old_ai_;
+
+ public:
+  ConfusionAI(int num_turns, AIComponent* old_ai)
+      : AIComponent(), num_turns_(num_turns), old_ai_(old_ai) {}
+  ~ConfusionAI() override = default;
+  void update(World& world, Entity* entity) override;
+};
 }  // namespace cpprl
 
 #endif

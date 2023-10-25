@@ -113,12 +113,7 @@ StateResult MouseInputEvent::execute() {
 }
 
 StateResult MouseClickEvent::execute() {
-  // world_.get_controller().cursor = position_;
-  world_.get_map().set_highlight_tile(position_);
-  // bool success = world_.get_map().set_target_tile(position_);
-  // if (success) {
-  //   // world_.toggle_targeting_mode();
-  // }
+  // world_.get_map().set_highlight_tile(position_);
   return Change{std::make_unique<InGameState>(world_)};
 }
 

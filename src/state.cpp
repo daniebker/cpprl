@@ -69,15 +69,13 @@ StateResult ViewInventoryState::on_update(SDL_Event& event) {
   }
 }
 
-void PickTileAOEState::on_enter() {
+void PickTileState::on_enter() {
   input_handler_ = std::make_unique<TargetingInputHandler>(world_);
 }
-StateResult PickTileAOEState::on_update(SDL_Event& event) {
+
+StateResult PickTileState::on_update(SDL_Event& event) {
   try {
     EngineEvent* command = input_handler_->handle_sdl_event(event);
-    // here because the ptr is created in the function I need to
-    // transfer the ownership. In the other functions the owner ship
-    // is in the class.
     StateResult result = command->execute();
     delete command;
     return result;
@@ -87,13 +85,31 @@ StateResult PickTileAOEState::on_update(SDL_Event& event) {
   }
 }
 
-void PickTileAOEState::on_exit() { on_pick_(); }
+void PickTileState::on_exit() { on_pick_(); }
+
+void PickTileState::render(Renderer&) {
+  auto& map = world_.get_map();
+  Vector2D position = map.get_highlight_tile();
+  auto& tile = g_console.at(position);
+  tile = {tile.ch, tcod::ColorRGB{0, 0, 0}, tcod::ColorRGB{255, 255, 255}};
+}
+
+void PickTileAOEState::on_enter() {
+  // input_handler_ = std::make_unique<TargetingInputHandler>(world_);
+  PickTileState::on_enter();
+}
+
+StateResult PickTileAOEState::on_update(SDL_Event& event) {
+  PickTileState::on_update(event);
+}
+
+void PickTileAOEState::on_exit() { PickTileState::on_exit(); }
+
 void PickTileAOEState::render(Renderer&) {
   auto& map = world_.get_map();
   if (map.get_highlight_tile() != Vector2D{0, 0}) {
     with_indexes(map, [&, pos = map.get_highlight_tile()](int x, int y) {
-      if (euclidean_squared(Vector2D{x, y} - pos) >= max_radius_squared_)
-        return;
+      if (euclidean_squared(Vector2D{x, y} - pos) >= aoe_squared_) return;
       if (!g_console.in_bounds({x, y})) return;
       auto& tile = g_console.at({x, y});
       tile = {tile.ch, tcod::ColorRGB{0, 0, 0}, tcod::ColorRGB{255, 255, 255}};

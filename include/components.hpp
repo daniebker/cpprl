@@ -108,14 +108,27 @@ class LightningBolt final : public ConsumableComponent {
 
 class FireSpell final : public ConsumableComponent {
  private:
-  float max_range_, damage_;
+  float max_range_, aoe_, damage_;
 
  public:
-  FireSpell(float max_range, float damage)
-      : max_range_(max_range), damage_(damage) {}
+  FireSpell(float max_range, float aoe, float damage)
+      : max_range_(max_range), aoe_(aoe), damage_(damage) {}
   ~FireSpell() = default;
 
   ActionResult use(Entity* owner, Entity* Wearer, World& world);
 };
+
+class ConfusionSpell final : public ConsumableComponent {
+ private:
+  int num_turns_, max_range_;
+
+ public:
+  ConfusionSpell(int num_turns, int max_range)
+      : num_turns_(num_turns), max_range_(max_range) {}
+  ~ConfusionSpell() = default;
+
+  ActionResult use(Entity* owner, Entity* wearer, World& world);
+};
+
 }  // namespace cpprl
 #endif

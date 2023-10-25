@@ -34,19 +34,33 @@ class InGameState final : public State {
   void on_exit() override;
 };
 
-class PickTileAOEState final : public State {
- private:
+class PickTileState : public State {
+ protected:
+  int max_range_;
   std::function<void()> on_pick_;
-  float max_radius_;
-  float max_radius_squared_;
+
+ public:
+  PickTileState(World& world, std::function<void()> on_pick, int max_range)
+      : State(world), max_range_(max_range), on_pick_(on_pick) {}
+  ~PickTileState() override = default;
+
+  void on_enter() override;
+  StateResult on_update(SDL_Event& sdl_event) override;
+  void render(Renderer& renderer) override;
+  void on_exit() override;
+};
+
+class PickTileAOEState final : public PickTileState {
+ private:
+  float aoe_;
+  float aoe_squared_;
 
  public:
   PickTileAOEState(
-      World& world, std::function<void()> on_pick, float max_radius)
-      : State(world),
-        on_pick_(on_pick),
-        max_radius_(max_radius),
-        max_radius_squared_(max_radius_ * max_radius_) {}
+      World& world, std::function<void()> on_pick, int max_range_, float aoe)
+      : PickTileState(world, on_pick, max_range_),
+        aoe_(aoe),
+        aoe_squared_(aoe * aoe) {}
   void on_enter() override;
   StateResult on_update(SDL_Event& sdl_event) override;
   void render(Renderer& renderer) override;

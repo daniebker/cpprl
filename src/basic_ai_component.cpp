@@ -54,4 +54,18 @@ void HostileAI::update(World& world, Entity* entity) {
   }
 }
 
+void ConfusionAI::update(World& world, Entity* entity) {
+  TCODRandom* random = TCODRandom::getInstance();
+  int dx = random->getInt(-1, 1);
+  int dy = random->getInt(-1, 1);
+  Vector2D move_vector_{dx, dy};
+  if ((dx != 0 || dy != 0) && num_turns_ > 0) {
+    auto action = DirectionalCommand(world, entity, {dx, dy});
+    action.execute();
+    --num_turns_;
+  } else {
+    entity->set_ai_component(old_ai_);
+    delete this;
+  }
+}
 }  // namespace cpprl
