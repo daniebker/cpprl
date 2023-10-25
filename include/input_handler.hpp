@@ -121,11 +121,15 @@ class HistoryViewInputHandler final : public GuiInputHandler {
 class InventoryInputHandler final : public GuiInputHandler {
  private:
   SelectItemCommand* selectItemCommand_;
+  SelectItemCommand* dropItemCommand_;
 
  public:
   InventoryInputHandler(World& world, Entity* entity, UiWindow& ui_window)
       : GuiInputHandler(world, ui_window),
-        selectItemCommand_(new SelectItemCommand(world, entity, ui_window)){};
+        selectItemCommand_(new SelectItemCommand(
+            world, entity, ui_window, SubCommand::USE_ITEM)),
+        dropItemCommand_(new SelectItemCommand(
+            world, entity, ui_window, SubCommand::DROP_ITEM)){};
   ~InventoryInputHandler() { delete selectItemCommand_; };
   EngineEvent* handle_sdl_event(SDL_Event event) noexcept override;
 };

@@ -51,7 +51,19 @@ class ViewHistoryCommand : public EngineEvent {
 class PickupCommand : public Command {
  public:
   PickupCommand(World& world, Entity* entity) : Command(world, entity){};
-  virtual StateResult execute();
+  StateResult execute() override;
+};
+
+// TODO: base class from useItemCommand
+class DropItemCommand final : public Command {
+ private:
+  int item_index_;
+
+ public:
+  DropItemCommand(World& world, Entity* entity, int item_index)
+      : Command(world, entity), item_index_(item_index){};
+  ~DropItemCommand() override = default;
+  StateResult execute() override;
 };
 
 class InventoryCommand final : public Command {
@@ -60,13 +72,18 @@ class InventoryCommand final : public Command {
   StateResult execute() override;
 };
 
+enum SubCommand { USE_ITEM, DROP_ITEM };
 class SelectItemCommand final : public Command {
  private:
+  SubCommand sub_command_;
   UiWindow& ui_window_;
 
  public:
-  SelectItemCommand(World& world, Entity* entity, UiWindow& ui_window)
-      : Command(world, entity), ui_window_(ui_window) {}
+  SelectItemCommand(
+      World& world, Entity* entity, UiWindow& ui_window, SubCommand sub_command)
+      : Command(world, entity),
+        sub_command_(sub_command),
+        ui_window_(ui_window) {}
   StateResult execute() override;
 };
 

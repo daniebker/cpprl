@@ -192,6 +192,9 @@ EngineEvent* InventoryInputHandler::handle_sdl_event(SDL_Event event) noexcept {
     case (SDLK_RETURN):
       return selectItemCommand_;
       break;
+    case (SDLK_d):
+      return dropItemCommand_;
+      break;
     default:
       return GuiInputHandler::handle_sdl_event(event);
       break;

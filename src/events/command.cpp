@@ -26,6 +26,25 @@ StateResult PickupCommand::execute() {
   return EndTurn{};
 }
 
+StateResult DropItemCommand::execute() {
+  Entity* item = entity_->get_container()->get_inventory()[item_index_ - 1];
+  ConsumableComponent* consumable_component = item->get_consumable_component();
+  if (!consumable_component) {
+    throw Impossible("There's nothing to drop.");
+  }
+  ActionResult result = consumable_component->drop(item, entity_);
+  world_.get_entities().spawn(item);
+  if (std::holds_alternative<Failure>(result)) {
+    std::string message = std::get<Failure>(result).message;
+    throw Impossible(message.c_str());
+  } else if (std::holds_alternative<Poll>(result)) {
+    return Change{std::move(std::get<Poll>(result).new_state)};
+  } else if (std::holds_alternative<Success>(result)) {
+    return EndTurn{};
+  }
+  return {};
+}
+
 StateResult ScrollCommand::execute() {
   ui_window_.set_cursor(ui_window_.get_cursor() + scroll_amount_);
   // world_.scroll_current_view(scroll_amount_);
@@ -50,10 +69,19 @@ StateResult InventoryCommand::execute() {
 }
 
 StateResult SelectItemCommand::execute() {
-  int cursor_ = ui_window_.get_cursor();
-  auto use_item_command =
-      std::make_unique<UseItemCommand>(world_, entity_, cursor_);
-  return use_item_command->execute();
+  // TODO: Add a switch to either use or drop on selection
+  int cursor = ui_window_.get_cursor();
+  if (sub_command_ == SubCommand::USE_ITEM) {
+    auto use_item_command =
+        std::make_unique<UseItemCommand>(world_, entity_, cursor);
+    return use_item_command->execute();
+  } else if (sub_command_ == SubCommand::DROP_ITEM) {
+    auto drop_item_command =
+        std::make_unique<DropItemCommand>(world_, entity_, cursor);
+    return drop_item_command->execute();
+  }
+
+  return {};
 }
 
 StateResult UseItemCommand::execute() {

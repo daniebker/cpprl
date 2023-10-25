@@ -83,7 +83,9 @@ class Container {
 class ConsumableComponent {
  public:
   virtual ~ConsumableComponent() = default;
-  bool pick_up(Entity* owner, Entity* wearer);
+  // TODO: should also be an action result
+  ActionResult pick_up(Entity* owner, Entity* wearer);
+  ActionResult drop(Entity* owner, Entity* wearer);
   virtual ActionResult use(Entity* owner, Entity* wearer, World& world);
 };
 

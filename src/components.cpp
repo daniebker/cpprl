@@ -61,12 +61,22 @@ void Container::remove(Entity* entityToRemove) {
       inventory_.end());
 }
 
-bool ConsumableComponent::pick_up(Entity* owner, Entity* wearer) {
+ActionResult ConsumableComponent::pick_up(Entity* owner, Entity* wearer) {
   if (wearer->get_container() && wearer->get_container()->add(owner)) {
     // remove the owner?
-    return true;
+    return Success{};
   }
-  return false;
+  return Failure{"There's nothing to pick up."};
+}
+
+ActionResult ConsumableComponent::drop(Entity* owner, Entity* wearer) {
+  if (wearer->get_container()) {
+    wearer->get_container()->remove(owner);
+    owner->get_transform_component()->move(
+        wearer->get_transform_component()->get_position());
+    return Success{};
+  }
+  return Failure{};
 }
 
 ActionResult ConsumableComponent::use(Entity* owner, Entity* wearer, World&) {
