@@ -64,8 +64,8 @@ void EntityManager::place_entities(
       continue;
     }
 
-    int dice = random->getInt(0, 100);
-    if (dice <= 70) {
+    float dice = random->getFloat(.0f, 1.0f);
+    if (dice <= 0.7f) {
       Entity* entity = new Entity(
           "healing potion",
           false,
@@ -73,27 +73,30 @@ void EntityManager::place_entities(
           new ASCIIComponent("!", DARK_RED, 0));
       entity->set_consumable_component(new HealingConsumable(10));
       spawn(entity);
-    } else if (dice <= 70 + 10) {
+    } else if (dice <= .8f) {
       Entity* entity = new Entity(
           "Lightning Scroll",
           false,
           new TransformComponent(x, y),
           new ASCIIComponent("#", DARK_RED, 0));
       entity->set_consumable_component(new LightningBolt(5, 20));
-    } else if (dice <= 70 + 10 + 10) {
+      spawn(entity);
+    } else if (dice <= .9f) {
       Entity* entity = new Entity(
           "Fire Scroll",
           false,
           new TransformComponent(x, y),
           new ASCIIComponent("#", DARK_RED, 0));
       entity->set_consumable_component(new FireSpell(5, 3, 20));
-    } else if (dice <= 70 + 10 + 10 + 10) {
+      spawn(entity);
+    } else if (dice <= 1.0f) {
       Entity* entity = new Entity(
           "Confusion Scroll",
           false,
           new TransformComponent(x, y),
           new ASCIIComponent("#", DARK_RED, 0));
       entity->set_consumable_component(new ConfusionSpell(3, 5));
+      spawn(entity);
     }
   }
 }
@@ -127,7 +130,7 @@ std::vector<Entity*> EntityManager::get_entities_at(Vector2D position) {
 }
 
 Entity* EntityManager::get_blocking_entity_at(Vector2D position) {
- for (Entity* entity : entities_) {
+  for (Entity* entity : entities_) {
     if (entity->is_blocking() &&
         entity->get_transform_component()->get_position() == position) {
       return entity;
