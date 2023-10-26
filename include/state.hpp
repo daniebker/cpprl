@@ -9,8 +9,10 @@
 #include "types/state_result.hpp"
 
 namespace cpprl {
+
 class Renderer;
 class UiWindow;
+
 class State {
  protected:
   World& world_;
@@ -20,7 +22,7 @@ class State {
   State(World& world) : world_(world), input_handler_(nullptr){};
   virtual ~State() = default;
   virtual void on_enter(){};
-  virtual StateResult on_update(SDL_Event& sdl_event) = 0;
+  virtual StateResult on_update(SDL_Event& sdl_event);
   virtual void render(Renderer&){};
   virtual void on_exit(){};
 };
@@ -29,9 +31,6 @@ class InGameState final : public State {
  public:
   InGameState(World& world) : State(world) {}
   void on_enter() override;
-  StateResult on_update(SDL_Event& sdl_event) override;
-  void render(Renderer& renderer) override;
-  void on_exit() override;
 };
 
 class PickTileState : public State {
@@ -60,11 +59,8 @@ class PickTileAOEState final : public PickTileState {
       World& world, std::function<void()> on_pick, int max_range_, float aoe)
       : PickTileState(world, on_pick, max_range_),
         aoe_(aoe),
-        aoe_squared_(aoe * aoe) {}
-  void on_enter() override;
-  StateResult on_update(SDL_Event& sdl_event) override;
+        aoe_squared_(aoe_ * aoe_) {}
   void render(Renderer& renderer) override;
-  void on_exit() override;
 };
 
 class GuiViewState : public State {
@@ -74,10 +70,7 @@ class GuiViewState : public State {
  public:
   GuiViewState(World& world, UiWindow* window)
       : State(world), window_(window) {}
-  void on_enter() override;
-  StateResult on_update(SDL_Event& sdl_event) override = 0;
   void render(Renderer& renderer) override;
-  void on_exit() override = 0;
 };
 
 class ViewMessageHistoryState final : public GuiViewState {
@@ -85,9 +78,6 @@ class ViewMessageHistoryState final : public GuiViewState {
   ViewMessageHistoryState(World& world, UiWindow* window)
       : GuiViewState(world, window) {}
   void on_enter() override;
-  StateResult on_update(SDL_Event& sdl_event) override;
-  void render(Renderer& renderer) override;
-  void on_exit() override;
 };
 
 class ViewInventoryState final : public GuiViewState {
@@ -95,9 +85,6 @@ class ViewInventoryState final : public GuiViewState {
   ViewInventoryState(World& world, UiWindow* window)
       : GuiViewState(world, window) {}
   void on_enter() override;
-  StateResult on_update(SDL_Event& sdl_event) override;
-  void render(Renderer& renderer) override;
-  void on_exit() override;
 };
 
 }  // namespace cpprl

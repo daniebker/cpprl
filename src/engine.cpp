@@ -41,18 +41,22 @@ void Engine::handle_events() {
     // call on_update of state which can return change
     if (event.type == SDL_KEYDOWN || event.type == SDL_MOUSEMOTION ||
         event.type == SDL_MOUSEBUTTONDOWN) {
-      StateResult result = engine_state_->on_update(event);
-      if (std::holds_alternative<std::monostate>(result)) {
-      } else if (std::holds_alternative<Change>(result)) {
-        engine_state_->on_exit();
-        engine_state_ = std::move(std::get<Change>(result).next_state);
-        engine_state_->on_enter();
-      } else if (std::holds_alternative<Reset>(result)) {
-        reset_game();
-      } else if (std::holds_alternative<EndTurn>(result)) {
-        world_->handle_enemy_turns();
-      } else if (std::holds_alternative<Quit>(result)) {
-        std::exit(EXIT_SUCCESS);
+      try {
+        StateResult result = engine_state_->on_update(event);
+        if (std::holds_alternative<std::monostate>(result)) {
+        } else if (std::holds_alternative<Change>(result)) {
+          engine_state_->on_exit();
+          engine_state_ = std::move(std::get<Change>(result).next_state);
+          engine_state_->on_enter();
+        } else if (std::holds_alternative<Reset>(result)) {
+          reset_game();
+        } else if (std::holds_alternative<EndTurn>(result)) {
+          world_->handle_enemy_turns();
+        } else if (std::holds_alternative<Quit>(result)) {
+          std::exit(EXIT_SUCCESS);
+        }
+      } catch (Impossible& e) {
+        world_->get_message_log().add_message(e.what(), RED);
       }
     } else if (event.type == SDL_QUIT) {
       std::exit(EXIT_SUCCESS);
