@@ -70,55 +70,8 @@ void Engine::render() {
   g_context.present(g_console);
 }
 
-// void Engine::handle_enemy_turns() {}
-
-// void Engine::handle_player_death() {
-//   game_over_ = true;
-//   delete input_handler_;
-//   input_handler_ = new MenuInputHandler(*this);
-// }
-
 void Engine::reset_game() {
-  // game_over_ = false;
-  // entities_->clear();
   world_->reset();
-  // map_ = nullptr;
-  // dungeon_ = nullptr;
-  // entities_ = nullptr;
-  // player_ = nullptr;
-  // map_ = nullptr;
-  // health_bar_ = nullptr;
-  // input_handler_ = nullptr;
   world_->generate_map(80, 40);
-  // generate_map(80, 40);
-  // set_input_handler(new GameInputHandler(*this, player_));
 }
-
-// void Engine::set_input_handler(EventHandler* input_handler) {
-//   delete input_handler_;
-//   input_handler_ = input_handler;
-// }
-
-// void Engine::scroll_current_view(int scroll_amount) {
-//   if (show_view_) {
-//     current_window_->set_cursor(current_window_->get_cursor() +
-//     scroll_amount);
-//   }
-// }
-
-// // TODO: move this to state, then add a callback to calc damage.
-// void Engine::set_targeting_tile(
-//     float max_range, std::function<void()> callback) {
-//   input_handler_ = new TargetingInputHandler(*this);
-//   targeting_mode_ = !targeting_mode_;
-//   map_->toggle_target_mode(max_range);
-//   // SDL_WaitEvent(nullptr);
-//   // SDL_Event event;
-//   // EngineEvent& command = input_handler_->handle_sdl_event(event);
-//   // command.execute();
-//   // Engine::render();
-//   // if (!targeting_mode_) {
-//   //   callback();
-//   // }
-// }
 }  // namespace cpprl
