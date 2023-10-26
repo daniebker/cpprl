@@ -54,7 +54,7 @@ StateResult ViewHistoryCommand::execute() {
   return Change{std::make_unique<ViewMessageHistoryState>(
       world_,
       new HistoryWindow(
-          80, 40, {0, 0}, world_.get_message_log(), "Message Log"))};
+          60, 35, {0, 0}, world_.get_message_log(), "Message Log"))};
 }
 
 StateResult InventoryCommand::execute() {
