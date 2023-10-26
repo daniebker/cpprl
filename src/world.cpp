@@ -96,19 +96,14 @@ void World::handle_enemy_turns() {
   }
 }
 
-void World::reset() {}
+void World::reset() {
+
+}
 
 void World::scroll_current_view(int scroll_amount) {
   if (current_window_) {
     current_window_->set_cursor(current_window_->get_cursor() + scroll_amount);
   }
-}
-
-void World::handle_player_death() {
-  // TODO: what happens when the player dies?
-  // game_over_ = true;
-  // delete input_handler_;
-  // input_handler_ = new MenuInputHandler(*this);
 }
 
 }  // namespace cpprl

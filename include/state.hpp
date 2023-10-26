@@ -87,6 +87,12 @@ class ViewInventoryState final : public GuiViewState {
   void on_enter() override;
 };
 
+class GameOverState final : public GuiViewState {
+ public:
+  GameOverState(World& world) : GuiViewState(world, nullptr) {}
+  void on_enter() override;
+};
+
 }  // namespace cpprl
 
 #endif

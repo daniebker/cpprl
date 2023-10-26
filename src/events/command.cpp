@@ -47,16 +47,10 @@ StateResult DropItemCommand::execute() {
 
 StateResult ScrollCommand::execute() {
   ui_window_.set_cursor(ui_window_.get_cursor() + scroll_amount_);
-  // world_.scroll_current_view(scroll_amount_);
   return {};
 }
 
 StateResult ViewHistoryCommand::execute() {
-  // world_.toggle_pause();
-  // world_.toggle_view();
-  // world_.set_current_view();
-
-  // world_.set_input_handler(new HistoryViewInputHandler(world_));
   return Change{std::make_unique<ViewMessageHistoryState>(
       world_,
       new HistoryWindow(
@@ -68,8 +62,8 @@ StateResult InventoryCommand::execute() {
       world_, new InventoryWindow(40, 20, {0, 0}, entity_, "Inventory"))};
 }
 
+// TODO: can this be a template?
 StateResult SelectItemCommand::execute() {
-  // TODO: Add a switch to either use or drop on selection
   int cursor = ui_window_.get_cursor();
   if (sub_command_ == SubCommand::USE_ITEM) {
     auto use_item_command =
@@ -105,17 +99,10 @@ StateResult UseItemCommand::execute() {
 StateResult CloseViewCommand::execute() {
   world_.toggle_pause();
   world_.toggle_view();
-  // world_.set_input_handler(new GameInputHandler(world_,
-  // world_.get_player()));
   return Change{std::make_unique<InGameState>(world_)};
 }
 
 StateResult DieEvent::execute() {
-  if (entity_->get_name() == "player") {
-    // TODO: add a GameOverState
-    // return Change{std::make_unique<GameOverState>)()};
-    return {};
-  }
   world_.get_message_log().add_message(
       fmt::format("{} has died!", util::capitalize(entity_->get_name())));
   entity_->get_defense_component()->die(*entity_);
@@ -141,7 +128,6 @@ StateResult MouseInputEvent::execute() {
 }
 
 StateResult MouseClickEvent::execute() {
-  // world_.get_map().set_highlight_tile(position_);
   return Change{std::make_unique<InGameState>(world_)};
 }
 
@@ -172,7 +158,7 @@ StateResult MeleeCommand::execute() {
 
       if (target->get_defense_component()->is_dead()) {
         auto action = DieEvent(world_, target);
-        action.execute();
+        return action.execute();
       }
     } else {
       std::string message = fmt::format(

@@ -77,12 +77,12 @@ class GameInputHandler final : public EventHandler {
 
 class MenuInputHandler final : public EventHandler {
  private:
-  ResetGameCommand* resetGameCommand;
+  ResetGameCommand* resetGameCommand_;
 
  public:
   MenuInputHandler(World& world)
-      : EventHandler(world), resetGameCommand(new ResetGameCommand(world)){};
-  ~MenuInputHandler() { delete resetGameCommand; };
+      : EventHandler(world), resetGameCommand_(new ResetGameCommand(world)){};
+  ~MenuInputHandler() { delete resetGameCommand_; };
   virtual EngineEvent* handle_sdl_event(SDL_Event event) noexcept override;
 };
 

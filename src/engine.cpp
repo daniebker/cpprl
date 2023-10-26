@@ -48,6 +48,11 @@ void Engine::handle_events() {
           reset_game();
         } else if (std::holds_alternative<EndTurn>(result)) {
           world_->handle_enemy_turns();
+          if (world_->get_player()->get_defense_component()->is_dead()) {
+            engine_state_->on_exit();
+            engine_state_ = std::make_unique<GameOverState>(*world_);
+            engine_state_->on_enter();
+          }
         } else if (std::holds_alternative<Quit>(result)) {
           std::exit(EXIT_SUCCESS);
         }
@@ -68,6 +73,9 @@ void Engine::render() {
 
 void Engine::reset_game() {
   world_->reset();
-  world_->generate_map(80, 40);
+  world_->generate_map(80, 35);
+  engine_state_->on_exit();
+  engine_state_ = std::make_unique<InGameState>(*world_);
+  engine_state_->on_enter();
 }
 }  // namespace cpprl

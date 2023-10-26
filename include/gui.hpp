@@ -73,7 +73,7 @@ class HistoryWindow : public UiWindow {
       Vector2D position,
       MessageLog& message_log,
       std::string title = "")
-      : UiWindow(width - 6, height - 6, position, title),
+      : UiWindow(width, height, position, title),
         message_log_(message_log),
         log_size_(message_log_.get_messages().size()){};
 
@@ -91,10 +91,27 @@ class InventoryWindow final : public UiWindow {
       Vector2D position,
       Entity* entity,
       std::string title = "")
-      : UiWindow(width - 6, height - 6, position, title), entity_(entity) {
+      : UiWindow(width, height, position, title), entity_(entity) {
     UiWindow::set_cursor(1);
   };
 
+  virtual void render(tcod::Console& parent_console) override;
+};
+
+class GameOverWindow final : public UiWindow {
+ private:
+  std::string message_;
+
+ public:
+  GameOverWindow(
+      std::size_t width,
+      std::size_t height,
+      Vector2D position,
+      std::string message,
+      std::string title = "")
+      : UiWindow(width, height, position, title), message_(message) {
+    UiWindow::set_cursor(1);
+  };
   virtual void render(tcod::Console& parent_console) override;
 };
 

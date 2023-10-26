@@ -132,7 +132,7 @@ EngineEvent* MenuInputHandler::handle_sdl_event(SDL_Event event) noexcept {
   SDL_Keycode key = event.key.keysym.sym;
   switch (key) {
     case SDLK_RETURN:
-      return resetGameCommand;
+      return resetGameCommand_;
       break;
     default:
       return EventHandler::handle_sdl_event(event);

@@ -70,4 +70,9 @@ void PickTileAOEState::render(Renderer&) {
     });
   }
 }
+
+void GameOverState::on_enter() {
+  input_handler_ = std::make_unique<MenuInputHandler>(world_);
+  window_ = new GameOverWindow(20, 10, {0, 0}, "Game Over");
+}
 }  // namespace cpprl
