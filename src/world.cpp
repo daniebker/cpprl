@@ -12,8 +12,7 @@ World::World()
     : entities_(std::make_unique<EntityManager>()),
       player_(nullptr),
       map_(nullptr),
-      current_window_(nullptr),
-      show_view_(false) {
+      current_window_(nullptr) {
   controller_ = std::make_unique<Controller>();
   dungeon_ = std::make_unique<Dungeon>();
   message_log_ = std::make_unique<MessageLog>();
@@ -96,9 +95,7 @@ void World::handle_enemy_turns() {
   }
 }
 
-void World::reset() {
-
-}
+void World::reset() { entities_->clear(); }
 
 void World::scroll_current_view(int scroll_amount) {
   if (current_window_) {

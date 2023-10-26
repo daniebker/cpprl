@@ -97,8 +97,6 @@ StateResult UseItemCommand::execute() {
 }
 
 StateResult CloseViewCommand::execute() {
-  world_.toggle_pause();
-  world_.toggle_view();
   return Change{std::make_unique<InGameState>(world_)};
 }
 

@@ -22,12 +22,9 @@ class World {
   UiWindow* health_bar_;
   std::unique_ptr<Controller> controller_;
   UiWindow* current_window_;
-  bool show_view_ = false;
-  bool is_paused_ = false;
 
  public:
   World();
-
   ~World() = default;
 
   MessageLog& get_message_log() {
@@ -43,16 +40,7 @@ class World {
   void render(Renderer& renderer);
   void handle_enemy_turns();
   void scroll_current_view(int scroll_amount);
-  void toggle_pause() { is_paused_ = !is_paused_; }
   void handle_player_death();
-  [[decltype(show_view_)]] void toggle_view() { show_view_ = !show_view_; }
-  // void set_input_handler(EventHandler* input_handler);
-  void set_current_view(UiWindow* current_window) {
-    current_window_ = std::move(current_window);
-  };
-  UiWindow& get_current_view() { return *current_window_; }
-  // void scroll_current_view(int scroll_amount);
-  // void toggle_targeting_mode() { targeting_mode_ = !targeting_mode_; }
   void set_targeting_tile(
       float max_range = 0.0f, std::function<void()> callback = nullptr);
 };
