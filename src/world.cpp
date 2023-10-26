@@ -46,20 +46,6 @@ void World::generate_map(int width, int height) {
   entity->set_attack_component(new AttackComponent(5));
   entity->set_defense_component(new DefenseComponent(2, 30));
   entity->set_container(new Container(26));
-  Entity* first_potion = new Entity(
-      "Healing Potion",
-      false,
-      new TransformComponent({0, 0}),
-      new ASCIIComponent("!", WHITE, 1));
-  first_potion->set_consumable_component(new HealingConsumable(10));
-  entity->get_container()->add(first_potion);
-  Entity* firstScroll = new Entity(
-      "Lightning Scroll",
-      false,
-      new TransformComponent({0, 0}),
-      new ASCIIComponent("#", DARK_RED, 0));
-  firstScroll->set_consumable_component(new ConfusionSpell(3, 5));
-  entity->get_container()->add(firstScroll);
   player_ = entities_->spawn(entity);
 
   map_->compute_fov(player_->get_transform_component()->get_position(), 4);
