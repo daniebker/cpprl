@@ -8,13 +8,9 @@
 
 #include "events/command.hpp"
 #include "exceptions.hpp"
-#include "gui.hpp"
-#include "health_bar.hpp"
-#include "input_handler.hpp"
 #include "state.hpp"
 #include "types/math.hpp"
 #include "types/state_result.hpp"
-#include "util.hpp"
 #include "world.hpp"
 
 namespace cpprl {
