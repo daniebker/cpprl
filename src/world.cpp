@@ -36,6 +36,7 @@ void World::generate_map(int width, int height) {
   for (auto it = rooms.begin() + 1; it != rooms.end(); ++it) {
     entities_->place_entities(*it, 2, 1);
   }
+  // TODO: move all this code to the factory pattern
   Entity* entity = new Entity(
       "player",
       true,
