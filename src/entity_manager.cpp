@@ -2,6 +2,9 @@
 
 #include <SDL2/SDL.h>
 
+#include "basic_ai_component.hpp"
+#include "colours.hpp"
+#include "components.hpp"
 #include "util.hpp"
 
 namespace cpprl {
@@ -60,13 +63,41 @@ void EntityManager::place_entities(
     if (iterator != entities_.end()) {
       continue;
     }
-    Entity* entity = new Entity(
-        "healing potion",
-        false,
-        new TransformComponent(x, y),
-        new ASCIIComponent("!", DARK_RED, 0));
-    entity->set_consumable_component(new HealingConsumable(10));
-    spawn(entity);
+
+    float dice = random->getFloat(.0f, 1.0f);
+    if (dice <= 0.7f) {
+      Entity* entity = new Entity(
+          "healing potion",
+          false,
+          new TransformComponent(x, y),
+          new ASCIIComponent("!", DARK_RED, 0));
+      entity->set_consumable_component(new HealingConsumable(10));
+      spawn(entity);
+    } else if (dice <= .8f) {
+      Entity* entity = new Entity(
+          "Lightning Scroll",
+          false,
+          new TransformComponent(x, y),
+          new ASCIIComponent("#", DARK_RED, 0));
+      entity->set_consumable_component(new LightningBolt(5, 20));
+      spawn(entity);
+    } else if (dice <= .9f) {
+      Entity* entity = new Entity(
+          "Fire Scroll",
+          false,
+          new TransformComponent(x, y),
+          new ASCIIComponent("#", DARK_RED, 0));
+      entity->set_consumable_component(new FireSpell(5, 3, 20));
+      spawn(entity);
+    } else if (dice <= 1.0f) {
+      Entity* entity = new Entity(
+          "Confusion Scroll",
+          false,
+          new TransformComponent(x, y),
+          new ASCIIComponent("#", DARK_RED, 0));
+      entity->set_consumable_component(new ConfusionSpell(3, 5));
+      spawn(entity);
+    }
   }
 }
 
@@ -86,7 +117,9 @@ Entity* EntityManager::spawn(Entity* src, Vector2D position) {
 
 std::vector<Entity*> EntityManager::get_entities_at(Vector2D position) {
   std::vector<Entity*> entities_at_position;
-  entities_at_position.reserve(entities_.size());
+  // At max there can be 3? things at a position.
+  // Corpse, Item, Actor...
+  entities_at_position.reserve(3);
   for (auto& entity : entities_) {
     if (entity->get_transform_component()->get_position() == position) {
       entities_at_position.push_back(entity);
@@ -123,5 +156,22 @@ void EntityManager::remove(Entity* entity) {
           entities_.end(),
           [&entity](const Entity* e) { return e == entity; }),
       entities_.end());
+}
+
+Entity* EntityManager::get_closest_monster(
+    Vector2D position, float range) const {
+  Entity* closest = nullptr;
+  float best_distance = 1E6f;
+  for (Entity* entity : entities_) {
+    if (entity->get_ai_component() && entity->get_defense_component()) {
+      float distance = position.distance_to(
+          entity->get_transform_component()->get_position());
+      if (distance < best_distance && (distance <= range || range == 0.0f)) {
+        best_distance = distance;
+        closest = entity;
+      }
+    }
+  }
+  return closest;
 }
 }  // namespace cpprl

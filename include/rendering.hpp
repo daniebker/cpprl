@@ -5,14 +5,16 @@
 
 #include <libtcod.hpp>
 
-#include "components.hpp"
 #include "globals.hpp"
 #include "util.hpp"
 
 namespace cpprl {
+class ASCIIComponent;
+class TransformComponent;
 class Renderer {
  public:
   Renderer() {}
+  ~Renderer() {}
 
   virtual void render(
       ASCIIComponent& sprite, TransformComponent& transform) = 0;
@@ -38,6 +40,7 @@ class TCODRenderer : public Renderer {
     params.console = g_console.get();
     g_context = tcod::Context{params};
   };
+  ~TCODRenderer() {}
 
   virtual void render(ASCIIComponent& sprite, TransformComponent& transform);
 };

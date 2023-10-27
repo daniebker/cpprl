@@ -2,6 +2,7 @@
 #define TYPES_MATH_HPP
 
 #include <array>
+#include <cmath>
 
 namespace cpprl {
 
@@ -18,6 +19,9 @@ struct Vector2D {
   Vector2D operator/(int scalar) const noexcept { return {x / scalar, y / scalar}; }
   bool operator==(const Vector2D& other) const noexcept { return x == other.x && y == other.y; }
   bool operator!=(const Vector2D& other) const noexcept { return !(*this == other); }
+  float distance_to(const Vector2D& other) const noexcept {
+    return std::sqrt(std::pow(x - other.x, 2) + std::pow(y - other.y, 2));
+  }
 
   int x;
   int y;
@@ -40,6 +44,15 @@ struct Quadrilateral {
   int width;
   int height;
 };
+
+template <typename T>
+inline T euclidean_squared(T x, T y) {
+  return x * x + y * y;
+}
+inline int euclidean_squared(Vector2D vec) {
+  return euclidean_squared(vec.x, vec.y);
+}
+
 }  // namespace cpprl
 
 #endif  // TYPES_MATH_HPP

@@ -16,6 +16,14 @@
       "console": "integratedTerminal"
     },
     {
+      "name": "(Mac) clang++ - Build and debug active file",
+      "type": "lldb",
+      "request": "launch",
+      "program": "${command:cmake.launchTargetPath}",
+      "args": [],
+      "cwd": "${workspaceFolder}",
+    },
+    {
       "name": "(gdb) - Mac - Launch CMake target",
       "type": "cppdbg",
       "request": "launch",

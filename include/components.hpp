@@ -3,15 +3,15 @@
 
 #include <libtcod.hpp>
 #include <string_view>
+#include <variant>
 
+#include "types/action_result.hpp"
+#include "types/entity_fwd.hpp"
 #include "types/math.hpp"
+#include "types/world_fwd.hpp"
 
 namespace cpprl {
-class Entity;
-struct ActionResult {
-  bool success;
-  std::string message;
-};
+
 class AttackComponent {
  public:
   AttackComponent(int damage) : damage_(damage) {}
@@ -83,17 +83,54 @@ class Container {
 class ConsumableComponent {
  public:
   virtual ~ConsumableComponent() = default;
-  bool pick_up(Entity* owner, Entity* wearer);
-  virtual ActionResult use(Entity* owner, Entity* wearer);
+  // TODO: should also be an action result
+  ActionResult pick_up(Entity* owner, Entity* wearer);
+  ActionResult drop(Entity* owner, Entity* wearer);
+  virtual ActionResult use(Entity* owner, Entity* wearer, World& world);
 };
 
 class HealingConsumable final : public ConsumableComponent {
  public:
   HealingConsumable(int amount);
-  ActionResult use(Entity* owner, Entity* wearer);
+  ActionResult use(Entity* owner, Entity* wearer, World& world);
 
  private:
   int amount_;
 };
+
+class LightningBolt final : public ConsumableComponent {
+ private:
+  float range_, damage_;
+
+ public:
+  LightningBolt(float range, float damage) : range_(range), damage_(damage) {}
+  ~LightningBolt() = default;
+  ActionResult use(Entity* owner, Entity* wearer, World& world);
+};
+
+class FireSpell final : public ConsumableComponent {
+ private:
+  float max_range_, aoe_, damage_;
+
+ public:
+  FireSpell(float max_range, float aoe, float damage)
+      : max_range_(max_range), aoe_(aoe), damage_(damage) {}
+  ~FireSpell() = default;
+
+  ActionResult use(Entity* owner, Entity* Wearer, World& world);
+};
+
+class ConfusionSpell final : public ConsumableComponent {
+ private:
+  int num_turns_, max_range_;
+
+ public:
+  ConfusionSpell(int num_turns, int max_range)
+      : num_turns_(num_turns), max_range_(max_range) {}
+  ~ConfusionSpell() = default;
+
+  ActionResult use(Entity* owner, Entity* wearer, World& world);
+};
+
 }  // namespace cpprl
 #endif

@@ -22,8 +22,22 @@ struct Tile {
 };
 
 struct TileGraphic {
-  TCOD_ConsoleTile light, dark;
+  TCOD_ConsoleTile light, dark, target;
 };
+
+template <typename Func>
+inline void with_indexes(int width, int height, Func func) {
+  for (int y{0}; y < height; ++y) {
+    for (int x{0}; x < width; ++x) {
+      func(x, y);
+    }
+  }
+}
+
+template <typename Array, typename F>
+inline void with_indexes(const Array& array, F func) {
+  with_indexes(array.get_width(), array.get_height(), func);
+}
 
 class Map {
  public:
@@ -51,7 +65,13 @@ class Map {
   TileGraphic& get_floor_tile() { return floor_tile_; }
   /** Render the map */
   void render(tcod::Console& console);
-  void set_target_tile(Vector2D position) { target_tile_ = position; }
+  void set_highlight_tile(Vector2D position);
+  void toggle_target_mode(float max_range) {
+    max_range_ = max_range;
+    target_mode_ = !target_mode_;
+  }
+  bool set_target_tile(Vector2D position, Entity& player);
+  Vector2D get_highlight_tile() { return target_tile_; }
 
  private:
   /** The wall tile */
@@ -66,6 +86,8 @@ class Map {
   TCODMap tcod_map_;
   std::vector<RectangularRoom> _rooms;
   Vector2D target_tile_ = {0, 0};
+  bool target_mode_ = false;
+  float max_range_ = 0.0f;
 };
 
 }  // namespace cpprl

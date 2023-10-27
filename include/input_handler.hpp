@@ -4,111 +4,134 @@
 
 #include <vector>
 
-#include "events/close_view_command.hpp"
-#include "events/directional_command.hpp"
-#include "events/engine_event.hpp"
-#include "events/quit_command.hpp"
+#include "events/command.hpp"
 #include "globals.hpp"
+#include "gui.hpp"
+#include "types/world_fwd.hpp"
 
 namespace cpprl {
 
-class Engine;
-class EngineEvent;
+class Entity;
 
 class EventHandler {
  public:
-  EventHandler(Engine& engine)
-      : engine_(engine), noop(engine), quitCommand(engine){};
-  virtual ~EventHandler() = default;
-  virtual EngineEvent& handle_sdl_event(SDL_Event event) noexcept = 0;
+  EventHandler(World& world)
+      : world_(world),
+        noop_(new NoOpEvent(world)),
+        quitCommand_(new QuitCommand(world)){};
+  virtual ~EventHandler() { delete quitCommand_; };
+  virtual EngineEvent* handle_sdl_event(SDL_Event event) noexcept = 0;
 
  protected:
-  Engine& engine_;
-  NoOpEvent noop;
+  World& world_;
+  NoOpEvent* noop_;
 
  private:
-  QuitCommand quitCommand;
+  QuitCommand* quitCommand_;
+};
+
+class TargetingInputHandler final : public EventHandler {
+ private:
+  ExitTargetingModeCommand* exit_targeting_mode_command_;
+
+ public:
+  TargetingInputHandler(World& world)
+      : EventHandler(world),
+        exit_targeting_mode_command_(new ExitTargetingModeCommand(world)){};
+  ~TargetingInputHandler(){};
+  virtual EngineEvent* handle_sdl_event(SDL_Event event) noexcept override;
 };
 
 class GameInputHandler final : public EventHandler {
  private:
-  DirectionalCommand buttonRight;
-  DirectionalCommand buttonUp;
-  DirectionalCommand buttonDown;
-  DirectionalCommand buttonUpRight;
-  DirectionalCommand buttonUpLeft;
-  DirectionalCommand buttonLeft;
-  DirectionalCommand buttonDownRight;
-  DirectionalCommand buttonDownLeft;
-  ViewHistoryCommand viewHistoryCommand;
-  PickupCommand pickupCommand_;
-  InventoryCommand inventoryCommand_;
+  DirectionalCommand* buttonRight;
+  DirectionalCommand* buttonUp;
+  DirectionalCommand* buttonDown;
+  DirectionalCommand* buttonUpRight;
+  DirectionalCommand* buttonUpLeft;
+  DirectionalCommand* buttonLeft;
+  DirectionalCommand* buttonDownRight;
+  DirectionalCommand* buttonDownLeft;
+  ViewHistoryCommand* viewHistoryCommand;
+  PickupCommand* pickupCommand_;
+  InventoryCommand* inventoryCommand_;
 
  public:
-  GameInputHandler(Engine& engine, Entity* controllableEntity)
-      : EventHandler(engine),
-        buttonRight(engine_, controllableEntity, Vector2D{1, 0}),
-        buttonUp(engine_, controllableEntity, Vector2D{0, -1}),
-        buttonDown(engine_, controllableEntity, Vector2D{0, 1}),
-        buttonUpRight(engine_, controllableEntity, Vector2D{1, -1}),
-        buttonUpLeft(engine_, controllableEntity, Vector2D{-1, -1}),
-        buttonLeft(engine_, controllableEntity, Vector2D{-1, 0}),
-        buttonDownRight(engine_, controllableEntity, Vector2D{1, 1}),
-        buttonDownLeft(engine_, controllableEntity, Vector2D{-1, 1}),
-        viewHistoryCommand(engine_),
-        pickupCommand_(engine, controllableEntity),
-        inventoryCommand_(engine, controllableEntity){};
+  GameInputHandler(World& world, Entity* controllable_entity);
+  ~GameInputHandler() {
+    delete buttonRight;
+    delete buttonUp;
+    delete buttonDown;
+    delete buttonUpRight;
+    delete buttonUpLeft;
+    delete buttonLeft;
+    delete buttonDownRight;
+    delete buttonDownLeft;
+    delete viewHistoryCommand;
+    delete pickupCommand_;
+    delete inventoryCommand_;
+  };
 
-  virtual EngineEvent& handle_sdl_event(SDL_Event event) noexcept override;
+  virtual EngineEvent* handle_sdl_event(SDL_Event event) noexcept override;
 };
 
 class MenuInputHandler final : public EventHandler {
  private:
-  ResetGameCommand resetGameCommand;
+  ResetGameCommand* resetGameCommand_;
 
  public:
-  MenuInputHandler(Engine& engine)
-      : EventHandler(engine), resetGameCommand(engine){};
-  virtual EngineEvent& handle_sdl_event(SDL_Event event) noexcept override;
+  MenuInputHandler(World& world)
+      : EventHandler(world), resetGameCommand_(new ResetGameCommand(world)){};
+  ~MenuInputHandler() { delete resetGameCommand_; };
+  virtual EngineEvent* handle_sdl_event(SDL_Event event) noexcept override;
 };
 
 class GuiInputHandler : public EventHandler {
  protected:
-  CloseViewCommand closeViewCommand_;
-  ScrollCommand scrollDownCommand_;
-  ScrollCommand scrollUpCommand_;
-  ScrollCommand jumpUpCommand_;
-  ScrollCommand jumpDownCommand_;
-  ScrollCommand jumpToHome_;
+  CloseViewCommand* closeViewCommand_;
+  ScrollCommand* scrollDownCommand_;
+  ScrollCommand* scrollUpCommand_;
+  ScrollCommand* jumpUpCommand_;
+  ScrollCommand* jumpDownCommand_;
+  ScrollCommand* jumpToHome_;
 
  public:
-  GuiInputHandler(Engine& engine)
-      : EventHandler(engine),
-        closeViewCommand_(engine),
-        scrollDownCommand_(engine, -1),
-        scrollUpCommand_(engine, 1),
-        jumpUpCommand_(engine, -10),
-        jumpDownCommand_(engine, 10),
-        jumpToHome_(engine, 0){};
+  GuiInputHandler(World& world, UiWindow& ui_window);
+  ~GuiInputHandler() {
+    delete closeViewCommand_;
+    delete scrollDownCommand_;
+    delete scrollUpCommand_;
+    delete jumpUpCommand_;
+    delete jumpDownCommand_;
+    delete jumpToHome_;
+  };
 
-  virtual EngineEvent& handle_sdl_event(SDL_Event event) noexcept override;
+  virtual EngineEvent* handle_sdl_event(SDL_Event event) noexcept override;
 };
 
 class HistoryViewInputHandler final : public GuiInputHandler {
  public:
-  HistoryViewInputHandler(Engine& engine) : GuiInputHandler(engine){};
+  HistoryViewInputHandler(World& world, UiWindow& ui_window)
+      : GuiInputHandler(world, ui_window){};
+  ~HistoryViewInputHandler() = default;
 
-  virtual EngineEvent& handle_sdl_event(SDL_Event event) noexcept override;
+  virtual EngineEvent* handle_sdl_event(SDL_Event event) noexcept override;
 };
 
 class InventoryInputHandler final : public GuiInputHandler {
  private:
-  SelectItemCommand selectItemCommand_;
+  SelectItemCommand* selectItemCommand_;
+  SelectItemCommand* dropItemCommand_;
 
  public:
-  InventoryInputHandler(Engine& engine, Entity* entity)
-      : GuiInputHandler(engine), selectItemCommand_(engine, entity){};
-  EngineEvent& handle_sdl_event(SDL_Event event) noexcept override;
+  InventoryInputHandler(World& world, Entity* entity, UiWindow& ui_window)
+      : GuiInputHandler(world, ui_window),
+        selectItemCommand_(new SelectItemCommand(
+            world, entity, ui_window, SubCommand::USE_ITEM)),
+        dropItemCommand_(new SelectItemCommand(
+            world, entity, ui_window, SubCommand::DROP_ITEM)){};
+  ~InventoryInputHandler() { delete selectItemCommand_; };
+  EngineEvent* handle_sdl_event(SDL_Event event) noexcept override;
 };
 
 }  // namespace cpprl

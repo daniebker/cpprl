@@ -47,7 +47,7 @@ void MessageLog::render_messages(
     std::string text = message.full_text();
     tcod::print_rect(
         console,
-        {x, y - y_offset, width, line_height},
+        {x, y + y_offset, width, line_height},
         message.full_text(),
         message.colour_,
         BLACK_DARK,

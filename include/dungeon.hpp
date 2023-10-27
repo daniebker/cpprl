@@ -22,6 +22,7 @@ class Dungeon {
 
  public:
   Dungeon(){};
+  ~Dungeon() = default;
   Map* generate(DungeonConfig config);
 };
 }  // namespace cpprl

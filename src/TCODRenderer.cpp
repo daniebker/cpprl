@@ -1,3 +1,4 @@
+#include "components.hpp"
 #include "rendering.hpp"
 
 namespace cpprl {

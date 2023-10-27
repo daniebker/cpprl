@@ -3,6 +3,8 @@
 #include <algorithm>
 
 #include "colours.hpp"
+#include "components.hpp"
+#include "game_entity.hpp"
 
 namespace cpprl {
 
@@ -107,5 +109,26 @@ void InventoryWindow::render(tcod::Console& parent_console) {
         {position_.x, position_.y, console_->getWidth(), console_->getHeight()},
         1.0f,
         1.0f);
+}
+
+void GameOverWindow::render(tcod::Console& parent_console) {
+  console_->clear();
+  UiWindow::add_frame();
+
+  tcod::print_rect(
+      *console_,
+      {1, 1, console_->getWidth() - 1, console_->getHeight() - 1},
+      message_,
+      WHITE,
+      std::nullopt,
+      TCOD_LEFT);
+
+  tcod::blit(
+      parent_console,
+      *console_,
+      {3, 3},
+      {position_.x, position_.y, console_->getWidth(), console_->getHeight()},
+      1.0f,
+      1.0f);
 }
 }  // namespace cpprl

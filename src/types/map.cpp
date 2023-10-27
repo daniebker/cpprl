@@ -1,4 +1,7 @@
-#include "../../include/types/map.hpp"
+#include "types/map.hpp"
+
+#include "colours.hpp"
+#include "components.hpp"
 
 namespace cpprl {
 Map::Map(int width, int height)
@@ -9,7 +12,9 @@ Map::Map(int width, int height)
   wall_tile_.light = TCOD_ConsoleTile{'#', WHITE, BLACK};
   wall_tile_.dark = TCOD_ConsoleTile{'#', GREY, BLACK};
   floor_tile_.light = TCOD_ConsoleTile{'.', WHITE, BLACK};
+  floor_tile_.target = TCOD_ConsoleTile{'.', TEAL, BLACK};
   floor_tile_.dark = TCOD_ConsoleTile{'.', GREY, BLACK};
+  target_tile_ = Vector2D{0, 0};
 }
 
 Map::~Map() {}
@@ -58,15 +63,17 @@ bool Map::is_explored(Vector2D position) {
 
 void Map::render(tcod::Console& console) {
   console.clear();
-  // TODO: Should happen in the map render function
+
   for (int y{0}; y < get_height(); ++y) {
     for (int x{0}; x < get_width(); ++x) {
       if (!console.in_bounds({x, y})) continue;
       bool isFloor = get_tiles().at({x, y}).type == TileType::floor;
       if (is_in_fov({x, y})) {
         set_is_explored({x, y});
-        console.at({x, y}) =
-            isFloor ? get_floor_tile().light : get_wall_tile().light;
+        // if mode is targeting change the tile colours to highlight
+        TCOD_ConsoleTile floor =
+            target_mode_ ? get_floor_tile().target : get_floor_tile().light;
+        console.at({x, y}) = isFloor ? floor : get_wall_tile().light;
       } else if (is_explored({x, y})) {
         console.at({x, y}) =
             isFloor ? get_floor_tile().dark : get_wall_tile().dark;
@@ -77,5 +84,9 @@ void Map::render(tcod::Console& console) {
   }
   if (is_in_fov(target_tile_)) {
   }
+}
+
+void Map::set_highlight_tile(Vector2D position) {
+  target_tile_ = position;
 }
 }  // namespace cpprl

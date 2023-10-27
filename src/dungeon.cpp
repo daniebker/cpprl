@@ -1,13 +1,13 @@
-#include "../include/dungeon.hpp"
+#include "dungeon.hpp"
 
 #include <tuple>
 
-#include "../include/rectangular_room.hpp"
-#include "../include/types/map.hpp"
+#include "rectangular_room.hpp"
+#include "types/map.hpp"
 
 namespace cpprl {
 Map* Dungeon::generate(DungeonConfig dungeon_config) {
-  auto map = new Map(dungeon_config.map_width, dungeon_config.map_height);
+  Map* map = new Map(dungeon_config.map_width, dungeon_config.map_height);
   auto rooms = std::vector<RectangularRoom>{};
 
   auto* random = TCODRandom::getInstance();

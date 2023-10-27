@@ -4,8 +4,15 @@
 
 #include <algorithm>
 
+#include "basic_ai_component.hpp"
+#include "combat_system.hpp"
+#include "events/command.hpp"
 #include "exceptions.hpp"
 #include "game_entity.hpp"
+#include "globals.hpp"
+#include "main.hpp"
+#include "state.hpp"
+#include "world.hpp"
 
 namespace cpprl {
 int DefenseComponent::heal(int amount) {
@@ -54,37 +61,134 @@ void Container::remove(Entity* entityToRemove) {
       inventory_.end());
 }
 
-bool ConsumableComponent::pick_up(Entity* owner, Entity* wearer) {
+ActionResult ConsumableComponent::pick_up(Entity* owner, Entity* wearer) {
   if (wearer->get_container() && wearer->get_container()->add(owner)) {
     // remove the owner?
-    return true;
+    return Success{};
   }
-  return false;
+  return Failure{"There's nothing to pick up."};
 }
 
-ActionResult ConsumableComponent::use(Entity* owner, Entity* wearer) {
+ActionResult ConsumableComponent::drop(Entity* owner, Entity* wearer) {
   if (wearer->get_container()) {
     wearer->get_container()->remove(owner);
-    return {true, ""};
+    owner->get_transform_component()->move(
+        wearer->get_transform_component()->get_position());
+    return Success{};
   }
-  return {false, ""};
+  return Failure{};
+}
+
+ActionResult ConsumableComponent::use(Entity* owner, Entity* wearer, World&) {
+  if (wearer->get_container()) {
+    wearer->get_container()->remove(owner);
+    return Success{};
+  }
+  return Failure{""};
 }
 
 HealingConsumable::HealingConsumable(int amount) : amount_(amount){};
 
-ActionResult HealingConsumable::use(Entity* owner, Entity* wearer) {
+ActionResult HealingConsumable::use(
+    Entity* owner, Entity* wearer, World& world) {
   if (!wearer->get_defense_component()) {
-    return {false, "There's nothing to heal."};
+    return Failure{"There's nothing to heal."};
   }
 
   int amount_healed = wearer->get_defense_component()->heal(amount_);
   if (amount_healed > 0) {
-    ActionResult result = ConsumableComponent::use(owner, wearer);
-    result.message = fmt::format("You healed for {} HP.", amount_healed);
-    return result;
+    ConsumableComponent::use(owner, wearer, world);
+    std::string message = fmt::format("You healed for {} HP.", amount_healed);
+    world.get_message_log().add_message(message, GREEN);
+    return Success{};
   }
 
-  return {false, "You are already at full health."};
+  return Failure{"You are already at full health."};
 }
 
+ActionResult LightningBolt::use(Entity* owner, Entity* wearer, World& world) {
+  Entity* closest_monster = nullptr;
+  closest_monster = world.get_entities().get_closest_monster(
+      wearer->get_transform_component()->get_position(), range_);
+  if (!closest_monster) {
+    return Failure{"No enemy is close enough to strike."};
+  }
+  // closest_monster->get_defense_component()->take_damage(damage_);
+  int inflicted = combat_system::handle_spell(damage_, *closest_monster);
+  ConsumableComponent::use(owner, wearer, world);
+  if (inflicted > 0) {
+    world.get_message_log().add_message(
+        fmt::format(
+            "A lightning bolt strikes the {} with a loud "
+            "thunder! The damage is {} hit points.",
+            closest_monster->get_name(),
+            damage_),
+        GREEN);
+
+    if (closest_monster->get_defense_component()->is_dead()) {
+      auto action = DieEvent(world, closest_monster);
+      action.execute();
+    }
+    return Success{};
+  } else {
+    return Failure{fmt::format(
+        "The lightning bolt hits the {} but does no damage.",
+        closest_monster->get_name())};
+  }
+}
+
+ActionResult FireSpell::use(Entity* owner, Entity* wearer, World& world) {
+  // We want everything by reference, except the pointers which
+  // we need by value. I need the memory address of the owner and
+  // wearer in order to update them and have it persist beyond the lambda.
+  auto on_pick = [&, owner, wearer]() {
+    // TODO:: when I get here the pointers are garbage.
+    ConsumableComponent::use(owner, wearer, world);
+    for (Entity* entity : world.get_entities()) {
+      if (entity->get_defense_component() &&
+          entity->get_defense_component()->is_not_dead() &&
+          entity->get_transform_component()->get_position().distance_to(
+              world.get_map().get_highlight_tile()) <= max_range_) {
+        world.get_message_log().add_message(
+            fmt::format(
+                "The {} gets burned for {} hit points.",
+                entity->get_name(),
+                damage_),
+            RED);
+        int inflicted = combat_system::handle_spell(damage_, *entity);
+        if (inflicted > 0) {
+          // TODO: this is repeated everywhere. Put it in take_damage
+          if (entity->get_defense_component()->is_dead()) {
+            auto action = DieEvent(world, entity);
+            action.execute();
+          }
+        }
+      }
+    }
+  };
+  // world.set_targeting_tile(max_range_, on_pick);
+  return Poll{
+      std::make_unique<PickTileAOEState>(world, on_pick, max_range_, aoe_)};
+}
+
+ActionResult ConfusionSpell::use(Entity* owner, Entity* wearer, World& world) {
+  auto on_pick = [&, owner, wearer]() {
+    Entity* target = world.get_entities().get_blocking_entity_at(
+        world.get_map().get_highlight_tile());
+    if (target) {
+      target->set_ai_component(
+          new ConfusionAI(num_turns_, target->get_ai_component()));
+      world.get_message_log().add_message(
+          fmt::format(
+              "The eyes of the {} look vacant, as it starts to "
+              "stumble around!",
+              target->get_name()),
+          GREEN);
+      ConsumableComponent::use(owner, wearer, world);
+    } else {
+      throw Impossible("There is no targetable enemy at that location.");
+    }
+  };
+  return Poll{std::make_unique<PickTileState>(world, on_pick, max_range_)};
+}
 }  // namespace cpprl

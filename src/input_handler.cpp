@@ -1,32 +1,85 @@
 #include "input_handler.hpp"
 
+#include <memory>
+
 #include "engine.hpp"
-#include "events/directional_command.hpp"
-#include "events/quit_command.hpp"
+#include "events/command.hpp"
+#include "gui.hpp"
+#include "world.hpp"
 
 namespace cpprl {
-
-EngineEvent& EventHandler::handle_sdl_event(SDL_Event event) noexcept {
+EngineEvent* EventHandler::handle_sdl_event(SDL_Event event) noexcept {
   SDL_Keycode key = event.key.keysym.sym;
   switch (key) {
     case SDLK_ESCAPE:
-      return quitCommand;
+      return quitCommand_;
       break;
     default:
-      return noop;
+      return noop_;
       break;
   }
 };
 
-EngineEvent& GameInputHandler::handle_sdl_event(SDL_Event event) noexcept {
+EngineEvent* TargetingInputHandler::handle_sdl_event(SDL_Event event) noexcept {
+  if (event.type == SDL_MOUSEMOTION) {
+    g_context.convert_event_coordinates(event);
+    auto mouse_input_event =
+        new MouseInputEvent(world_, {event.motion.x, event.motion.y});
+    return mouse_input_event;
+  } else if (event.type == SDL_MOUSEBUTTONDOWN) {
+    g_context.convert_event_coordinates(event);
+    auto mouse_click_event =
+        new MouseClickEvent(world_, {event.motion.x, event.motion.y});
+    return mouse_click_event;
+  } else if (event.type == SDL_KEYDOWN) {
+    auto mouse_click_event =
+        new MouseClickEvent(world_, {event.motion.x, event.motion.y});
+    SDL_Keycode key = event.key.keysym.sym;
+    switch (key) {
+      case SDLK_q:
+        return exit_targeting_mode_command_;
+        break;
+      case SDLK_RETURN:
+        return mouse_click_event;
+        break;
+      default:
+        return noop_;
+        break;
+    }
+  }
+  return noop_;
+};
+
+GameInputHandler::GameInputHandler(World& world, Entity* controllable_entity)
+    : EventHandler(world),
+      buttonRight(
+          new DirectionalCommand(world_, controllable_entity, Vector2D{1, 0})),
+      buttonUp(
+          new DirectionalCommand(world_, controllable_entity, Vector2D{0, -1})),
+      buttonDown(
+          new DirectionalCommand(world_, controllable_entity, Vector2D{0, 1})),
+      buttonUpRight(
+          new DirectionalCommand(world_, controllable_entity, Vector2D{1, -1})),
+      buttonUpLeft(new DirectionalCommand(
+          world_, controllable_entity, Vector2D{-1, -1})),
+      buttonLeft(
+          new DirectionalCommand(world_, controllable_entity, Vector2D{-1, 0})),
+      buttonDownRight(
+          new DirectionalCommand(world_, controllable_entity, Vector2D{1, 1})),
+      buttonDownLeft(
+          new DirectionalCommand(world_, controllable_entity, Vector2D{-1, 1})),
+      viewHistoryCommand(new ViewHistoryCommand(world_)),
+      pickupCommand_(new PickupCommand(world, controllable_entity)),
+      inventoryCommand_(new InventoryCommand(world, controllable_entity)){};
+
+EngineEvent* GameInputHandler::handle_sdl_event(SDL_Event event) noexcept {
   // TODO: Move this to its own handler.
   //  probably want an event handler which has
   //  input handler for keyboard and another for mouse
   if (event.type == SDL_MOUSEMOTION) {
     g_context.convert_event_coordinates(event);
-    engine_.get_controller().cursor = {event.motion.x, event.motion.y};
-    engine_.get_map()->set_target_tile({event.motion.x, event.motion.y});
-    return noop;
+    world_.get_map().set_highlight_tile({event.motion.x, event.motion.y});
+    return noop_;
   }
 
   SDL_Keycode key = event.key.keysym.sym;
@@ -75,11 +128,11 @@ EngineEvent& GameInputHandler::handle_sdl_event(SDL_Event event) noexcept {
   }
 };
 
-EngineEvent& MenuInputHandler::handle_sdl_event(SDL_Event event) noexcept {
+EngineEvent* MenuInputHandler::handle_sdl_event(SDL_Event event) noexcept {
   SDL_Keycode key = event.key.keysym.sym;
   switch (key) {
     case SDLK_RETURN:
-      return resetGameCommand;
+      return resetGameCommand_;
       break;
     default:
       return EventHandler::handle_sdl_event(event);
@@ -87,7 +140,16 @@ EngineEvent& MenuInputHandler::handle_sdl_event(SDL_Event event) noexcept {
   }
 };
 
-EngineEvent& GuiInputHandler::handle_sdl_event(SDL_Event event) noexcept {
+GuiInputHandler::GuiInputHandler(World& world, UiWindow& ui_window)
+    : EventHandler(world),
+      closeViewCommand_(new CloseViewCommand(world)),
+      scrollDownCommand_(new ScrollCommand(world, ui_window, 1)),
+      scrollUpCommand_(new ScrollCommand(world, ui_window, -1)),
+      jumpUpCommand_(new ScrollCommand(world, ui_window, -10)),
+      jumpDownCommand_(new ScrollCommand(world, ui_window, 10)),
+      jumpToHome_(new ScrollCommand(world, ui_window, 0)){};
+
+EngineEvent* GuiInputHandler::handle_sdl_event(SDL_Event event) noexcept {
   SDL_Keycode key = event.key.keysym.sym;
   switch (key) {
     case SDLK_j:
@@ -114,7 +176,7 @@ EngineEvent& GuiInputHandler::handle_sdl_event(SDL_Event event) noexcept {
   }
 }
 
-EngineEvent& HistoryViewInputHandler::handle_sdl_event(
+EngineEvent* HistoryViewInputHandler::handle_sdl_event(
     SDL_Event event) noexcept {
   SDL_Keycode key = event.key.keysym.sym;
   switch (key) {
@@ -124,11 +186,14 @@ EngineEvent& HistoryViewInputHandler::handle_sdl_event(
   }
 }
 
-EngineEvent& InventoryInputHandler::handle_sdl_event(SDL_Event event) noexcept {
+EngineEvent* InventoryInputHandler::handle_sdl_event(SDL_Event event) noexcept {
   SDL_Keycode key = event.key.keysym.sym;
   switch (key) {
     case (SDLK_RETURN):
       return selectItemCommand_;
+      break;
+    case (SDLK_d):
+      return dropItemCommand_;
       break;
     default:
       return GuiInputHandler::handle_sdl_event(event);
