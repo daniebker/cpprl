@@ -14,6 +14,8 @@ struct Reset {};
 struct EndTurn {};
 struct Quit {};
 struct GameOver {};
-using StateResult = std::variant<std::monostate, Change, Reset, EndTurn, Quit>;
+struct LoadGame {};
+using StateResult =
+    std::variant<std::monostate, Change, Reset, EndTurn, Quit, LoadGame>;
 }  // namespace cpprl
 #endif

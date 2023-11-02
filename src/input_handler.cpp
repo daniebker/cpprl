@@ -52,25 +52,26 @@ EngineEvent* TargetingInputHandler::handle_sdl_event(SDL_Event event) noexcept {
 
 GameInputHandler::GameInputHandler(World& world, Entity* controllable_entity)
     : EventHandler(world),
-      buttonRight(
+      button_right_(
           new DirectionalCommand(world_, controllable_entity, Vector2D{1, 0})),
-      buttonUp(
+      button_up_(
           new DirectionalCommand(world_, controllable_entity, Vector2D{0, -1})),
-      buttonDown(
+      button_down_(
           new DirectionalCommand(world_, controllable_entity, Vector2D{0, 1})),
-      buttonUpRight(
+      button_up_right_(
           new DirectionalCommand(world_, controllable_entity, Vector2D{1, -1})),
-      buttonUpLeft(new DirectionalCommand(
+      button_up_left_(new DirectionalCommand(
           world_, controllable_entity, Vector2D{-1, -1})),
-      buttonLeft(
+      button_left_(
           new DirectionalCommand(world_, controllable_entity, Vector2D{-1, 0})),
-      buttonDownRight(
+      button_down_right_(
           new DirectionalCommand(world_, controllable_entity, Vector2D{1, 1})),
-      buttonDownLeft(
+      button_down_left_(
           new DirectionalCommand(world_, controllable_entity, Vector2D{-1, 1})),
-      viewHistoryCommand(new ViewHistoryCommand(world_)),
-      pickupCommand_(new PickupCommand(world, controllable_entity)),
-      inventoryCommand_(new InventoryCommand(world, controllable_entity)){};
+      view_history_command_(new ViewHistoryCommand(world_)),
+      pick_up_command_(new PickupCommand(world, controllable_entity)),
+      inventory_command_(new InventoryCommand(world, controllable_entity)),
+      main_menu_command_(new MainMenuCommand(world)){};
 
 EngineEvent* GameInputHandler::handle_sdl_event(SDL_Event event) noexcept {
   // TODO: Move this to its own handler.
@@ -86,41 +87,44 @@ EngineEvent* GameInputHandler::handle_sdl_event(SDL_Event event) noexcept {
 
   switch (key) {
     case SDLK_e:
-      return buttonUpRight;
+      return button_up_right_;
       break;
     case SDLK_q:
-      return buttonUpLeft;
+      return button_up_left_;
       break;
     case SDLK_z:
-      return buttonDownLeft;
+      return button_down_left_;
       break;
     case SDLK_c:
-      return buttonDownRight;
+      return button_down_right_;
       break;
     case SDLK_w:
     case SDLK_UP:
-      return buttonUp;
+      return button_up_;
       break;
     case SDLK_s:
     case SDLK_DOWN:
-      return buttonDown;
+      return button_down_;
       break;
     case SDLK_a:
     case SDLK_LEFT:
-      return buttonLeft;
+      return button_left_;
       break;
     case SDLK_d:
     case SDLK_RIGHT:
-      return buttonRight;
+      return button_right_;
       break;
     case SDLK_v:
-      return viewHistoryCommand;
+      return view_history_command_;
       break;
     case SDLK_g:
-      return pickupCommand_;
+      return pick_up_command_;
       break;
     case SDLK_i:
-      return inventoryCommand_;
+      return inventory_command_;
+      break;
+    case SDLK_COMMA:
+      return main_menu_command_;
       break;
     default:
       return EventHandler::handle_sdl_event(event);
@@ -201,4 +205,15 @@ EngineEvent* InventoryInputHandler::handle_sdl_event(SDL_Event event) noexcept {
   }
 }
 
+EngineEvent* MainMenuInputHandler::handle_sdl_event(SDL_Event event) noexcept {
+  SDL_Keycode key = event.key.keysym.sym;
+  switch (key) {
+    case SDLK_RETURN:
+      return selectMenuItemCommand_;
+      break;
+    default:
+      return GuiInputHandler::handle_sdl_event(event);
+      break;
+  }
+}
 }  // namespace cpprl

@@ -65,11 +65,11 @@ StateResult InventoryCommand::execute() {
 // TODO: can this be a template?
 StateResult SelectItemCommand::execute() {
   int cursor = ui_window_.get_cursor();
-  if (sub_command_ == SubCommand::USE_ITEM) {
+  if (sub_command_ == ItemSubCommand::USE_ITEM) {
     auto use_item_command =
         std::make_unique<UseItemCommand>(world_, entity_, cursor);
     return use_item_command->execute();
-  } else if (sub_command_ == SubCommand::DROP_ITEM) {
+  } else if (sub_command_ == ItemSubCommand::DROP_ITEM) {
     auto drop_item_command =
         std::make_unique<DropItemCommand>(world_, entity_, cursor);
     return drop_item_command->execute();
@@ -193,4 +193,41 @@ StateResult MovementCommand::execute() {
 }
 
 StateResult QuitCommand::execute() { return Quit{}; }
+
+StateResult SelectMenuItemCommand::execute() {
+  int cursor = ui_window_.get_cursor();
+  MenuSubCommand sub_command;
+
+  // could also be a map in the select menu item command
+  // convert to a map
+  switch (cursor) {
+    case 1:
+      sub_command = MenuSubCommand::NEW_GAME;
+      break;
+    case 2:
+      sub_command = MenuSubCommand::CONTINUE;
+      break;
+    case 3:
+      sub_command = MenuSubCommand::QUIT;
+      break;
+    default:
+      break;
+  }
+
+  if (sub_command == MenuSubCommand::CONTINUE) {
+    return LoadGame{};
+  } else if (sub_command == MenuSubCommand::NEW_GAME) {
+    auto reset_game_command = std::make_unique<ResetGameCommand>(world_);
+    return reset_game_command->execute();
+  } else if (sub_command == MenuSubCommand::QUIT) {
+    return Quit{};
+  }
+
+  return {};
+}
+
+StateResult MainMenuCommand::execute() {
+  return Change{std::make_unique<MainMenuState>(
+      world_, new MainMenuWindow(60, 35, {0, 0}))};
+}
 }  // namespace cpprl

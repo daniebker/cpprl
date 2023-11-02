@@ -75,4 +75,9 @@ void GameOverState::on_enter() {
   input_handler_ = std::make_unique<MenuInputHandler>(world_);
   window_ = new GameOverWindow(20, 10, {0, 0}, "Game Over");
 }
+
+void MainMenuState::on_enter() {
+  window_ = new MainMenuWindow(20, 10, {0, 0}, "Main Menu");
+  input_handler_ = std::make_unique<MainMenuInputHandler>(world_, *window_);
+}
 }  // namespace cpprl
