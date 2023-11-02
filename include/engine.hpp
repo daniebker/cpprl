@@ -38,6 +38,9 @@ class Engine {
   void render();
   void handle_player_death();
   void reset_game();
+  void load();
+  void save();
+  void init();
 };
 }  // namespace cpprl
 #endif

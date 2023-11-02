@@ -18,12 +18,34 @@ namespace cpprl {
 Engine::Engine(int argc, char** argv)
     : renderer_(std::make_unique<TCODRenderer>(argc, argv)),
       world_(std::make_unique<World>()),
-      engine_state_(std::make_unique<InGameState>(*world_)) {
-  world_->generate_map(80, 35);
+      engine_state_(std::make_unique<InGameState>(*world_)) {}
+Engine::~Engine() {}
+
+void Engine::init() {
+  world_->generate_map(80, 35, true);
   engine_state_->on_enter();
 }
-Engine::~Engine() {
 
+void Engine::save() {
+  if (world_->get_player()->get_defense_component()->is_dead()) {
+    TCODSystem::deleteFile("game.sav");
+  } else {
+    TCODZip zip;
+    world_->save(zip);
+    zip.saveToFile("game.sav");
+  }
+}
+
+void Engine::load() {
+  if (TCODSystem::fileExists("game.sav")) {
+    TCODZip zip;
+    zip.loadFromFile("game.sav");
+    // load the map
+    world_->load(zip);
+    engine_state_->on_enter();
+  } else {
+    init();
+  }
 }
 
 void Engine::handle_events() {
@@ -54,6 +76,7 @@ void Engine::handle_events() {
             engine_state_->on_enter();
           }
         } else if (std::holds_alternative<Quit>(result)) {
+          save();
           std::exit(EXIT_SUCCESS);
         }
       } catch (Impossible& e) {

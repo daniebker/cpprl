@@ -1,7 +1,10 @@
 #ifndef WORLD_HPP
 #define WORLD_HPP
 
+#include <libtcod.hpp>
+
 #include "message_log.hpp"
+#include "persistent.hpp"
 #include "rendering.hpp"
 #include "types/map.hpp"
 
@@ -12,7 +15,7 @@ class Entity;
 class UiWindow;
 struct Controller;
 
-class World {
+class World : public Persistent {
  private:
   std::unique_ptr<EntityManager> entities_;
   Entity* player_;
@@ -27,16 +30,15 @@ class World {
   World();
   ~World() = default;
 
-  MessageLog& get_message_log() {
-    return *message_log_; }
-  Map& get_map() {
-    return *map_; }
-  EntityManager& get_entities() {
-    return *entities_; }
+  MessageLog& get_message_log() { return *message_log_; }
+  Map& get_map() { return *map_; }
+  EntityManager& get_entities() { return *entities_; }
   Entity* get_player() { return player_; }
   void reset();
 
-  void generate_map(int width, int height);
+  void save(TCODZip& zip) override;
+  void load(TCODZip& zip) override;
+  void generate_map(int width, int height, bool with_entities = false);
   void render(Renderer& renderer);
   void handle_enemy_turns();
   void scroll_current_view(int scroll_amount);

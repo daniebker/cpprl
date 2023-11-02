@@ -55,4 +55,29 @@ void MessageLog::render_messages(
     y_offset++;
   }
 }
+
+void MessageLog::save(TCODZip& zip) {
+  zip.putInt(messages_.size());
+  for (Message message : messages_) {
+    zip.putString(message.text_.c_str());
+    zip.putInt(message.colour_.r);
+    zip.putInt(message.colour_.g);
+    zip.putInt(message.colour_.b);
+    zip.putInt(message.count_);
+  }
+}
+void MessageLog::load(TCODZip& zip) {
+  int nbMessages = zip.getInt();
+  while (nbMessages > 0) {
+    const char* text = zip.getString();
+    int r = zip.getInt();
+    int g = zip.getInt();
+    int b = zip.getInt();
+    tcod::ColorRGB col = {(uint8_t)r, (uint8_t)g, (uint8_t)b};
+    int count = zip.getInt();
+    nbMessages--;
+    messages_.emplace_back(text, col, count);
+  }
+}
+
 }  // namespace cpprl

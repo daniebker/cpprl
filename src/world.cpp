@@ -26,8 +26,13 @@ World::World()
   message_log_->add_message(
       "Use J, K, PG U, PG D to scroll through messages. Use Q to quit.", RED);
 }
-void World::generate_map(int width, int height) {
+void World::generate_map(int width, int height, bool with_entities) {
+  // TODO: will need to pass the seed here
   map_ = dungeon_->generate(DungeonConfig{30, 6, 10, width, height, 2});
+
+  if (!with_entities) {
+    return;
+  }
 
   std::vector<RectangularRoom> rooms = map_->get_rooms();
   int room_count = rooms.size();
@@ -101,6 +106,41 @@ void World::scroll_current_view(int scroll_amount) {
   if (current_window_) {
     current_window_->set_cursor(current_window_->get_cursor() + scroll_amount);
   }
+}
+
+void World::save(TCODZip& zip) {
+  zip.putInt(get_map().get_width());
+  zip.putInt(get_map().get_height());
+  dungeon_->save(zip);
+  map_->save(zip);
+  get_player()->save(zip);
+  zip.putInt(get_entities().size() - 1);
+  for (auto& entity : get_entities()) {
+    if (entity->get_name() != "player") {
+      entity->save(zip);
+    }
+  }
+  get_message_log().save(zip);
+}
+
+void World::load(TCODZip& zip) {
+  int width = zip.getInt();
+  int height = zip.getInt();
+  dungeon_->load(zip);
+  generate_map(width, height, false);
+  map_->load(zip);
+  Entity* player = new Entity("", false, nullptr, nullptr);
+  player->load(zip);
+  player_ = entities_->spawn(player);
+  auto& player_defense = *player_->get_defense_component();
+  health_bar_ = new HealthBar(20, 1, {2, 36}, player_defense);
+  int num_entities = zip.getInt();
+  for (int i = 0; i < num_entities; ++i) {
+    Entity* entity = new Entity("", false, nullptr, nullptr);
+    entity->load(zip);
+    entities_->spawn(entity);
+  }
+  get_message_log().load(zip);
 }
 
 }  // namespace cpprl

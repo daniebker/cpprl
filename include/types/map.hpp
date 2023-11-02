@@ -39,19 +39,23 @@ inline void with_indexes(const Array& array, F func) {
   with_indexes(array.get_width(), array.get_height(), func);
 }
 
-class Map {
+class Map : public Persistent {
  public:
   Map(int width, int height);
   ~Map();
   int get_height() const { return height_; }
   int get_width() const { return width_; }
   bool is_in_bounds(Vector2D position) const;
-  bool is_not_in_bounds(Vector2D position) const { return !is_in_bounds(position); }
+  bool is_not_in_bounds(Vector2D position) const {
+    return !is_in_bounds(position);
+  }
   bool is_explored(Vector2D position);
   void compute_fov(Vector2D position, int radius);
   bool is_in_fov(Vector2D position);
   /** Sets the tile at position to explored. */
-  void set_is_explored(Vector2D position) { tiles_.at(position).explored = true; }
+  void set_is_explored(Vector2D position) {
+    tiles_.at(position).explored = true;
+  }
   bool is_walkable(Vector2D position) const;
   Array2D<Tile>& get_tiles() { return tiles_; }
   void set_tiles_range(std::tuple<Vector2D, Vector2D> bounds, Tile tile);
@@ -72,6 +76,8 @@ class Map {
   }
   bool set_target_tile(Vector2D position, Entity& player);
   Vector2D get_highlight_tile() { return target_tile_; }
+  void save(TCODZip& zip) override;
+  void load(TCODZip& zip) override;
 
  private:
   /** The wall tile */

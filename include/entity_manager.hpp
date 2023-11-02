@@ -22,6 +22,7 @@ class EntityManager {
   void reserve(size_t size) { entities_.reserve(size); }
   void shrink_to_fit() { entities_.shrink_to_fit(); }
   void remove(Entity* entity);
+  size_t size() const { return entities_.size(); }
 
   Entity& at(int index) { return *entities_.at(index); }
 

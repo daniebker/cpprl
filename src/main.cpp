@@ -8,6 +8,7 @@
 int main(int argc, char** argv) {
   try {
     cpprl::Engine engine(argc, argv);
+    engine.load();
 #ifdef __EMSCRIPTEN__
     emscripten_set_main_loop(main_loop, 0, 0);
 #else
@@ -15,6 +16,7 @@ int main(int argc, char** argv) {
       engine.render();
       engine.handle_events();
     };
+    engine.save();
 #endif
   } catch (const std::exception& exc) {
     throw;

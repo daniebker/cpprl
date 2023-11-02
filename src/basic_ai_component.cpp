@@ -22,6 +22,21 @@ bool can_path_to_target(tcod::BresenhamLine& path, World& world) {
   return true;
 }
 
+AIComponent* AIComponent::create(TCODZip& zip) {
+  AiType type = static_cast<AiType>(zip.getInt());
+  AIComponent* ai = nullptr;
+  switch (type) {
+    case HOSTILE:
+      ai = new HostileAI();
+      break;
+    case CONFUSED:
+      ai = new ConfusionAI(0, nullptr);
+      break;
+  }
+  ai->load(zip);
+  return ai;
+}
+
 void HostileAI::update(World& world, Entity* entity) {
   Vector2D position = entity->get_transform_component()->get_position();
   if (world.get_map().is_in_fov(position)) {
@@ -53,6 +68,8 @@ void HostileAI::update(World& world, Entity* entity) {
     action.execute();
   }
 }
+void HostileAI::load(TCODZip& zip) {}
+void HostileAI::save(TCODZip& zip) { zip.putInt(HOSTILE); }
 
 void ConfusionAI::update(World& world, Entity* entity) {
   TCODRandom* random = TCODRandom::getInstance();
@@ -67,5 +84,16 @@ void ConfusionAI::update(World& world, Entity* entity) {
     entity->set_ai_component(old_ai_);
     delete this;
   }
+}
+
+void ConfusionAI::load(TCODZip& zip) {
+  num_turns_ = zip.getInt();
+  old_ai_ = AIComponent::create(zip);
+}
+
+void ConfusionAI::save(TCODZip& zip) {
+  zip.putInt(CONFUSED);
+  zip.putInt(num_turns_);
+  old_ai_->save(zip);
 }
 }  // namespace cpprl

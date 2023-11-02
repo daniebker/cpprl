@@ -38,6 +38,47 @@ void DefenseComponent::die(Entity& owner) {
   owner.set_ai_component(nullptr);
 }
 
+void DefenseComponent::save(TCODZip& zip) {
+  zip.putInt(defense_);
+  zip.putInt(hp_);
+  zip.putInt(max_hp_);
+}
+
+void DefenseComponent::load(TCODZip& zip) {
+  defense_ = zip.getInt();
+  hp_ = zip.getInt();
+  max_hp_ = zip.getInt();
+}
+
+void AttackComponent::save(TCODZip& zip) { zip.putInt(damage_); }
+void AttackComponent::load(TCODZip& zip) { damage_ = zip.getInt(); }
+
+void TransformComponent::save(TCODZip& zip) {
+  zip.putInt(position_.x);
+  zip.putInt(position_.y);
+}
+
+void TransformComponent::load(TCODZip& zip) {
+  position_.x = zip.getInt();
+  position_.y = zip.getInt();
+}
+
+void ASCIIComponent::save(TCODZip& zip) {
+  zip.putString(symbol_.c_str());
+  zip.putInt(colour_.r);
+  zip.putInt(colour_.g);
+  zip.putInt(colour_.b);
+  zip.putInt(layer_);
+}
+
+void ASCIIComponent::load(TCODZip& zip) {
+  symbol_ = zip.getString();
+  colour_.r = zip.getInt();
+  colour_.g = zip.getInt();
+  colour_.b = zip.getInt();
+  layer_ = zip.getInt();
+}
+
 Container::Container(int size) : size_(size), inventory_({}) {
   inventory_.reserve(size);
 }
@@ -59,6 +100,24 @@ void Container::remove(Entity* entityToRemove) {
             return entity == entityToRemove;
           }),
       inventory_.end());
+}
+void Container::load(TCODZip& zip) {
+  size_ = zip.getInt();
+  int nbActors = zip.getInt();
+  while (nbActors > 0) {
+    Entity* entity = new Entity("", false, nullptr, nullptr);
+    entity->load(zip);
+    inventory_.emplace_back(entity);
+    nbActors--;
+  }
+}
+
+void Container::save(TCODZip& zip) {
+  zip.putInt(size_);
+  zip.putInt(inventory_.size());
+  for (Entity* entity : inventory_) {
+    entity->save(zip);
+  }
 }
 
 ActionResult ConsumableComponent::pick_up(Entity* owner, Entity* wearer) {
@@ -86,8 +145,33 @@ ActionResult ConsumableComponent::use(Entity* owner, Entity* wearer, World&) {
   }
   return Failure{""};
 }
+ConsumableComponent* ConsumableComponent::create(TCODZip& zip) {
+  ConsumableType type = (ConsumableType)zip.getInt();
+  ConsumableComponent* component = nullptr;
+  switch (type) {
+    case HEALER:
+      component = new HealingConsumable(0);
+      break;
+    case LIGHTNING_BOLT:
+      component = new LightningBolt(0, 0);
+      break;
+    case CONFUSER:
+      component = new ConfusionSpell(0, 0);
+      break;
+    case FIREBALL:
+      component = new FireSpell(0, 0, 0);
+      break;
+  }
+  component->load(zip);
+  return component;
+}
 
 HealingConsumable::HealingConsumable(int amount) : amount_(amount){};
+void HealingConsumable::save(TCODZip& zip) {
+  zip.putInt(HEALER);
+  zip.putInt(amount_);
+}
+void HealingConsumable::load(TCODZip& zip) { amount_ = zip.getInt(); }
 
 ActionResult HealingConsumable::use(
     Entity* owner, Entity* wearer, World& world) {
@@ -136,6 +220,16 @@ ActionResult LightningBolt::use(Entity* owner, Entity* wearer, World& world) {
         closest_monster->get_name())};
   }
 }
+void LightningBolt::save(TCODZip& zip) {
+  zip.putInt(LIGHTNING_BOLT);
+  zip.putInt(range_);
+  zip.putInt(damage_);
+}
+
+void LightningBolt::load(TCODZip& zip) {
+  range_ = zip.getInt();
+  damage_ = zip.getInt();
+}
 
 ActionResult FireSpell::use(Entity* owner, Entity* wearer, World& world) {
   // We want everything by reference, except the pointers which
@@ -170,6 +264,17 @@ ActionResult FireSpell::use(Entity* owner, Entity* wearer, World& world) {
   return Poll{
       std::make_unique<PickTileAOEState>(world, on_pick, max_range_, aoe_)};
 }
+void FireSpell::save(TCODZip& zip) {
+  zip.putInt(FIREBALL);
+  zip.putInt(max_range_);
+  zip.putInt(aoe_);
+  zip.putInt(damage_);
+}
+void FireSpell::load(TCODZip& zip) {
+  max_range_ = zip.getInt();
+  aoe_ = zip.getInt();
+  damage_ = zip.getInt();
+}
 
 ActionResult ConfusionSpell::use(Entity* owner, Entity* wearer, World& world) {
   auto on_pick = [&, owner, wearer]() {
@@ -190,5 +295,15 @@ ActionResult ConfusionSpell::use(Entity* owner, Entity* wearer, World& world) {
     }
   };
   return Poll{std::make_unique<PickTileState>(world, on_pick, max_range_)};
+}
+void ConfusionSpell::save(TCODZip& zip) {
+  zip.putInt(CONFUSER);
+  zip.putInt(num_turns_);
+  zip.putInt(max_range_);
+}
+
+void ConfusionSpell::load(TCODZip& zip) {
+  num_turns_ = zip.getInt();
+  max_range_ = zip.getInt();
 }
 }  // namespace cpprl

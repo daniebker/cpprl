@@ -4,6 +4,7 @@
 #include <libtcod.hpp>
 #include <string_view>
 
+#include "persistent.hpp"
 #include "types/math.hpp"
 #include "types/world_fwd.hpp"
 
@@ -73,6 +74,8 @@ class Entity {
     aiComponent_ = aiComponent;
   };
   void set_container(Container* container) { container_ = container; };
+  void save(TCODZip& zip);
+  void load(TCODZip& zip);
 };
 
 }  // namespace cpprl
