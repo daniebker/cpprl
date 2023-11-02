@@ -139,7 +139,8 @@ void MainMenuWindow::render(tcod::Console& parent_console) {
   // print each menu item
   int y_offset = 1;
   for (auto it = menu_items_.begin(); it != menu_items_.end(); ++it) {
-    if (y_offset == 2 && !TCODSystem::fileExists("game.sav")) {
+    // this is a sucky way to do this.
+     if (y_offset == 2 && !TCODSystem::fileExists("game.sav")) {
       continue;
     }
     tcod::print_rect(

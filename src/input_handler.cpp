@@ -184,6 +184,9 @@ EngineEvent* HistoryViewInputHandler::handle_sdl_event(
     SDL_Event event) noexcept {
   SDL_Keycode key = event.key.keysym.sym;
   switch (key) {
+    case SDLK_v:
+      return closeViewCommand_;
+      break;
     default:
       return GuiInputHandler::handle_sdl_event(event);
       break;
@@ -199,6 +202,8 @@ EngineEvent* InventoryInputHandler::handle_sdl_event(SDL_Event event) noexcept {
     case (SDLK_d):
       return dropItemCommand_;
       break;
+    case SDLK_i:
+      return closeViewCommand_;
     default:
       return GuiInputHandler::handle_sdl_event(event);
       break;
@@ -211,6 +216,8 @@ EngineEvent* MainMenuInputHandler::handle_sdl_event(SDL_Event event) noexcept {
     case SDLK_RETURN:
       return selectMenuItemCommand_;
       break;
+    case SDLK_COMMA:
+      return closeViewCommand_;
     default:
       return GuiInputHandler::handle_sdl_event(event);
       break;
