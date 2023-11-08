@@ -8,6 +8,7 @@
 #include <libtcod.hpp>
 
 #include "colours.hpp"
+#include "persistent.hpp"
 
 namespace cpprl {
 
@@ -24,7 +25,7 @@ struct Message {
   }
 };
 
-class MessageLog {
+class MessageLog : public Persistent {
  private:
   /**
    * The stored messages.
@@ -60,6 +61,9 @@ class MessageLog {
    */
   void render(
       tcod::Console& console, int x, int y, int width, int height) const;
+
+  void save(TCODZip& zip) override;
+  void load(TCODZip& zip) override;
 };
 
 }  // namespace cpprl

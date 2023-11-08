@@ -72,18 +72,38 @@ class InventoryCommand final : public Command {
   StateResult execute() override;
 };
 
-enum SubCommand { USE_ITEM, DROP_ITEM };
+class MainMenuCommand final : public EngineEvent {
+ public:
+  MainMenuCommand(World& world) : EngineEvent(world) {}
+  StateResult execute() override;
+};
+
+enum ItemSubCommand { USE_ITEM, DROP_ITEM };
 class SelectItemCommand final : public Command {
  private:
-  SubCommand sub_command_;
+  ItemSubCommand sub_command_;
   UiWindow& ui_window_;
 
  public:
   SelectItemCommand(
-      World& world, Entity* entity, UiWindow& ui_window, SubCommand sub_command)
+      World& world,
+      Entity* entity,
+      UiWindow& ui_window,
+      ItemSubCommand sub_command)
       : Command(world, entity),
         sub_command_(sub_command),
         ui_window_(ui_window) {}
+  StateResult execute() override;
+};
+
+enum MenuSubCommand { NEW_GAME, CONTINUE, QUIT };
+class SelectMenuItemCommand final : public EngineEvent {
+ private:
+  UiWindow& ui_window_;
+
+ public:
+  SelectMenuItemCommand(World& world, UiWindow& ui_window)
+      : EngineEvent(world), ui_window_(ui_window) {}
   StateResult execute() override;
 };
 

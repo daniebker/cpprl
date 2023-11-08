@@ -93,6 +93,13 @@ class GameOverState final : public GuiViewState {
   void on_enter() override;
 };
 
+class MainMenuState final : public GuiViewState {
+ public:
+  MainMenuState(World& world, UiWindow* window) : GuiViewState(world, window) {}
+  ~MainMenuState() { delete window_; }
+  void on_enter() override;
+};  // namespace cpprl
+
 }  // namespace cpprl
 
 #endif

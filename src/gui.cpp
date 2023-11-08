@@ -131,4 +131,34 @@ void GameOverWindow::render(tcod::Console& parent_console) {
       1.0f,
       1.0f);
 }
+
+void MainMenuWindow::render(tcod::Console& parent_console) {
+  console_->clear();
+  UiWindow::add_frame();
+  tcod::print(*console_, {1, cursor_}, ">", WHITE, std::nullopt, TCOD_LEFT);
+  // print each menu item
+  int y_offset = 1;
+  for (auto it = menu_items_.begin(); it != menu_items_.end(); ++it) {
+    // this is a sucky way to do this.
+     if (y_offset == 2 && !TCODSystem::fileExists("game.sav")) {
+      continue;
+    }
+    tcod::print_rect(
+        *console_,
+        {2, y_offset, console_->getWidth() - 1, 1},
+        it->second,
+        WHITE,
+        std::nullopt,
+        TCOD_LEFT);
+    ++y_offset;
+  }
+
+  tcod::blit(
+      parent_console,
+      *console_,
+      {3, 3},
+      {position_.x, position_.y, console_->getWidth(), console_->getHeight()},
+      1.0f,
+      1.0f);
+}
 }  // namespace cpprl

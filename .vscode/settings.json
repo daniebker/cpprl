@@ -137,7 +137,8 @@
     "cinttypes": "cpp",
     "typeindex": "cpp",
     "valarray": "cpp",
-    "__std_stream": "cpp"
+    "__std_stream": "cpp",
+    "__tree": "cpp"
   },
   "[cpp]": {
     "editor.defaultFormatter": "xaver.clang-format"

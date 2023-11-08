@@ -2,6 +2,7 @@
 #define INCLUDE_HISTORY_WINDOW_HPP_
 
 #include <libtcod.hpp>
+#include <map>
 #include <memory>
 
 #include "game_entity.hpp"
@@ -113,6 +114,28 @@ class GameOverWindow final : public UiWindow {
     UiWindow::set_cursor(1);
   };
   virtual void render(tcod::Console& parent_console) override;
+};
+
+class MainMenuWindow final : public UiWindow {
+ private:
+  // This could be a map of MenuItems
+  // Where menu item is a name and a
+  // sub command
+  std::map<int, std::string> menu_items_;
+
+ public:
+  MainMenuWindow(
+      std::size_t width,
+      std::size_t height,
+      Vector2D position,
+      std::string title = "Main Menu")
+      : UiWindow(width, height, position, title) {
+    menu_items_[1] = "New Game";
+    menu_items_[2] = "Continue";
+    menu_items_[3] = "Quit";
+    UiWindow::set_cursor(1);
+  }
+  void render(tcod::Console& parent_console) override;
 };
 
 }  // namespace cpprl
