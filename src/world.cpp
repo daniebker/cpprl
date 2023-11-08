@@ -46,14 +46,14 @@ void World::generate_map(int width, int height, bool with_entities) {
       true,
       std::make_unique<TransformComponent>(
           rooms[0].get_center().x, rooms[0].get_center().y),
-      new ASCIIComponent("@", RED, 1));
-  entity->set_attack_component(new AttackComponent(5));
-  entity->set_defense_component(new DefenseComponent(2, 30));
+      std::make_unique<ASCIIComponent>("@", RED, 1));
+  entity->set_attack_component(std::make_unique<AttackComponent>(5));
+  entity->set_defense_component(std::make_unique<DefenseComponent>(2, 30));
   entity->set_container(new Container(26));
   player_ = entities_->spawn(entity);
 
   map_->compute_fov(player_->get_transform_component().get_position(), 4);
-  auto& player_defense = *player_->get_defense_component();
+  DefenseComponent& player_defense = player_->get_defense_component();
   health_bar_ = new HealthBar(20, 1, {2, 36}, player_defense);
   entities_->shrink_to_fit();
 }
@@ -65,7 +65,7 @@ void World::render(Renderer& renderer) {
   for (Entity* entity : *entities_) {
     if (map_->is_in_fov(entity->get_transform_component().get_position())) {
       renderer.render(
-          *entity->get_sprite_component(), entity->get_transform_component());
+          entity->get_sprite_component(), entity->get_transform_component());
     }
   }
   health_bar_->render(g_console);
@@ -90,7 +90,7 @@ void World::render(Renderer& renderer) {
 void World::handle_enemy_turns() {
   for (Entity* entity : *entities_) {
     if (entity->get_ai_component() &&
-        entity->get_defense_component()->is_not_dead()) {
+        entity->get_defense_component().is_not_dead()) {
       try {
         // dance puppet dance!
         entity->update(*this);
@@ -132,7 +132,7 @@ void World::load(TCODZip& zip) {
   Entity* player = new Entity("", false, nullptr, nullptr);
   player->load(zip);
   player_ = entities_->spawn(player);
-  auto& player_defense = *player_->get_defense_component();
+  DefenseComponent& player_defense = player_->get_defense_component();
   health_bar_ = new HealthBar(20, 1, {2, 36}, player_defense);
   int num_entities = zip.getInt();
   for (int i = 0; i < num_entities; ++i) {

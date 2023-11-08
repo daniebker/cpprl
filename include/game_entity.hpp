@@ -24,9 +24,9 @@ class Entity {
   // PhysicsComponent physicsComponent_;
   bool blocker_;
   std::unique_ptr<TransformComponent> transformComponent_;
-  ASCIIComponent* asciiComponent_;
-  AttackComponent* attackComponent_;
-  DefenseComponent* defenseComponent_;
+  std::unique_ptr<ASCIIComponent> asciiComponent_;
+  std::unique_ptr<AttackComponent> attackComponent_;
+  std::unique_ptr<DefenseComponent> defenseComponent_;
   ConsumableComponent* consumableComponent_;
   AIComponent* aiComponent_;
   Container* container_;
@@ -36,16 +36,16 @@ class Entity {
       std::string name,
       bool blocker,
       std::unique_ptr<TransformComponent> transformComponent,
-      ASCIIComponent* asciiComponent);
+      std::unique_ptr<ASCIIComponent> asciiComponent);
 
   ~Entity();
 
   TransformComponent& get_transform_component() {
     return *transformComponent_;
   };
-  ASCIIComponent* get_sprite_component() { return asciiComponent_; };
-  AttackComponent* get_attack_component() { return attackComponent_; };
-  DefenseComponent* get_defense_component() { return defenseComponent_; };
+  ASCIIComponent& get_sprite_component() { return *asciiComponent_; };
+  AttackComponent& get_attack_component() { return *attackComponent_; };
+  DefenseComponent& get_defense_component() { return *defenseComponent_; };
   ConsumableComponent* get_consumable_component() {
     return consumableComponent_;
   };
@@ -60,15 +60,10 @@ class Entity {
   void update(World& world);
   void set_blocking(bool blocker) { blocker_ = blocker; };
   void set_name(std::string name) { name_ = name; };
-  void set_ascii_component(ASCIIComponent* asciiComponent) {
-    asciiComponent_ = asciiComponent;
-  };
-  void set_defense_component(DefenseComponent* defenseComponent) {
-    defenseComponent_ = defenseComponent;
-  };
-  void set_attack_component(AttackComponent* attackComponent) {
-    attackComponent_ = attackComponent;
-  };
+  void set_ascii_component(std::unique_ptr<ASCIIComponent> asciiComponent);
+  void set_defense_component(
+      std::unique_ptr<DefenseComponent> defenseComponent);
+  void set_attack_component(std::unique_ptr<AttackComponent> attackComponent);
   void set_consumable_component(ConsumableComponent* consumableComponent) {
     consumableComponent_ = consumableComponent;
   };

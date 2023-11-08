@@ -34,9 +34,9 @@ void EntityManager::place_entities(
           "orc",
           true,
           std::make_unique<TransformComponent>(x, y),
-          new ASCIIComponent("o", WHITE, 1));
-      entity->set_defense_component(new DefenseComponent(0, 10));
-      entity->set_attack_component(new AttackComponent(3));
+          std::make_unique<ASCIIComponent>("o", WHITE, 1));
+      entity->set_defense_component(std::make_unique<DefenseComponent>(0, 10));
+      entity->set_attack_component(std::make_unique<AttackComponent>(3));
       entity->set_ai_component(new HostileAI());
       spawn(entity);
     } else {
@@ -44,9 +44,9 @@ void EntityManager::place_entities(
           "troll",
           true,
           std::make_unique<TransformComponent>(x, y),
-          new ASCIIComponent("T", WHITE, 1));
-      entity->set_attack_component(new AttackComponent(4));
-      entity->set_defense_component(new DefenseComponent(1, 16));
+          std::make_unique<ASCIIComponent>("T", WHITE, 1));
+      entity->set_attack_component(std::make_unique<AttackComponent>(4));
+      entity->set_defense_component(std::make_unique<DefenseComponent>(1, 16));
       entity->set_ai_component(new HostileAI());
       spawn(entity);
     }
@@ -70,7 +70,7 @@ void EntityManager::place_entities(
           "healing potion",
           false,
           std::make_unique<TransformComponent>(x, y),
-          new ASCIIComponent("!", DARK_RED, 0));
+          std::make_unique<ASCIIComponent>("!", DARK_RED, 0));
       entity->set_consumable_component(new HealingConsumable(10));
       spawn(entity);
     } else if (dice <= .8f) {
@@ -78,7 +78,7 @@ void EntityManager::place_entities(
           "Lightning Scroll",
           false,
           std::make_unique<TransformComponent>(x, y),
-          new ASCIIComponent("#", DARK_RED, 0));
+          std::make_unique<ASCIIComponent>("#", DARK_RED, 0));
       entity->set_consumable_component(new LightningBolt(5, 20));
       spawn(entity);
     } else if (dice <= .9f) {
@@ -86,7 +86,7 @@ void EntityManager::place_entities(
           "Fire Scroll",
           false,
           std::make_unique<TransformComponent>(x, y),
-          new ASCIIComponent("#", DARK_RED, 0));
+          std::make_unique<ASCIIComponent>("#", DARK_RED, 0));
       entity->set_consumable_component(new FireSpell(5, 3, 20));
       spawn(entity);
     } else if (dice <= 1.0f) {
@@ -94,7 +94,7 @@ void EntityManager::place_entities(
           "Confusion Scroll",
           false,
           std::make_unique<TransformComponent>(x, y),
-          new ASCIIComponent("#", DARK_RED, 0));
+          std::make_unique<ASCIIComponent>("#", DARK_RED, 0));
       entity->set_consumable_component(new ConfusionSpell(3, 5));
       spawn(entity);
     }
@@ -158,12 +158,13 @@ void EntityManager::remove(Entity* entity) {
       entities_.end());
 }
 
-Entity* EntityManager::get_closest_monster(
+Entity* EntityManager::get_closest_living_monster(
     Vector2D position, float range) const {
   Entity* closest = nullptr;
   float best_distance = 1E6f;
   for (Entity* entity : entities_) {
-    if (entity->get_ai_component() && entity->get_defense_component()) {
+    auto* defense_component = &entity->get_defense_component();
+    if (entity->get_ai_component() && defense_component) {
       float distance = position.distance_to(
           entity->get_transform_component().get_position());
       if (distance < best_distance && (distance <= range || range == 0.0f)) {

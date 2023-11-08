@@ -13,7 +13,7 @@ Entity::Entity(
     std::string name,
     bool blocker,
     std::unique_ptr<TransformComponent> transformComponent,
-    ASCIIComponent* asciiComponent)
+    std::unique_ptr<ASCIIComponent> asciiComponent)
     : name_(name),
       blocker_(blocker),
       transformComponent_(std::move(transformComponent)),
@@ -25,12 +25,9 @@ Entity::Entity(
       container_(nullptr) {}
 
 Entity::~Entity() {
-  if (attackComponent_) delete attackComponent_;
-  if (defenseComponent_) delete defenseComponent_;
   if (consumableComponent_) delete consumableComponent_;
   if (aiComponent_) delete aiComponent_;
   if (container_) delete container_;
-  if (asciiComponent_) delete asciiComponent_;
 }
 
 void Entity::update(World& world) { aiComponent_->update(world, this); }
@@ -75,15 +72,15 @@ void Entity::load(TCODZip& zip) {
     transformComponent_->load(zip);
   }
   if (hasAsciiComponent) {
-    asciiComponent_ = new ASCIIComponent("", WHITE, 0);
+    asciiComponent_ = std::make_unique<ASCIIComponent>("", WHITE, 0);
     asciiComponent_->load(zip);
   }
   if (hasAttackComponent) {
-    attackComponent_ = new AttackComponent(0);
+    attackComponent_ = std::make_unique<AttackComponent>(0);
     attackComponent_->load(zip);
   }
   if (hasDefenseComponent) {
-    defenseComponent_ = new DefenseComponent(0, 0);
+    defenseComponent_ = std::make_unique<DefenseComponent>(0, 0);
     defenseComponent_->load(zip);
   }
   if (hasConsumableComponent) {
@@ -97,4 +94,19 @@ void Entity::load(TCODZip& zip) {
     container_->load(zip);
   }
 }
+
+void Entity::set_ascii_component(
+    std::unique_ptr<ASCIIComponent> asciiComponent) {
+  asciiComponent_ = std::move(asciiComponent);
+};
+
+void Entity::set_attack_component(
+    std::unique_ptr<AttackComponent> attackComponent) {
+  attackComponent_ = std::move(attackComponent);
+};
+
+void Entity::set_defense_component(
+    std::unique_ptr<DefenseComponent> defenseComponent) {
+  defenseComponent_ = std::move(defenseComponent);
+};
 }  // namespace cpprl

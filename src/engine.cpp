@@ -30,7 +30,7 @@ void Engine::init() {
 }
 
 void Engine::save() {
-  if (world_->get_player()->get_defense_component()->is_dead()) {
+  if (world_->get_player()->get_defense_component().is_dead()) {
     TCODSystem::deleteFile("game.sav");
   } else {
     TCODZip zip;
@@ -77,7 +77,7 @@ void Engine::handle_events() {
           load();
         } else if (std::holds_alternative<EndTurn>(result)) {
           world_->handle_enemy_turns();
-          if (world_->get_player()->get_defense_component()->is_dead()) {
+          if (world_->get_player()->get_defense_component().is_dead()) {
             engine_state_->on_exit();
             engine_state_ = std::make_unique<GameOverState>(*world_);
             engine_state_->on_enter();

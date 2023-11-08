@@ -104,7 +104,7 @@ StateResult CloseViewCommand::execute() {
 StateResult DieEvent::execute() {
   world_.get_message_log().add_message(
       fmt::format("{} has died!", util::capitalize(entity_->get_name())));
-  entity_->get_defense_component()->die(*entity_);
+  entity_->get_defense_component().die(*entity_);
   return {};
 }
 
@@ -155,7 +155,7 @@ StateResult MeleeCommand::execute() {
 
       world_.get_message_log().add_message(message, attack_colour, true);
 
-      if (target->get_defense_component()->is_dead()) {
+      if (target->get_defense_component().is_dead()) {
         auto action = DieEvent(world_, target);
         return action.execute();
       }
