@@ -12,7 +12,7 @@ namespace cpprl {
 Entity::Entity(
     std::string name,
     bool blocker,
-    TransformComponent* transformComponent,
+    std::unique_ptr<TransformComponent> transformComponent,
     ASCIIComponent* asciiComponent)
     : name_(name),
       blocker_(blocker),
@@ -30,7 +30,6 @@ Entity::~Entity() {
   if (consumableComponent_) delete consumableComponent_;
   if (aiComponent_) delete aiComponent_;
   if (container_) delete container_;
-  if (transformComponent_) delete transformComponent_;
   if (asciiComponent_) delete asciiComponent_;
 }
 
@@ -39,7 +38,7 @@ void Entity::update(World& world) { aiComponent_->update(world, this); }
 // TODO: not sure this belongs here
 float Entity::get_distance_to(Entity* other) {
   return transformComponent_->get_position().distance_to(
-      other->get_transform_component()->get_position());
+      other->get_transform_component().get_position());
 };
 
 void Entity::save(TCODZip& zip) {
@@ -72,7 +71,7 @@ void Entity::load(TCODZip& zip) {
   bool hasAIComponent = zip.getInt();
   bool hasContainer = zip.getInt();
   if (hasTransformComponent) {
-    transformComponent_ = new TransformComponent(0, 0);
+    transformComponent_ = std::make_unique<TransformComponent>(0, 0);
     transformComponent_->load(zip);
   }
   if (hasAsciiComponent) {

@@ -9,7 +9,7 @@ namespace cpprl::util {
 template <typename T>
 inline auto find_entity_at(std::vector<T>& vec, int x, int y) {
   auto iterator = std::find_if(vec.begin(), vec.end(), [x, y](T& entity) {
-    return entity->get_transform_component()->get_position() == Vector2D{x, y};
+    return entity->get_transform_component().get_position() == Vector2D{x, y};
   });
   return iterator;
 }

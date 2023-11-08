@@ -13,7 +13,7 @@ namespace cpprl {
 
 StateResult PickupCommand::execute() {
   Entity* item = world_.get_entities().get_non_blocking_entity_at(
-      entity_->get_transform_component()->get_position());
+      entity_->get_transform_component().get_position());
   if (item) {
     world_.get_message_log().add_message(
         "You pick up the " + item->get_name() + ".", WHITE);
@@ -110,7 +110,7 @@ StateResult DieEvent::execute() {
 
 StateResult DirectionalCommand::execute() {
   auto targetPos =
-      entity_->get_transform_component()->get_position() + move_vector_;
+      entity_->get_transform_component().get_position() + move_vector_;
 
   if (world_.get_entities().get_blocking_entity_at(targetPos)) {
     auto action = MeleeCommand(world_, entity_, move_vector_);
@@ -136,7 +136,7 @@ StateResult ExitTargetingModeCommand::execute() {
 
 StateResult MeleeCommand::execute() {
   auto targetPos =
-      entity_->get_transform_component()->get_position() + move_vector_;
+      entity_->get_transform_component().get_position() + move_vector_;
   Entity* target = world_.get_entities().get_blocking_entity_at(targetPos);
 
   tcod::ColorRGB attack_colour = WHITE;
@@ -173,7 +173,7 @@ StateResult MeleeCommand::execute() {
 
 StateResult MovementCommand::execute() {
   Vector2D new_position =
-      entity_->get_transform_component()->get_position() + move_vector_;
+      entity_->get_transform_component().get_position() + move_vector_;
   auto& map = world_.get_map();
 
   if (map.is_not_in_bounds(new_position)) {
@@ -185,7 +185,7 @@ StateResult MovementCommand::execute() {
   }
 
   if (map.is_walkable(new_position)) {
-    entity_->get_transform_component()->move(new_position);
+    entity_->get_transform_component().move(new_position);
   } else {
     throw Impossible("You can't walk on that.");
   }

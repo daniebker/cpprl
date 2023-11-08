@@ -38,11 +38,11 @@ AIComponent* AIComponent::create(TCODZip& zip) {
 }
 
 void HostileAI::update(World& world, Entity* entity) {
-  Vector2D position = entity->get_transform_component()->get_position();
+  Vector2D position = entity->get_transform_component().get_position();
   if (world.get_map().is_in_fov(position)) {
     Entity* player = world.get_player();
     Vector2D player_position =
-        player->get_transform_component()->get_position();
+        player->get_transform_component().get_position();
     Vector2D delta = player_position - position;
 
     int distance = std::max(std::abs(delta.x), std::abs(delta.y));

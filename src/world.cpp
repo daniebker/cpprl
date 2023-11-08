@@ -44,28 +44,28 @@ void World::generate_map(int width, int height, bool with_entities) {
   Entity* entity = new Entity(
       "player",
       true,
-      new TransformComponent(
-          {rooms[0].get_center().x, rooms[0].get_center().y}),
+      std::make_unique<TransformComponent>(
+          rooms[0].get_center().x, rooms[0].get_center().y),
       new ASCIIComponent("@", RED, 1));
   entity->set_attack_component(new AttackComponent(5));
   entity->set_defense_component(new DefenseComponent(2, 30));
   entity->set_container(new Container(26));
   player_ = entities_->spawn(entity);
 
-  map_->compute_fov(player_->get_transform_component()->get_position(), 4);
+  map_->compute_fov(player_->get_transform_component().get_position(), 4);
   auto& player_defense = *player_->get_defense_component();
   health_bar_ = new HealthBar(20, 1, {2, 36}, player_defense);
   entities_->shrink_to_fit();
 }
 
 void World::render(Renderer& renderer) {
-  map_->compute_fov(player_->get_transform_component()->get_position(), 10);
+  map_->compute_fov(player_->get_transform_component().get_position(), 10);
   map_->render(g_console);
 
   for (Entity* entity : *entities_) {
-    if (map_->is_in_fov(entity->get_transform_component()->get_position())) {
+    if (map_->is_in_fov(entity->get_transform_component().get_position())) {
       renderer.render(
-          *entity->get_sprite_component(), *entity->get_transform_component());
+          *entity->get_sprite_component(), entity->get_transform_component());
     }
   }
   health_bar_->render(g_console);

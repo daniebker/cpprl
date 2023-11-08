@@ -23,7 +23,7 @@ class Entity {
   std::string name_;
   // PhysicsComponent physicsComponent_;
   bool blocker_;
-  TransformComponent* transformComponent_;
+  std::unique_ptr<TransformComponent> transformComponent_;
   ASCIIComponent* asciiComponent_;
   AttackComponent* attackComponent_;
   DefenseComponent* defenseComponent_;
@@ -35,12 +35,14 @@ class Entity {
   Entity(
       std::string name,
       bool blocker,
-      TransformComponent* transformComponent,
+      std::unique_ptr<TransformComponent> transformComponent,
       ASCIIComponent* asciiComponent);
 
   ~Entity();
 
-  TransformComponent* get_transform_component() { return transformComponent_; };
+  TransformComponent& get_transform_component() {
+    return *transformComponent_;
+  };
   ASCIIComponent* get_sprite_component() { return asciiComponent_; };
   AttackComponent* get_attack_component() { return attackComponent_; };
   DefenseComponent* get_defense_component() { return defenseComponent_; };

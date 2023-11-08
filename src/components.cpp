@@ -131,8 +131,8 @@ ActionResult ConsumableComponent::pick_up(Entity* owner, Entity* wearer) {
 ActionResult ConsumableComponent::drop(Entity* owner, Entity* wearer) {
   if (wearer->get_container()) {
     wearer->get_container()->remove(owner);
-    owner->get_transform_component()->move(
-        wearer->get_transform_component()->get_position());
+    owner->get_transform_component().move(
+        wearer->get_transform_component().get_position());
     return Success{};
   }
   return Failure{};
@@ -193,7 +193,7 @@ ActionResult HealingConsumable::use(
 ActionResult LightningBolt::use(Entity* owner, Entity* wearer, World& world) {
   Entity* closest_monster = nullptr;
   closest_monster = world.get_entities().get_closest_monster(
-      wearer->get_transform_component()->get_position(), range_);
+      wearer->get_transform_component().get_position(), range_);
   if (!closest_monster) {
     return Failure{"No enemy is close enough to strike."};
   }
@@ -241,7 +241,7 @@ ActionResult FireSpell::use(Entity* owner, Entity* wearer, World& world) {
     for (Entity* entity : world.get_entities()) {
       if (entity->get_defense_component() &&
           entity->get_defense_component()->is_not_dead() &&
-          entity->get_transform_component()->get_position().distance_to(
+          entity->get_transform_component().get_position().distance_to(
               world.get_map().get_highlight_tile()) <= max_range_) {
         world.get_message_log().add_message(
             fmt::format(

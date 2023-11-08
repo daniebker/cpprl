@@ -43,7 +43,6 @@ void Engine::load() {
   if (TCODSystem::fileExists("game.sav")) {
     TCODZip zip;
     zip.loadFromFile("game.sav");
-    // load the map
     world_ = std::make_unique<World>();
     world_->load(zip);
     engine_state_->on_exit();
