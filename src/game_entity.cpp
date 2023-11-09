@@ -117,4 +117,8 @@ void Entity::set_container(std::unique_ptr<Container> container) {
   container_ = std::move(container);
 };
 
+std::unique_ptr<AIComponent> Entity::transfer_ai_component() {
+  return std::move(aiComponent_);
+};
+
 }  // namespace cpprl

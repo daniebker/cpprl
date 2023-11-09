@@ -21,7 +21,6 @@ class Container;
 class Entity {
  protected:
   std::string name_;
-  // PhysicsComponent physicsComponent_;
   bool blocker_;
   std::unique_ptr<TransformComponent> transformComponent_;
   std::unique_ptr<ASCIIComponent> asciiComponent_;
@@ -50,9 +49,7 @@ class Entity {
     return *consumableComponent_;
   };
   AIComponent& get_ai_component() { return *aiComponent_; };
-  std::unique_ptr<AIComponent> transfer_ai_component() {
-    return std::move(aiComponent_);
-  };
+  std::unique_ptr<AIComponent> transfer_ai_component();
   Container& get_container() { return *container_; };
 
   float get_distance_to(Entity* other);
