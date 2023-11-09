@@ -17,7 +17,7 @@ StateResult PickupCommand::execute() {
   if (item) {
     world_.get_message_log().add_message(
         "You pick up the " + item->get_name() + ".", WHITE);
-    entity_->get_container()->add(item);
+    entity_->get_container().add(item);
     world_.get_entities().remove(item);
   } else {
     throw Impossible("There is nothing here to pick up.");
@@ -27,8 +27,8 @@ StateResult PickupCommand::execute() {
 }
 
 StateResult DropItemCommand::execute() {
-  Entity* item = entity_->get_container()->get_inventory()[item_index_ - 1];
-  ConsumableComponent* consumable_component = item->get_consumable_component();
+  Entity* item = entity_->get_container().get_inventory()[item_index_ - 1];
+  ConsumableComponent* consumable_component = &item->get_consumable_component();
   if (!consumable_component) {
     throw Impossible("There's nothing to drop.");
   }
@@ -80,8 +80,8 @@ StateResult SelectItemCommand::execute() {
 
 StateResult UseItemCommand::execute() {
   // TODO: this throws when inventory is empty
-  Entity* item = entity_->get_container()->get_inventory()[item_index_ - 1];
-  ConsumableComponent* consumable_component = item->get_consumable_component();
+  Entity* item = entity_->get_container().get_inventory()[item_index_ - 1];
+  ConsumableComponent* consumable_component = &item->get_consumable_component();
   if (!consumable_component) {
     throw Impossible("There's nothing to use.");
   }

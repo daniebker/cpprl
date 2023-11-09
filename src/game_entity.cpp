@@ -24,12 +24,6 @@ Entity::Entity(
       aiComponent_(nullptr),
       container_(nullptr) {}
 
-Entity::~Entity() {
-  if (consumableComponent_) delete consumableComponent_;
-  if (aiComponent_) delete aiComponent_;
-  if (container_) delete container_;
-}
-
 void Entity::update(World& world) { aiComponent_->update(world, this); }
 
 // TODO: not sure this belongs here
@@ -90,7 +84,7 @@ void Entity::load(TCODZip& zip) {
     aiComponent_ = AIComponent::create(zip);
   }
   if (hasContainer) {
-    container_ = new Container(0);
+    container_ = std::make_unique<Container>(0);
     container_->load(zip);
   }
 }
@@ -109,4 +103,18 @@ void Entity::set_defense_component(
     std::unique_ptr<DefenseComponent> defenseComponent) {
   defenseComponent_ = std::move(defenseComponent);
 };
+
+void Entity::set_consumable_component(
+    std::unique_ptr<ConsumableComponent> consumableComponent) {
+  consumableComponent_ = std::move(consumableComponent);
+};
+
+void Entity::set_ai_component(std::unique_ptr<AIComponent> aiComponent) {
+  aiComponent_ = std::move(aiComponent);
+};
+
+void Entity::set_container(std::unique_ptr<Container> container) {
+  container_ = std::move(container);
+};
+
 }  // namespace cpprl

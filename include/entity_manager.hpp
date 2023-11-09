@@ -2,6 +2,7 @@
 
 #include <vector>
 
+#include "entity_factory.hpp"
 #include "game_entity.hpp"
 #include "rectangular_room.hpp"
 #include "types/map.hpp"
@@ -9,7 +10,12 @@
 namespace cpprl {
 class EntityManager {
  public:
-  EntityManager() : entities_(){};
+  EntityManager(
+      std::unique_ptr<AbstractEntityFactory> orc_factory,
+      std::unique_ptr<AbstractEntityFactory> troll_factory)
+      : entities_{},
+        orc_factory_(std::move(orc_factory)),
+        troll_factory_(std::move(troll_factory)){};
   void clear();
   Entity* get_blocking_entity_at(Vector2D position);
   Entity* get_non_blocking_entity_at(Vector2D position);
@@ -39,5 +45,7 @@ class EntityManager {
 
  private:
   std::vector<Entity*> entities_;
+  std::unique_ptr<AbstractEntityFactory> orc_factory_;
+  std::unique_ptr<AbstractEntityFactory> troll_factory_;
 };
 }  // namespace cpprl

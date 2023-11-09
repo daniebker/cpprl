@@ -15,7 +15,7 @@ class AIComponent : public Persistent {
   AIComponent(){};
   virtual ~AIComponent() = default;
   virtual void update(World& world, Entity* entity) = 0;
-  static AIComponent* create(TCODZip& zip);
+  static std::unique_ptr<AIComponent> create(TCODZip& zip);
   virtual void load(TCODZip& zip) = 0;
   virtual void save(TCODZip& zip) = 0;
 
@@ -34,11 +34,11 @@ class HostileAI final : public AIComponent {
 class ConfusionAI final : public AIComponent {
  private:
   int num_turns_;
-  AIComponent* old_ai_;
+  std::unique_ptr<AIComponent> old_ai_;
 
  public:
-  ConfusionAI(int num_turns, AIComponent* old_ai)
-      : AIComponent(), num_turns_(num_turns), old_ai_(old_ai) {}
+  ConfusionAI(int num_turns, std::unique_ptr<AIComponent> old_ai);
+
   ~ConfusionAI() override = default;
   void update(World& world, Entity* entity) override;
   void load(TCODZip& zip) override;

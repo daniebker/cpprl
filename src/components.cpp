@@ -3,6 +3,7 @@
 #include <fmt/core.h>
 
 #include <algorithm>
+#include <memory>
 
 #include "basic_ai_component.hpp"
 #include "combat_system.hpp"
@@ -121,7 +122,8 @@ void Container::save(TCODZip& zip) {
 }
 
 ActionResult ConsumableComponent::pick_up(Entity* owner, Entity* wearer) {
-  if (wearer->get_container() && wearer->get_container()->add(owner)) {
+  auto* container = &wearer->get_container();
+  if (container && container->add(owner)) {
     // remove the owner?
     return Success{};
   }
@@ -129,8 +131,9 @@ ActionResult ConsumableComponent::pick_up(Entity* owner, Entity* wearer) {
 }
 
 ActionResult ConsumableComponent::drop(Entity* owner, Entity* wearer) {
-  if (wearer->get_container()) {
-    wearer->get_container()->remove(owner);
+  auto* container = &wearer->get_container();
+  if (container) {
+    container->remove(owner);
     owner->get_transform_component().move(
         wearer->get_transform_component().get_position());
     return Success{};
@@ -139,27 +142,29 @@ ActionResult ConsumableComponent::drop(Entity* owner, Entity* wearer) {
 }
 
 ActionResult ConsumableComponent::use(Entity* owner, Entity* wearer, World&) {
-  if (wearer->get_container()) {
-    wearer->get_container()->remove(owner);
+  auto* container = &wearer->get_container();
+  if (container) {
+    container->remove(owner);
     return Success{};
   }
   return Failure{""};
 }
-ConsumableComponent* ConsumableComponent::create(TCODZip& zip) {
+
+std::unique_ptr<ConsumableComponent> ConsumableComponent::create(TCODZip& zip) {
   ConsumableType type = (ConsumableType)zip.getInt();
-  ConsumableComponent* component = nullptr;
+  std::unique_ptr<ConsumableComponent> component = nullptr;
   switch (type) {
     case HEALER:
-      component = new HealingConsumable(0);
+      component = std::make_unique<HealingConsumable>(0);
       break;
     case LIGHTNING_BOLT:
-      component = new LightningBolt(0, 0);
+      component = std::make_unique<LightningBolt>(0, 0);
       break;
     case CONFUSER:
-      component = new ConfusionSpell(0, 0);
+      component = std::make_unique<ConfusionSpell>(0, 0);
       break;
     case FIREBALL:
-      component = new FireSpell(0, 0, 0);
+      component = std::make_unique<FireSpell>(0, 0, 0);
       break;
   }
   component->load(zip);
@@ -282,8 +287,11 @@ ActionResult ConfusionSpell::use(Entity* owner, Entity* wearer, World& world) {
     Entity* target = world.get_entities().get_blocking_entity_at(
         world.get_map().get_highlight_tile());
     if (target) {
-      target->set_ai_component(
-          new ConfusionAI(num_turns_, target->get_ai_component()));
+      std::unique_ptr<AIComponent> old_ai = target->transfer_ai_component();
+
+      std::unique_ptr<AIComponent> confusion_ai =
+          std::make_unique<ConfusionAI>(num_turns_, std::move(old_ai));
+      target->set_ai_component(std::move(confusion_ai));
       world.get_message_log().add_message(
           fmt::format(
               "The eyes of the {} look vacant, as it starts to "

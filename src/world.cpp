@@ -2,6 +2,7 @@
 
 #include "controller.hpp"
 #include "dungeon.hpp"
+#include "entity_factory.hpp"
 #include "entity_manager.hpp"
 #include "exceptions.hpp"
 #include "game_entity.hpp"
@@ -9,7 +10,8 @@
 
 namespace cpprl {
 World::World()
-    : entities_(std::make_unique<EntityManager>()),
+    : entities_(std::make_unique<EntityManager>(
+          std::make_unique<OrcFactory>(), std::make_unique<TrollFactory>())),
       player_(nullptr),
       map_(nullptr),
       current_window_(nullptr) {
@@ -40,18 +42,11 @@ void World::generate_map(int width, int height, bool with_entities) {
   for (auto it = rooms.begin() + 1; it != rooms.end(); ++it) {
     entities_->place_entities(*it, 2, 1);
   }
-  // TODO: move all this code to the factory pattern
-  Entity* entity = new Entity(
-      "player",
-      true,
-      std::make_unique<TransformComponent>(
-          rooms[0].get_center().x, rooms[0].get_center().y),
-      std::make_unique<ASCIIComponent>("@", RED, 1));
-  entity->set_attack_component(std::make_unique<AttackComponent>(5));
-  entity->set_defense_component(std::make_unique<DefenseComponent>(2, 30));
-  entity->set_container(new Container(26));
-  player_ = entities_->spawn(entity);
 
+  auto player_factory_ = std::make_unique<PlayerFactory>();
+  Entity* player = player_factory_->create();
+  player_ = entities_->spawn(
+      player, {rooms[0].get_center().x, rooms[0].get_center().y});
   map_->compute_fov(player_->get_transform_component().get_position(), 4);
   DefenseComponent& player_defense = player_->get_defense_component();
   health_bar_ = new HealthBar(20, 1, {2, 36}, player_defense);
@@ -89,8 +84,8 @@ void World::render(Renderer& renderer) {
 
 void World::handle_enemy_turns() {
   for (Entity* entity : *entities_) {
-    if (entity->get_ai_component() &&
-        entity->get_defense_component().is_not_dead()) {
+    auto* ai_component = &entity->get_ai_component();
+    if (ai_component && entity->get_defense_component().is_not_dead()) {
       try {
         // dance puppet dance!
         entity->update(*this);

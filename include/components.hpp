@@ -101,7 +101,7 @@ class ConsumableComponent : public Persistent {
   virtual ActionResult use(Entity* owner, Entity* wearer, World& world);
   virtual void load(TCODZip& zip) = 0;
   virtual void save(TCODZip& zip) = 0;
-  static ConsumableComponent* create(TCODZip& zip);
+  static std::unique_ptr<ConsumableComponent> create(TCODZip& zip);
 
  protected:
   enum ConsumableType { HEALER, LIGHTNING_BOLT, CONFUSER, FIREBALL };

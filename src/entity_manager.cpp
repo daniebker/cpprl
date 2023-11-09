@@ -30,25 +30,12 @@ void EntityManager::place_entities(
     }
 
     if (random->getFloat(0.0f, 1.0f) < 0.8f) {
-      Entity* entity = new Entity(
-          "orc",
-          true,
-          std::make_unique<TransformComponent>(x, y),
-          std::make_unique<ASCIIComponent>("o", WHITE, 1));
-      entity->set_defense_component(std::make_unique<DefenseComponent>(0, 10));
-      entity->set_attack_component(std::make_unique<AttackComponent>(3));
-      entity->set_ai_component(new HostileAI());
+      Entity* entity = orc_factory_->create();
+      entity->get_transform_component().move({x, y});
       spawn(entity);
     } else {
-      Entity* entity = new Entity(
-          "troll",
-          true,
-          std::make_unique<TransformComponent>(x, y),
-          std::make_unique<ASCIIComponent>("T", WHITE, 1));
-      entity->set_attack_component(std::make_unique<AttackComponent>(4));
-      entity->set_defense_component(std::make_unique<DefenseComponent>(1, 16));
-      entity->set_ai_component(new HostileAI());
-      spawn(entity);
+      Entity* entity = troll_factory_->create();
+      spawn(entity, {x, y});
     }
   }
 
@@ -71,7 +58,7 @@ void EntityManager::place_entities(
           false,
           std::make_unique<TransformComponent>(x, y),
           std::make_unique<ASCIIComponent>("!", DARK_RED, 0));
-      entity->set_consumable_component(new HealingConsumable(10));
+      entity->set_consumable_component(std::make_unique<HealingConsumable>(10));
       spawn(entity);
     } else if (dice <= .8f) {
       Entity* entity = new Entity(
@@ -79,7 +66,7 @@ void EntityManager::place_entities(
           false,
           std::make_unique<TransformComponent>(x, y),
           std::make_unique<ASCIIComponent>("#", DARK_RED, 0));
-      entity->set_consumable_component(new LightningBolt(5, 20));
+      entity->set_consumable_component(std::make_unique<LightningBolt>(5, 20));
       spawn(entity);
     } else if (dice <= .9f) {
       Entity* entity = new Entity(
@@ -87,7 +74,7 @@ void EntityManager::place_entities(
           false,
           std::make_unique<TransformComponent>(x, y),
           std::make_unique<ASCIIComponent>("#", DARK_RED, 0));
-      entity->set_consumable_component(new FireSpell(5, 3, 20));
+      entity->set_consumable_component(std::make_unique<FireSpell>(5, 3, 20));
       spawn(entity);
     } else if (dice <= 1.0f) {
       Entity* entity = new Entity(
@@ -95,7 +82,7 @@ void EntityManager::place_entities(
           false,
           std::make_unique<TransformComponent>(x, y),
           std::make_unique<ASCIIComponent>("#", DARK_RED, 0));
-      entity->set_consumable_component(new ConfusionSpell(3, 5));
+      entity->set_consumable_component(std::make_unique<ConfusionSpell>(3, 5));
       spawn(entity);
     }
   }
@@ -164,7 +151,8 @@ Entity* EntityManager::get_closest_living_monster(
   float best_distance = 1E6f;
   for (Entity* entity : entities_) {
     auto* defense_component = &entity->get_defense_component();
-    if (entity->get_ai_component() && defense_component) {
+    auto* ai_component = &entity->get_ai_component();
+    if (ai_component && defense_component) {
       float distance = position.distance_to(
           entity->get_transform_component().get_position());
       if (distance < best_distance && (distance <= range || range == 0.0f)) {

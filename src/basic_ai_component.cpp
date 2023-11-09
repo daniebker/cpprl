@@ -22,15 +22,15 @@ bool can_path_to_target(tcod::BresenhamLine& path, World& world) {
   return true;
 }
 
-AIComponent* AIComponent::create(TCODZip& zip) {
+std::unique_ptr<AIComponent> AIComponent::create(TCODZip& zip) {
   AiType type = static_cast<AiType>(zip.getInt());
-  AIComponent* ai = nullptr;
+  std::unique_ptr<AIComponent> ai = nullptr;
   switch (type) {
     case HOSTILE:
-      ai = new HostileAI();
+      ai = std::make_unique<HostileAI>();
       break;
     case CONFUSED:
-      ai = new ConfusionAI(0, nullptr);
+      ai = std::make_unique<ConfusionAI>(0, nullptr);
       break;
   }
   ai->load(zip);
@@ -68,21 +68,22 @@ void HostileAI::update(World& world, Entity* entity) {
     action.execute();
   }
 }
-void HostileAI::load(TCODZip& zip) {}
+void HostileAI::load(TCODZip&) {}
 void HostileAI::save(TCODZip& zip) { zip.putInt(HOSTILE); }
+
+ConfusionAI::ConfusionAI(int num_turns, std::unique_ptr<AIComponent> old_ai)
+    : num_turns_(num_turns), old_ai_(std::move(old_ai)) {}
 
 void ConfusionAI::update(World& world, Entity* entity) {
   TCODRandom* random = TCODRandom::getInstance();
   int dx = random->getInt(-1, 1);
   int dy = random->getInt(-1, 1);
-  Vector2D move_vector_{dx, dy};
   if ((dx != 0 || dy != 0) && num_turns_ > 0) {
     auto action = DirectionalCommand(world, entity, {dx, dy});
     action.execute();
     --num_turns_;
   } else {
-    entity->set_ai_component(old_ai_);
-    delete this;
+    entity->set_ai_component(std::move(old_ai_));
   }
 }
 
