@@ -18,6 +18,17 @@ World::World()
   controller_ = std::make_unique<Controller>();
   dungeon_ = std::make_unique<Dungeon>();
   message_log_ = std::make_unique<MessageLog>();
+
+  message_log_->add_message("Welcome to your eternal doom!", WHITE);
+  // TODO: add help menu
+  // message_log_->add_message("Press '?' for help.", WHITE);
+  message_log_->add_message("Press 'ESC' to quit.", WHITE);
+  message_log_->add_message("Press 'i' to open your inventory.", WHITE);
+  message_log_->add_message("Press 'g' to pick up items.", WHITE);
+  message_log_->add_message("Press 'd' in the inventory to drop items.", WHITE);
+  message_log_->add_message("Press 'w' 'a' 's' 'd' to move.", WHITE);
+  message_log_->add_message("Press 'v' to view your adventure log", WHITE);
+  message_log_->add_message("Now, fly you fool!", WHITE);
 }
 void World::generate_map(int width, int height, bool with_entities) {
   // TODO: will need to pass the seed here
@@ -102,7 +113,7 @@ void World::save(TCODZip& zip) {
   get_player()->save(zip);
   zip.putInt(get_entities().size() - 1);
   for (auto& entity : get_entities()) {
-    if (entity->get_name() != "player") {
+    if (entity->get_name() != "Player") {
       entity->save(zip);
     }
   }
