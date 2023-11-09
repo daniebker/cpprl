@@ -18,15 +18,6 @@ World::World()
   controller_ = std::make_unique<Controller>();
   dungeon_ = std::make_unique<Dungeon>();
   message_log_ = std::make_unique<MessageLog>();
-
-  message_log_->add_message("Welcome to your eternal doom!", RED);
-  message_log_->add_message("May you travel safe", RED);
-  message_log_->add_message(
-      "Use W, A, S, D, Q, E, Z, C to move around the map. ", RED);
-  message_log_->add_message("Press ESC to quit.", RED);
-  message_log_->add_message("V opens your message log.", RED);
-  message_log_->add_message(
-      "Use J, K, PG U, PG D to scroll through messages. Use Q to quit.", RED);
 }
 void World::generate_map(int width, int height, bool with_entities) {
   // TODO: will need to pass the seed here

@@ -5,6 +5,7 @@
 #include "basic_ai_component.hpp"
 #include "colours.hpp"
 #include "components.hpp"
+#include "consumable_factory.hpp"
 #include "util.hpp"
 
 namespace cpprl {
@@ -53,37 +54,22 @@ void EntityManager::place_entities(
 
     float dice = random->getFloat(.0f, 1.0f);
     if (dice <= 0.7f) {
-      Entity* entity = new Entity(
-          "healing potion",
-          false,
-          std::make_unique<TransformComponent>(x, y),
-          std::make_unique<ASCIIComponent>("!", DARK_RED, 0));
-      entity->set_consumable_component(std::make_unique<HealingConsumable>(10));
-      spawn(entity);
+      auto health_potion_factory = std::make_unique<HealthPotionFactory>();
+      Entity* entity = health_potion_factory->create();
+      spawn(entity, {x, y});
     } else if (dice <= .8f) {
-      Entity* entity = new Entity(
-          "Lightning Scroll",
-          false,
-          std::make_unique<TransformComponent>(x, y),
-          std::make_unique<ASCIIComponent>("#", DARK_RED, 0));
-      entity->set_consumable_component(std::make_unique<LightningBolt>(5, 20));
-      spawn(entity);
+      auto lighting_scroll_factory = std::make_unique<LightningScrollFactory>();
+      Entity* entity = lighting_scroll_factory->create();
+      spawn(entity, {x, y});
     } else if (dice <= .9f) {
-      Entity* entity = new Entity(
-          "Fire Scroll",
-          false,
-          std::make_unique<TransformComponent>(x, y),
-          std::make_unique<ASCIIComponent>("#", DARK_RED, 0));
-      entity->set_consumable_component(std::make_unique<FireSpell>(5, 3, 20));
-      spawn(entity);
+      auto fireball_scroll_factory = std::make_unique<FireballScrollFactory>();
+      Entity* entity = fireball_scroll_factory->create();
+      spawn(entity, {x, y});
     } else if (dice <= 1.0f) {
-      Entity* entity = new Entity(
-          "Confusion Scroll",
-          false,
-          std::make_unique<TransformComponent>(x, y),
-          std::make_unique<ASCIIComponent>("#", DARK_RED, 0));
-      entity->set_consumable_component(std::make_unique<ConfusionSpell>(3, 5));
-      spawn(entity);
+      auto confusion_scroll_factory =
+          std::make_unique<ConfusionScrollFactory>();
+      Entity* entity = confusion_scroll_factory->create();
+      spawn(entity, {x, y});
     }
   }
 }
