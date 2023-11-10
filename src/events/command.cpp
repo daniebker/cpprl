@@ -13,11 +13,11 @@ namespace cpprl {
 
 StateResult PickupCommand::execute() {
   Entity* item = world_.get_entities().get_non_blocking_entity_at(
-      entity_->get_transform_component()->get_position());
+      entity_->get_transform_component().get_position());
   if (item) {
     world_.get_message_log().add_message(
         "You pick up the " + item->get_name() + ".", WHITE);
-    entity_->get_container()->add(item);
+    entity_->get_container().add(item);
     world_.get_entities().remove(item);
   } else {
     throw Impossible("There is nothing here to pick up.");
@@ -27,8 +27,8 @@ StateResult PickupCommand::execute() {
 }
 
 StateResult DropItemCommand::execute() {
-  Entity* item = entity_->get_container()->get_inventory()[item_index_ - 1];
-  ConsumableComponent* consumable_component = item->get_consumable_component();
+  Entity* item = entity_->get_container().get_inventory()[item_index_ - 1];
+  ConsumableComponent* consumable_component = &item->get_consumable_component();
   if (!consumable_component) {
     throw Impossible("There's nothing to drop.");
   }
@@ -80,8 +80,8 @@ StateResult SelectItemCommand::execute() {
 
 StateResult UseItemCommand::execute() {
   // TODO: this throws when inventory is empty
-  Entity* item = entity_->get_container()->get_inventory()[item_index_ - 1];
-  ConsumableComponent* consumable_component = item->get_consumable_component();
+  Entity* item = entity_->get_container().get_inventory()[item_index_ - 1];
+  ConsumableComponent* consumable_component = &item->get_consumable_component();
   if (!consumable_component) {
     throw Impossible("There's nothing to use.");
   }
@@ -104,13 +104,13 @@ StateResult CloseViewCommand::execute() {
 StateResult DieEvent::execute() {
   world_.get_message_log().add_message(
       fmt::format("{} has died!", util::capitalize(entity_->get_name())));
-  entity_->get_defense_component()->die(*entity_);
+  entity_->get_defense_component().die(*entity_);
   return {};
 }
 
 StateResult DirectionalCommand::execute() {
   auto targetPos =
-      entity_->get_transform_component()->get_position() + move_vector_;
+      entity_->get_transform_component().get_position() + move_vector_;
 
   if (world_.get_entities().get_blocking_entity_at(targetPos)) {
     auto action = MeleeCommand(world_, entity_, move_vector_);
@@ -136,7 +136,7 @@ StateResult ExitTargetingModeCommand::execute() {
 
 StateResult MeleeCommand::execute() {
   auto targetPos =
-      entity_->get_transform_component()->get_position() + move_vector_;
+      entity_->get_transform_component().get_position() + move_vector_;
   Entity* target = world_.get_entities().get_blocking_entity_at(targetPos);
 
   tcod::ColorRGB attack_colour = WHITE;
@@ -155,7 +155,7 @@ StateResult MeleeCommand::execute() {
 
       world_.get_message_log().add_message(message, attack_colour, true);
 
-      if (target->get_defense_component()->is_dead()) {
+      if (target->get_defense_component().is_dead()) {
         auto action = DieEvent(world_, target);
         return action.execute();
       }
@@ -173,7 +173,7 @@ StateResult MeleeCommand::execute() {
 
 StateResult MovementCommand::execute() {
   Vector2D new_position =
-      entity_->get_transform_component()->get_position() + move_vector_;
+      entity_->get_transform_component().get_position() + move_vector_;
   auto& map = world_.get_map();
 
   if (map.is_not_in_bounds(new_position)) {
@@ -185,7 +185,7 @@ StateResult MovementCommand::execute() {
   }
 
   if (map.is_walkable(new_position)) {
-    entity_->get_transform_component()->move(new_position);
+    entity_->get_transform_component().move(new_position);
   } else {
     throw Impossible("You can't walk on that.");
   }

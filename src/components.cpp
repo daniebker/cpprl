@@ -3,6 +3,7 @@
 #include <fmt/core.h>
 
 #include <algorithm>
+#include <memory>
 
 #include "basic_ai_component.hpp"
 #include "combat_system.hpp"
@@ -33,7 +34,7 @@ int DefenseComponent::heal(int amount) {
 
 void DefenseComponent::die(Entity& owner) {
   owner.set_name("corpse of " + owner.get_name());
-  owner.set_ascii_component(new ASCIIComponent("%", RED, -1));
+  owner.set_ascii_component(std::make_unique<ASCIIComponent>("%", RED, -1));
   owner.set_blocking(false);
   owner.set_ai_component(nullptr);
 }
@@ -121,7 +122,8 @@ void Container::save(TCODZip& zip) {
 }
 
 ActionResult ConsumableComponent::pick_up(Entity* owner, Entity* wearer) {
-  if (wearer->get_container() && wearer->get_container()->add(owner)) {
+  auto* container = &wearer->get_container();
+  if (container && container->add(owner)) {
     // remove the owner?
     return Success{};
   }
@@ -129,37 +131,40 @@ ActionResult ConsumableComponent::pick_up(Entity* owner, Entity* wearer) {
 }
 
 ActionResult ConsumableComponent::drop(Entity* owner, Entity* wearer) {
-  if (wearer->get_container()) {
-    wearer->get_container()->remove(owner);
-    owner->get_transform_component()->move(
-        wearer->get_transform_component()->get_position());
+  auto* container = &wearer->get_container();
+  if (container) {
+    container->remove(owner);
+    owner->get_transform_component().move(
+        wearer->get_transform_component().get_position());
     return Success{};
   }
   return Failure{};
 }
 
 ActionResult ConsumableComponent::use(Entity* owner, Entity* wearer, World&) {
-  if (wearer->get_container()) {
-    wearer->get_container()->remove(owner);
+  auto* container = &wearer->get_container();
+  if (container) {
+    container->remove(owner);
     return Success{};
   }
   return Failure{""};
 }
-ConsumableComponent* ConsumableComponent::create(TCODZip& zip) {
+
+std::unique_ptr<ConsumableComponent> ConsumableComponent::create(TCODZip& zip) {
   ConsumableType type = (ConsumableType)zip.getInt();
-  ConsumableComponent* component = nullptr;
+  std::unique_ptr<ConsumableComponent> component = nullptr;
   switch (type) {
     case HEALER:
-      component = new HealingConsumable(0);
+      component = std::make_unique<HealingConsumable>(0);
       break;
     case LIGHTNING_BOLT:
-      component = new LightningBolt(0, 0);
+      component = std::make_unique<LightningBolt>(0, 0);
       break;
     case CONFUSER:
-      component = new ConfusionSpell(0, 0);
+      component = std::make_unique<ConfusionSpell>(0, 0);
       break;
     case FIREBALL:
-      component = new FireSpell(0, 0, 0);
+      component = std::make_unique<FireSpell>(0, 0, 0);
       break;
   }
   component->load(zip);
@@ -175,11 +180,12 @@ void HealingConsumable::load(TCODZip& zip) { amount_ = zip.getInt(); }
 
 ActionResult HealingConsumable::use(
     Entity* owner, Entity* wearer, World& world) {
-  if (!wearer->get_defense_component()) {
+  DefenseComponent* defense_component = &wearer->get_defense_component();
+  if (defense_component == nullptr) {
     return Failure{"There's nothing to heal."};
   }
 
-  int amount_healed = wearer->get_defense_component()->heal(amount_);
+  int amount_healed = wearer->get_defense_component().heal(amount_);
   if (amount_healed > 0) {
     ConsumableComponent::use(owner, wearer, world);
     std::string message = fmt::format("You healed for {} HP.", amount_healed);
@@ -192,8 +198,8 @@ ActionResult HealingConsumable::use(
 
 ActionResult LightningBolt::use(Entity* owner, Entity* wearer, World& world) {
   Entity* closest_monster = nullptr;
-  closest_monster = world.get_entities().get_closest_monster(
-      wearer->get_transform_component()->get_position(), range_);
+  closest_monster = world.get_entities().get_closest_living_monster(
+      wearer->get_transform_component().get_position(), range_);
   if (!closest_monster) {
     return Failure{"No enemy is close enough to strike."};
   }
@@ -209,7 +215,7 @@ ActionResult LightningBolt::use(Entity* owner, Entity* wearer, World& world) {
             damage_),
         GREEN);
 
-    if (closest_monster->get_defense_component()->is_dead()) {
+    if (closest_monster->get_defense_component().is_dead()) {
       auto action = DieEvent(world, closest_monster);
       action.execute();
     }
@@ -239,9 +245,9 @@ ActionResult FireSpell::use(Entity* owner, Entity* wearer, World& world) {
     // TODO:: when I get here the pointers are garbage.
     ConsumableComponent::use(owner, wearer, world);
     for (Entity* entity : world.get_entities()) {
-      if (entity->get_defense_component() &&
-          entity->get_defense_component()->is_not_dead() &&
-          entity->get_transform_component()->get_position().distance_to(
+      auto* defense_component = &entity->get_defense_component();
+      if (defense_component && defense_component->is_not_dead() &&
+          entity->get_transform_component().get_position().distance_to(
               world.get_map().get_highlight_tile()) <= max_range_) {
         world.get_message_log().add_message(
             fmt::format(
@@ -252,7 +258,7 @@ ActionResult FireSpell::use(Entity* owner, Entity* wearer, World& world) {
         int inflicted = combat_system::handle_spell(damage_, *entity);
         if (inflicted > 0) {
           // TODO: this is repeated everywhere. Put it in take_damage
-          if (entity->get_defense_component()->is_dead()) {
+          if (entity->get_defense_component().is_dead()) {
             auto action = DieEvent(world, entity);
             action.execute();
           }
@@ -281,8 +287,11 @@ ActionResult ConfusionSpell::use(Entity* owner, Entity* wearer, World& world) {
     Entity* target = world.get_entities().get_blocking_entity_at(
         world.get_map().get_highlight_tile());
     if (target) {
-      target->set_ai_component(
-          new ConfusionAI(num_turns_, target->get_ai_component()));
+      std::unique_ptr<AIComponent> old_ai = target->transfer_ai_component();
+
+      std::unique_ptr<AIComponent> confusion_ai =
+          std::make_unique<ConfusionAI>(num_turns_, std::move(old_ai));
+      target->set_ai_component(std::move(confusion_ai));
       world.get_message_log().add_message(
           fmt::format(
               "The eyes of the {} look vacant, as it starts to "
@@ -291,7 +300,7 @@ ActionResult ConfusionSpell::use(Entity* owner, Entity* wearer, World& world) {
           GREEN);
       ConsumableComponent::use(owner, wearer, world);
     } else {
-      throw Impossible("There is no targetable enemy at that location.");
+      throw Impossible("There is no enemy at that location.");
     }
   };
   return Poll{std::make_unique<PickTileState>(world, on_pick, max_range_)};

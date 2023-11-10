@@ -12,8 +12,8 @@ namespace cpprl {
 Entity::Entity(
     std::string name,
     bool blocker,
-    TransformComponent* transformComponent,
-    ASCIIComponent* asciiComponent)
+    std::unique_ptr<TransformComponent> transformComponent,
+    std::unique_ptr<ASCIIComponent> asciiComponent)
     : name_(name),
       blocker_(blocker),
       transformComponent_(std::move(transformComponent)),
@@ -24,22 +24,12 @@ Entity::Entity(
       aiComponent_(nullptr),
       container_(nullptr) {}
 
-Entity::~Entity() {
-  if (attackComponent_) delete attackComponent_;
-  if (defenseComponent_) delete defenseComponent_;
-  if (consumableComponent_) delete consumableComponent_;
-  if (aiComponent_) delete aiComponent_;
-  if (container_) delete container_;
-  if (transformComponent_) delete transformComponent_;
-  if (asciiComponent_) delete asciiComponent_;
-}
-
 void Entity::update(World& world) { aiComponent_->update(world, this); }
 
 // TODO: not sure this belongs here
 float Entity::get_distance_to(Entity* other) {
   return transformComponent_->get_position().distance_to(
-      other->get_transform_component()->get_position());
+      other->get_transform_component().get_position());
 };
 
 void Entity::save(TCODZip& zip) {
@@ -72,19 +62,19 @@ void Entity::load(TCODZip& zip) {
   bool hasAIComponent = zip.getInt();
   bool hasContainer = zip.getInt();
   if (hasTransformComponent) {
-    transformComponent_ = new TransformComponent(0, 0);
+    transformComponent_ = std::make_unique<TransformComponent>(0, 0);
     transformComponent_->load(zip);
   }
   if (hasAsciiComponent) {
-    asciiComponent_ = new ASCIIComponent("", WHITE, 0);
+    asciiComponent_ = std::make_unique<ASCIIComponent>("", WHITE, 0);
     asciiComponent_->load(zip);
   }
   if (hasAttackComponent) {
-    attackComponent_ = new AttackComponent(0);
+    attackComponent_ = std::make_unique<AttackComponent>(0);
     attackComponent_->load(zip);
   }
   if (hasDefenseComponent) {
-    defenseComponent_ = new DefenseComponent(0, 0);
+    defenseComponent_ = std::make_unique<DefenseComponent>(0, 0);
     defenseComponent_->load(zip);
   }
   if (hasConsumableComponent) {
@@ -94,8 +84,41 @@ void Entity::load(TCODZip& zip) {
     aiComponent_ = AIComponent::create(zip);
   }
   if (hasContainer) {
-    container_ = new Container(0);
+    container_ = std::make_unique<Container>(0);
     container_->load(zip);
   }
 }
+
+void Entity::set_ascii_component(
+    std::unique_ptr<ASCIIComponent> asciiComponent) {
+  asciiComponent_ = std::move(asciiComponent);
+};
+
+void Entity::set_attack_component(
+    std::unique_ptr<AttackComponent> attackComponent) {
+  attackComponent_ = std::move(attackComponent);
+};
+
+void Entity::set_defense_component(
+    std::unique_ptr<DefenseComponent> defenseComponent) {
+  defenseComponent_ = std::move(defenseComponent);
+};
+
+void Entity::set_consumable_component(
+    std::unique_ptr<ConsumableComponent> consumableComponent) {
+  consumableComponent_ = std::move(consumableComponent);
+};
+
+void Entity::set_ai_component(std::unique_ptr<AIComponent> aiComponent) {
+  aiComponent_ = std::move(aiComponent);
+};
+
+void Entity::set_container(std::unique_ptr<Container> container) {
+  container_ = std::move(container);
+};
+
+std::unique_ptr<AIComponent> Entity::transfer_ai_component() {
+  return std::move(aiComponent_);
+};
+
 }  // namespace cpprl

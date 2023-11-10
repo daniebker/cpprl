@@ -78,7 +78,7 @@ void InventoryWindow::render(tcod::Console& parent_console) {
   console_->clear();
   UiWindow::add_frame();
 
-  std::vector<Entity*> items = entity_->get_container()->get_inventory();
+  std::vector<Entity*> items = entity_->get_container().get_inventory();
   int y_offset = 1;
   if (items.size() == 0) {
     tcod::print_rect(

@@ -167,6 +167,7 @@ class MouseInputEvent final : public EngineEvent {
 };
 
 class MouseClickEvent final : public EngineEvent {
+  // TODO: remove this?
  private:
   Vector2D position_;
 
