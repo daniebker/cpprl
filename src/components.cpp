@@ -7,11 +7,11 @@
 
 #include "basic_ai_component.hpp"
 #include "combat_system.hpp"
+#include "entity_manager.hpp"
 #include "events/command.hpp"
 #include "exceptions.hpp"
 #include "game_entity.hpp"
 #include "globals.hpp"
-#include "main.hpp"
 #include "state.hpp"
 #include "world.hpp"
 
