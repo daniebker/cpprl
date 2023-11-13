@@ -13,7 +13,6 @@
                                  // compiler handle termination.
 #endif
 
-// static void main_loop(void* arg) {
 static void main_loop(void* arg) {
   cpprl::Engine* engine = static_cast<cpprl::Engine*>(arg);
   engine->render();
