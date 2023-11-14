@@ -22,8 +22,12 @@ bool can_path_to_target(tcod::BresenhamLine& path, World& world) {
   return true;
 }
 
-std::unique_ptr<AIComponent> AIComponent::create(TCODZip& zip) {
-  AiType type = static_cast<AiType>(zip.getInt());
+// std::unique_ptr<AIComponent> AIComponent::create(TCODZip& zip) {
+std::unique_ptr<AIComponent> AIComponent::create(
+    cereal::JSONInputArchive& archive) {
+  // AiType type = static_cast<AiType>(zip.getInt());
+  AiType type;
+  archive(type);
   std::unique_ptr<AIComponent> ai = nullptr;
   switch (type) {
     case HOSTILE:
@@ -33,7 +37,7 @@ std::unique_ptr<AIComponent> AIComponent::create(TCODZip& zip) {
       ai = std::make_unique<ConfusionAI>(0, nullptr);
       break;
   }
-  ai->load(zip);
+  ai->load(archive);
   return ai;
 }
 
@@ -68,8 +72,10 @@ void HostileAI::update(World& world, Entity* entity) {
     action.execute();
   }
 }
-void HostileAI::load(TCODZip&) {}
-void HostileAI::save(TCODZip& zip) { zip.putInt(HOSTILE); }
+// void HostileAI::load(TCODZip&) {}
+// void HostileAI::save(TCODZip& zip) { zip.putInt(HOSTILE); }
+void HostileAI::load(cereal::JSONInputArchive&) {}
+void HostileAI::save(cereal::JSONOutputArchive& archive) { archive(HOSTILE); }
 
 ConfusionAI::ConfusionAI(int num_turns, std::unique_ptr<AIComponent> old_ai)
     : num_turns_(num_turns), old_ai_(std::move(old_ai)) {}
@@ -87,14 +93,24 @@ void ConfusionAI::update(World& world, Entity* entity) {
   }
 }
 
-void ConfusionAI::load(TCODZip& zip) {
-  num_turns_ = zip.getInt();
-  old_ai_ = AIComponent::create(zip);
+// void ConfusionAI::load(TCODZip& zip) {
+//   num_turns_ = zip.getInt();
+//   old_ai_ = AIComponent::create(zip);
+// }
+
+// void ConfusionAI::save(TCODZip& zip) {
+//   zip.putInt(CONFUSED);
+//   zip.putInt(num_turns_);
+//   old_ai_->save(zip);
+// }
+void ConfusionAI::load(cereal::JSONInputArchive& archive) {
+  archive(num_turns_);
+  old_ai_ = AIComponent::create(archive);
+}
+void ConfusionAI::save(cereal::JSONOutputArchive& archive) {
+  archive(CONFUSED);
+  archive(num_turns_);
+  old_ai_->save(archive);
 }
 
-void ConfusionAI::save(TCODZip& zip) {
-  zip.putInt(CONFUSED);
-  zip.putInt(num_turns_);
-  old_ai_->save(zip);
-}
 }  // namespace cpprl

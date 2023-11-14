@@ -5,6 +5,7 @@
   "dependencies": [
     "fmt",
     "libtcod",
+    "cereal",
     "sdl2",
     {
       "name": "sdl2",

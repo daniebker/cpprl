@@ -105,39 +105,75 @@ void World::scroll_current_view(int scroll_amount) {
   }
 }
 
-void World::save(TCODZip& zip) {
-  zip.putInt(get_map().get_width());
-  zip.putInt(get_map().get_height());
-  dungeon_->save(zip);
-  map_->save(zip);
-  get_player()->save(zip);
-  zip.putInt(get_entities().size() - 1);
+// void World::save(TCODZip& zip) {
+//   zip.putInt(get_map().get_width());
+//   zip.putInt(get_map().get_height());
+//   dungeon_->save(zip);
+//   map_->save(zip);
+//   get_player()->save(zip);
+//   zip.putInt(get_entities().size() - 1);
+//   for (auto& entity : get_entities()) {
+//     if (entity->get_name() != "Player") {
+//       entity->save(zip);
+//     }
+//   }
+//   get_message_log().save(zip);
+// }
+
+void World::save(cereal::JSONOutputArchive& archive) {
+  archive(get_map().get_width(), get_map().get_height());
+  dungeon_->save(archive);
+  map_->save(archive);
+  get_player()->save(archive);
+  int num_entities = get_entities().size() - 1;
+  archive(num_entities);
   for (auto& entity : get_entities()) {
     if (entity->get_name() != "Player") {
-      entity->save(zip);
+      entity->save(archive);
     }
   }
-  get_message_log().save(zip);
+  // get_message_log().save(archive);
 }
 
-void World::load(TCODZip& zip) {
-  int width = zip.getInt();
-  int height = zip.getInt();
-  dungeon_->load(zip);
+void World::load(cereal::JSONInputArchive& archive) {
+  int width, height;
+  archive(width, height);
+  dungeon_->load(archive);
   generate_map(width, height, false);
-  map_->load(zip);
+  map_->load(archive);
   Entity* player = new Entity("", false, nullptr, nullptr);
-  player->load(zip);
+  player->load(archive);
   player_ = entities_->spawn(player);
   DefenseComponent& player_defense = player_->get_defense_component();
   health_bar_ = new HealthBar(20, 1, {2, 36}, player_defense);
-  int num_entities = zip.getInt();
+  int num_entities;
+  archive(num_entities);
   for (int i = 0; i < num_entities; ++i) {
     Entity* entity = new Entity("", false, nullptr, nullptr);
-    entity->load(zip);
+    entity->load(archive);
     entities_->spawn(entity);
   }
-  get_message_log().load(zip);
+  // get_message_log().load(archive);
 }
+
+// void World::load(TCODZip& zip) {
+//   int width = zip.getInt();
+//   int height = zip.getInt();
+//   dungeon_->load(zip);
+//   generate_map(width, height, false);
+//   map_->load(zip);
+//   Entity* player = new Entity("", false, nullptr, nullptr);
+//   player->load(zip);
+//   player_ = entities_->spawn(player);
+//   DefenseComponent& player_defense = player_->get_defense_component();
+//   health_bar_ = new HealthBar(20, 1, {2, 36}, player_defense);
+//   int num_entities = zip.getInt();
+//   for (int i = 0; i < num_entities; ++i) {
+//     Entity* entity = new Entity("", false, nullptr, nullptr);
+//     entity->load(zip);
+//     entities_->spawn(entity);
+//   }
+//   get_message_log().load(zip);
+// }
 
 }  // namespace cpprl

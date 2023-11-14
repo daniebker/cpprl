@@ -36,8 +36,10 @@ class World : public Persistent {
   Entity* get_player() { return player_; }
   void reset();
 
-  void save(TCODZip& zip) override;
-  void load(TCODZip& zip) override;
+  // void save(TCODZip& zip) override;
+  void save(cereal::JSONOutputArchive& archive) override;
+      // void load(TCODZip& zip) override;
+      void load(cereal::JSONInputArchive& archive) override;
   void generate_map(int width, int height, bool with_entities = false);
   void render(Renderer& renderer);
   void handle_enemy_turns();

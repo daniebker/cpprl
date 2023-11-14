@@ -76,8 +76,10 @@ class Map : public Persistent {
   }
   bool set_target_tile(Vector2D position, Entity& player);
   Vector2D get_highlight_tile() { return target_tile_; }
-  void save(TCODZip& zip) override;
-  void load(TCODZip& zip) override;
+  // void save(TCODZip& zip) override;
+  void save(cereal::JSONOutputArchive& archive) override;
+  // void load(TCODZip& zip) override;
+  void load(cereal::JSONInputArchive& archive) override;
 
  private:
   /** The wall tile */

@@ -71,8 +71,10 @@ std::vector<Vector2D> Dungeon::l_tunnel_between(Vector2D start, Vector2D end) {
   return tunnel;
 }
 
-void Dungeon::save(TCODZip& zip) { zip.putInt(seed_); }
+// void Dungeon::save(TCODZip& zip) { zip.putInt(seed_); }
+void Dungeon::save(cereal::JSONOutputArchive& archive) { archive(seed_); }
 
-void Dungeon::load(TCODZip& zip) { seed_ = zip.getInt(); }
+// void Dungeon::load(TCODZip& zip) { seed_ = zip.getInt(); }
+void Dungeon::load(cereal::JSONInputArchive& archive) { archive(seed_); }
 
 }  // namespace cpprl

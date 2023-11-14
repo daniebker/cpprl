@@ -88,18 +88,34 @@ void Map::render(tcod::Console& console) {
 
 void Map::set_highlight_tile(Vector2D position) { target_tile_ = position; }
 
-void Map::save(TCODZip& zip) {
+// void Map::save(TCODZip& zip) {
+//   for (int y = 0; y < get_height(); y++) {
+//     for (int x = 0; x < get_width(); x++) {
+//       zip.putInt(tiles_.at({x, y}).explored);
+//     }
+//   }
+// }
+void Map::save(cereal::JSONOutputArchive& archive) {
   for (int y = 0; y < get_height(); y++) {
     for (int x = 0; x < get_width(); x++) {
-      zip.putInt(tiles_.at({x, y}).explored);
+      archive(tiles_.at({x, y}).explored);
     }
   }
 }
 
-void Map::load(TCODZip& zip) {
+// void Map::load(TCODZip& zip) {
+//   for (int y = 0; y < get_height(); y++) {
+//     for (int x = 0; x < get_width(); x++) {
+//       bool explored = zip.getInt();
+//       tiles_.at({x, y}).explored = explored;
+//     }
+//   }
+// }
+void Map::load(cereal::JSONInputArchive& archive) {
   for (int y = 0; y < get_height(); y++) {
     for (int x = 0; x < get_width(); x++) {
-      bool explored = zip.getInt();
+      bool explored;
+      archive(explored);
       tiles_.at({x, y}).explored = explored;
     }
   }

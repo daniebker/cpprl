@@ -62,8 +62,10 @@ class MessageLog : public Persistent {
   void render(
       tcod::Console& console, int x, int y, int width, int height) const;
 
-  void save(TCODZip& zip) override;
-  void load(TCODZip& zip) override;
+  // void save(TCODZip& zip) override;
+  // void load(TCODZip& zip) override;
+  void save(cereal::JSONOutputArchive& archive) override;
+  void load(cereal::JSONInputArchive& archive) override;
 };
 
 }  // namespace cpprl

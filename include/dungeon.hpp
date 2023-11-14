@@ -29,8 +29,10 @@ class Dungeon : public Persistent {
   };
   ~Dungeon() { delete rng_; };
   Map* generate(DungeonConfig config);
-  void save(TCODZip& zip) override;
-  void load(TCODZip& zip) override;
+  // void save(TCODZip& zip) override;
+  void save(cereal::JSONOutputArchive& archive) override;
+  // void load(TCODZip& zip) override;
+  void load(cereal::JSONInputArchive& archive) override;
 };
 }  // namespace cpprl
 

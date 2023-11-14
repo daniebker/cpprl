@@ -68,8 +68,10 @@ class Entity {
       std::unique_ptr<ConsumableComponent> consumableComponent);
   void set_ai_component(std::unique_ptr<AIComponent> aiComponent);
   void set_container(std::unique_ptr<Container> container);
-  void save(TCODZip& zip);
-  void load(TCODZip& zip);
+  // void save(TCODZip& zip);
+  // void load(TCODZip& zip);
+  void save(cereal::JSONOutputArchive& archive);
+  void load(cereal::JSONInputArchive& archive);
 };
 
 }  // namespace cpprl

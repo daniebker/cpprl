@@ -3,6 +3,9 @@
 
 #include <SDL2/SDL.h>
 
+#include <cereal/archives/binary.hpp>
+// #include <cereal/types/memory.hpp>
+#include <fstream>
 #include <iostream>
 #include <memory>
 
@@ -31,20 +34,31 @@ void Engine::init() {
 
 void Engine::save() {
   if (world_->get_player()->get_defense_component().is_dead()) {
+    // TCODSystem::deleteFile("game.sav");
     TCODSystem::deleteFile("game.sav");
+
   } else {
-    TCODZip zip;
-    world_->save(zip);
-    zip.saveToFile("game.sav");
+    // TCODZip zip;
+    std::ofstream os("game.sav", std::ios::binary);
+    // std::ofstream file("game.sav");
+    cereal::JSONOutputArchive archive(os);
+    world_->save(archive);
+    // zip.saveToFile("game.sav");
   }
 }
 
 void Engine::load() {
   if (TCODSystem::fileExists("game.sav")) {
-    TCODZip zip;
-    zip.loadFromFile("game.sav");
+    // TCODZip zip;
+    // zip.loadFromFile("game.sav");
+    std::ifstream is("game.sav", std::ios::binary);
+    cereal::JSONInputArchive archive(is);
+
     world_ = std::make_unique<World>();
-    world_->load(zip);
+
+    // Use load function for loading
+    // archive(world_);
+    world_->load(archive);
     engine_state_->on_exit();
     engine_state_ = std::make_unique<InGameState>(*world_);
     engine_state_->on_enter();

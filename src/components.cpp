@@ -39,45 +39,70 @@ void DefenseComponent::die(Entity& owner) {
   owner.set_ai_component(nullptr);
 }
 
-void DefenseComponent::save(TCODZip& zip) {
-  zip.putInt(defense_);
-  zip.putInt(hp_);
-  zip.putInt(max_hp_);
+// void DefenseComponent::save(TCODZip& zip) {
+//   zip.putInt(defense_);
+//   zip.putInt(hp_);
+//   zip.putInt(max_hp_);
+// }
+
+// void DefenseComponent::load(TCODZip& zip) {
+//   defense_ = zip.getInt();
+//   hp_ = zip.getInt();
+//   max_hp_ = zip.getInt();
+// }
+void DefenseComponent::save(cereal::JSONOutputArchive& archive) {
+  archive(defense_, hp_, max_hp_);
+}
+void DefenseComponent::load(cereal::JSONInputArchive& archive) {
+  archive(defense_, hp_, max_hp_);
 }
 
-void DefenseComponent::load(TCODZip& zip) {
-  defense_ = zip.getInt();
-  hp_ = zip.getInt();
-  max_hp_ = zip.getInt();
+// void AttackComponent::save(TCODZip& zip) { zip.putInt(damage_); }
+// void AttackComponent::load(TCODZip& zip) { damage_ = zip.getInt(); }
+void AttackComponent::save(cereal::JSONOutputArchive& archive) {
+  archive(damage_);
+}
+void AttackComponent::load(cereal::JSONInputArchive& archive) {
+  archive(damage_);
 }
 
-void AttackComponent::save(TCODZip& zip) { zip.putInt(damage_); }
-void AttackComponent::load(TCODZip& zip) { damage_ = zip.getInt(); }
+// void TransformComponent::save(TCODZip& zip) {
+//   zip.putInt(position_.x);
+//   zip.putInt(position_.y);
+// }
 
-void TransformComponent::save(TCODZip& zip) {
-  zip.putInt(position_.x);
-  zip.putInt(position_.y);
+// void TransformComponent::load(TCODZip& zip) {
+//   position_.x = zip.getInt();
+//   position_.y = zip.getInt();
+// }
+void TransformComponent::save(cereal::JSONOutputArchive& archive) {
+  archive(position_.x, position_.y);
+}
+void TransformComponent::load(cereal::JSONInputArchive& archive) {
+  archive(position_.x, position_.y);
 }
 
-void TransformComponent::load(TCODZip& zip) {
-  position_.x = zip.getInt();
-  position_.y = zip.getInt();
-}
+// void ASCIIComponent::save(TCODZip& zip) {
+//   zip.putString(symbol_.c_str());
+//   zip.putInt(colour_.r);
+//   zip.putInt(colour_.g);
+//   zip.putInt(colour_.b);
+//   zip.putInt(layer_);
+// }
 
-void ASCIIComponent::save(TCODZip& zip) {
-  zip.putString(symbol_.c_str());
-  zip.putInt(colour_.r);
-  zip.putInt(colour_.g);
-  zip.putInt(colour_.b);
-  zip.putInt(layer_);
-}
+// void ASCIIComponent::load(TCODZip& zip) {
+//   symbol_ = zip.getString();
+//   colour_.r = zip.getInt();
+//   colour_.g = zip.getInt();
+//   colour_.b = zip.getInt();
+//   layer_ = zip.getInt();
+// }
 
-void ASCIIComponent::load(TCODZip& zip) {
-  symbol_ = zip.getString();
-  colour_.r = zip.getInt();
-  colour_.g = zip.getInt();
-  colour_.b = zip.getInt();
-  layer_ = zip.getInt();
+void ASCIIComponent::save(cereal::JSONOutputArchive& archive) {
+  archive(symbol_, colour_, layer_);
+}
+void ASCIIComponent::load(cereal::JSONInputArchive& archive) {
+  archive(symbol_, colour_, layer_);
 }
 
 Container::Container(int size) : size_(size), inventory_({}) {
@@ -102,22 +127,43 @@ void Container::remove(Entity* entityToRemove) {
           }),
       inventory_.end());
 }
-void Container::load(TCODZip& zip) {
-  size_ = zip.getInt();
-  int nbActors = zip.getInt();
+
+// void Container::load(TCODZip& zip) {
+//   size_ = zip.getInt();
+//   int nbActors = zip.getInt();
+//   while (nbActors > 0) {
+//     Entity* entity = new Entity("", false, nullptr, nullptr);
+//     entity->load(zip);
+//     inventory_.emplace_back(entity);
+//     nbActors--;
+//   }
+// }
+
+// void Container::save(TCODZip& zip) {
+//   zip.putInt(size_);
+//   zip.putInt(inventory_.size());
+//   for (Entity* entity : inventory_) {
+//     entity->save(zip);
+//   }
+// }
+
+void Container::load(cereal::JSONInputArchive& archive) {
+  archive(size_);
+  int nbActors;
+  archive(nbActors);
   while (nbActors > 0) {
     Entity* entity = new Entity("", false, nullptr, nullptr);
-    entity->load(zip);
+    entity->load(archive);
     inventory_.emplace_back(entity);
     nbActors--;
   }
 }
 
-void Container::save(TCODZip& zip) {
-  zip.putInt(size_);
-  zip.putInt(inventory_.size());
+void Container::save(cereal::JSONOutputArchive& archive) {
+  archive(size_);
+  archive(inventory_.size());
   for (Entity* entity : inventory_) {
-    entity->save(zip);
+    entity->save(archive);
   }
 }
 
@@ -150,8 +196,11 @@ ActionResult ConsumableComponent::use(Entity* owner, Entity* wearer, World&) {
   return Failure{""};
 }
 
-std::unique_ptr<ConsumableComponent> ConsumableComponent::create(TCODZip& zip) {
-  ConsumableType type = (ConsumableType)zip.getInt();
+std::unique_ptr<ConsumableComponent> ConsumableComponent::create(
+    cereal::JSONInputArchive& archive) {
+  // ConsumableType type = (ConsumableType)zip.getInt();
+  ConsumableType type;
+  archive(type);
   std::unique_ptr<ConsumableComponent> component = nullptr;
   switch (type) {
     case HEALER:
@@ -167,16 +216,23 @@ std::unique_ptr<ConsumableComponent> ConsumableComponent::create(TCODZip& zip) {
       component = std::make_unique<FireSpell>(0, 0, 0);
       break;
   }
-  component->load(zip);
+  component->load(archive);
   return component;
 }
 
 HealingConsumable::HealingConsumable(int amount) : amount_(amount){};
-void HealingConsumable::save(TCODZip& zip) {
-  zip.putInt(HEALER);
-  zip.putInt(amount_);
+// void HealingConsumable::save(TCODZip& zip) {
+//   zip.putInt(HEALER);
+//   zip.putInt(amount_);
+// }
+// void HealingConsumable::load(TCODZip& zip) { amount_ = zip.getInt(); }
+
+void HealingConsumable::save(cereal::JSONOutputArchive& archive) {
+  archive(HEALER, amount_);
 }
-void HealingConsumable::load(TCODZip& zip) { amount_ = zip.getInt(); }
+void HealingConsumable::load(cereal::JSONInputArchive& archive) {
+  archive(amount_);
+}
 
 ActionResult HealingConsumable::use(
     Entity* owner, Entity* wearer, World& world) {
@@ -226,15 +282,22 @@ ActionResult LightningBolt::use(Entity* owner, Entity* wearer, World& world) {
         closest_monster->get_name())};
   }
 }
-void LightningBolt::save(TCODZip& zip) {
-  zip.putInt(LIGHTNING_BOLT);
-  zip.putInt(range_);
-  zip.putInt(damage_);
-}
+// void LightningBolt::save(TCODZip& zip) {
+//   zip.putInt(LIGHTNING_BOLT);
+//   zip.putInt(range_);
+//   zip.putInt(damage_);
+// }
 
-void LightningBolt::load(TCODZip& zip) {
-  range_ = zip.getInt();
-  damage_ = zip.getInt();
+// void LightningBolt::load(TCODZip& zip) {
+//   range_ = zip.getInt();
+//   damage_ = zip.getInt();
+// }
+
+void LightningBolt::save(cereal::JSONOutputArchive& archive) {
+  archive(LIGHTNING_BOLT, range_, damage_);
+}
+void LightningBolt::load(cereal::JSONInputArchive& archive) {
+  archive(range_, damage_);
 }
 
 ActionResult FireSpell::use(Entity* owner, Entity* wearer, World& world) {
@@ -270,16 +333,22 @@ ActionResult FireSpell::use(Entity* owner, Entity* wearer, World& world) {
   return Poll{
       std::make_unique<PickTileAOEState>(world, on_pick, max_range_, aoe_)};
 }
-void FireSpell::save(TCODZip& zip) {
-  zip.putInt(FIREBALL);
-  zip.putInt(max_range_);
-  zip.putInt(aoe_);
-  zip.putInt(damage_);
+// void FireSpell::save(TCODZip& zip) {
+//   zip.putInt(FIREBALL);
+//   zip.putInt(max_range_);
+//   zip.putInt(aoe_);
+//   zip.putInt(damage_);
+// }
+// void FireSpell::load(TCODZip& zip) {
+//   max_range_ = zip.getInt();
+//   aoe_ = zip.getInt();
+//   damage_ = zip.getInt();
+// }
+void FireSpell::save(cereal::JSONOutputArchive& archive) {
+  archive(FIREBALL, max_range_, aoe_, damage_);
 }
-void FireSpell::load(TCODZip& zip) {
-  max_range_ = zip.getInt();
-  aoe_ = zip.getInt();
-  damage_ = zip.getInt();
+void FireSpell::load(cereal::JSONInputArchive& archive) {
+  archive(max_range_, aoe_, damage_);
 }
 
 ActionResult ConfusionSpell::use(Entity* owner, Entity* wearer, World& world) {
@@ -305,14 +374,20 @@ ActionResult ConfusionSpell::use(Entity* owner, Entity* wearer, World& world) {
   };
   return Poll{std::make_unique<PickTileState>(world, on_pick, max_range_)};
 }
-void ConfusionSpell::save(TCODZip& zip) {
-  zip.putInt(CONFUSER);
-  zip.putInt(num_turns_);
-  zip.putInt(max_range_);
-}
+// void ConfusionSpell::save(TCODZip& zip) {
+//   zip.putInt(CONFUSER);
+//   zip.putInt(num_turns_);
+//   zip.putInt(max_range_);
+// }
 
-void ConfusionSpell::load(TCODZip& zip) {
-  num_turns_ = zip.getInt();
-  max_range_ = zip.getInt();
+// void ConfusionSpell::load(TCODZip& zip) {
+//   num_turns_ = zip.getInt();
+//   max_range_ = zip.getInt();
+// }
+void ConfusionSpell::save(cereal::JSONOutputArchive& archive) {
+  archive(CONFUSER, num_turns_, max_range_);
+}
+void ConfusionSpell::load(cereal::JSONInputArchive& archive) {
+  archive(num_turns_, max_range_);
 }
 }  // namespace cpprl
