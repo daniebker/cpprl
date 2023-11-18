@@ -54,11 +54,11 @@ void Engine::load() {
 }
 
 void Engine::handle_events() {
+  SDL_Event event;
 #ifndef __EMSCRIPTEN__
   // Block until events exist.  This conserves resources well but isn't
   // compatible with animations or Emscripten.
   SDL_WaitEvent(nullptr);
-  SDL_Event event;
 #endif
   while (SDL_PollEvent(&event)) {
     // call on_update of state which can return change
