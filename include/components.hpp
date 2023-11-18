@@ -16,9 +16,8 @@ namespace cpprl {
 class AttackComponent : public Persistent {
  public:
   AttackComponent(int damage) : damage_(damage) {}
+  virtual ~AttackComponent() = default;
   int get_damage() { return damage_; }
-  // void load(TCODZip& zip);
-  // void save(TCODZip& zip);
   void load(cereal::JSONInputArchive& archive) override;
   void save(cereal::JSONOutputArchive& archive) override;
 
@@ -30,6 +29,7 @@ class DefenseComponent : public Persistent {
  public:
   DefenseComponent(int defense, int maxHp)
       : defense_(defense), hp_(maxHp), max_hp_(maxHp) {}
+  virtual ~DefenseComponent() = default;
 
   int get_hp() { return hp_; }
   int get_max_hp() { return max_hp_; }
@@ -40,8 +40,6 @@ class DefenseComponent : public Persistent {
   bool is_dead() { return hp_ <= 0; }
   bool is_not_dead() { return !is_dead(); }
   void die(Entity& owner);
-  // void load(TCODZip& zip);
-  // void save(TCODZip& zip);
   void load(cereal::JSONInputArchive& archive) override;
   void save(cereal::JSONOutputArchive& archive) override;
 
@@ -54,6 +52,7 @@ class DefenseComponent : public Persistent {
 class TransformComponent : public Persistent {
  public:
   TransformComponent(int x, int y) : position_({x, y}) {}
+  virtual ~TransformComponent() = default;
   Vector2D get_position() { return position_; }
   void move(Vector2D new_position) { position_ = new_position; }
   // void load(TCODZip& zip);
@@ -69,6 +68,7 @@ class ASCIIComponent : public Persistent {
  public:
   ASCIIComponent(std::string_view symbol, tcod::ColorRGB colour, int layer)
       : symbol_(symbol), colour_(colour), layer_(layer) {}
+  virtual ~ASCIIComponent() = default;
 
   std::string_view get_symbol() { return symbol_; }
   tcod::ColorRGB get_colour() { return colour_; }
@@ -91,6 +91,7 @@ class Container : Persistent {
 
  public:
   Container(int size);
+  virtual ~Container() = default;
   bool add(Entity* actor);
   void remove(Entity* actor);
   std::vector<Entity*> get_inventory() { return inventory_; }
@@ -124,6 +125,7 @@ class ConsumableComponent : public Persistent {
 class HealingConsumable final : public ConsumableComponent {
  public:
   HealingConsumable(int amount);
+  virtual ~HealingConsumable() = default;
   ActionResult use(Entity* owner, Entity* wearer, World& world) override;
 
   // void load(TCODZip& zip);
@@ -141,7 +143,7 @@ class LightningBolt final : public ConsumableComponent {
 
  public:
   LightningBolt(float range, float damage) : range_(range), damage_(damage) {}
-  ~LightningBolt() = default;
+  virtual ~LightningBolt() = default;
   ActionResult use(Entity* owner, Entity* wearer, World& world) override;
 
   // void load(TCODZip& zip);
@@ -157,7 +159,7 @@ class FireSpell final : public ConsumableComponent {
  public:
   FireSpell(float max_range, float aoe, float damage)
       : max_range_(max_range), aoe_(aoe), damage_(damage) {}
-  ~FireSpell() = default;
+  virtual ~FireSpell() = default;
 
   ActionResult use(Entity* owner, Entity* Wearer, World& world) override;
 
@@ -174,7 +176,7 @@ class ConfusionSpell final : public ConsumableComponent {
  public:
   ConfusionSpell(int num_turns, int max_range)
       : num_turns_(num_turns), max_range_(max_range) {}
-  ~ConfusionSpell() = default;
+  virtual ~ConfusionSpell() = default;
 
   ActionResult use(Entity* owner, Entity* wearer, World& world) override;
 

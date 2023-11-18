@@ -47,6 +47,7 @@ class MessageLog : public Persistent {
   MessageLog(int max_messages = 1024) : max_messages_(max_messages) {
     messages_.reserve(max_messages_);
   }
+  virtual ~MessageLog() = default;
   void add_message(Message message, bool stack);
   void add_message(
       std::string text, tcod::ColorRGB color = WHITE, bool stack = true);

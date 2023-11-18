@@ -28,7 +28,7 @@ class World : public Persistent {
 
  public:
   World();
-  ~World() = default;
+  virtual ~World() = default;
 
   MessageLog& get_message_log() { return *message_log_; }
   Map& get_map() { return *map_; }

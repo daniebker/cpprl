@@ -1,4 +1,7 @@
 
+#ifdef __EMSCRIPTEN__
+#include <emscripten.h>
+#endif  // __EMSCRIPTEN__
 #include "engine.hpp"
 
 #include <SDL2/SDL.h>
@@ -18,33 +21,49 @@
 
 namespace cpprl {
 
-Engine::Engine(int argc, char** argv)
-    : renderer_(std::make_unique<TCODRenderer>(argc, argv)),
-      world_(nullptr),
-      engine_state_(std::make_unique<MainMenuState>(
-          *world_, new MainMenuWindow(60, 35, {0, 0}))) {
-  engine_state_->on_enter();
-}
-Engine::~Engine() {}
+Engine::Engine(){};
+Engine::~Engine(){};
 
-void Engine::init() {
-  world_->generate_map(80, 35, true);
+Engine& Engine::get_instance() {
+  static Engine instance_;
+  return instance_;
+}
+
+void Engine::init(int argc, char** argv) {
+  argc_ = argc;
+  argv_ = argv;
+  renderer_ = std::make_unique<TCODRenderer>(argc, argv);
+  engine_state_ = std::make_unique<MainMenuState>(
+      *world_, new MainMenuWindow(60, 35, {0, 0}));
   engine_state_->on_enter();
+  // world_->generate_map(80, 35, true);
+  // engine_state_->on_enter();
 }
 
 void Engine::save() {
+  std::filesystem::create_directories("saves");
   if (world_->get_player()->get_defense_component().is_dead()) {
     // TCODSystem::deleteFile("game.sav");
-    TCODSystem::deleteFile("game.sav");
+    TCODSystem::deleteFile("saves/game.sav");
 
   } else {
     // TCODZip zip;
-    std::ofstream os("game.sav", std::ios::binary);
+    std::ofstream os("saves/game.sav", std::ios::binary);
     // std::ofstream file("game.sav");
     cereal::JSONOutputArchive archive(os);
     world_->save(archive);
     // zip.saveToFile("game.sav");
   }
+#ifdef __EMSCRIPTEN__
+  // clang-format off
+  EM_ASM(
+    FS.syncfs(false, function (err) {
+      assert(!err);
+      console.log("SyncFS finished.");
+    });
+  );
+  // clang-format on
+#endif
 }
 
 void Engine::load() {
@@ -63,7 +82,7 @@ void Engine::load() {
     engine_state_ = std::make_unique<InGameState>(*world_);
     engine_state_->on_enter();
   } else {
-    init();
+    init(argc_, argv_);
   }
 }
 
@@ -121,6 +140,7 @@ void Engine::reset_game() {
   world_ = std::make_unique<World>();
   engine_state_->on_exit();
   engine_state_ = std::make_unique<InGameState>(*world_);
-  init();
+  world_->generate_map(80, 35, true);
+  engine_state_->on_enter();
 }
 }  // namespace cpprl

@@ -14,7 +14,7 @@ class TransformComponent;
 class Renderer {
  public:
   Renderer() {}
-  ~Renderer() {}
+  virtual ~Renderer() {}
 
   virtual void render(
       ASCIIComponent& sprite, TransformComponent& transform) = 0;
@@ -40,7 +40,7 @@ class TCODRenderer : public Renderer {
     params.console = g_console.get();
     g_context = tcod::Context{params};
   };
-  ~TCODRenderer() {}
+  ~TCODRenderer() = default;
 
   virtual void render(ASCIIComponent& sprite, TransformComponent& transform);
 };

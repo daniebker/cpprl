@@ -214,7 +214,7 @@ StateResult SelectMenuItemCommand::execute() {
       break;
   }
 
-  if (sub_command == MenuSubCommand::CONTINUE) {
+  if (sub_command && sub_command == MenuSubCommand::CONTINUE) {
     return LoadGame{};
   } else if (sub_command == MenuSubCommand::NEW_GAME) {
     auto reset_game_command = std::make_unique<ResetGameCommand>(world_);
