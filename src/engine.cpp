@@ -36,23 +36,17 @@ void Engine::init(int argc, char** argv) {
   engine_state_ = std::make_unique<MainMenuState>(
       *world_, new MainMenuWindow(60, 35, {0, 0}));
   engine_state_->on_enter();
-  // world_->generate_map(80, 35, true);
-  // engine_state_->on_enter();
 }
 
 void Engine::save() {
   std::filesystem::create_directories("saves");
   if (world_->get_player()->get_defense_component().is_dead()) {
-    // TCODSystem::deleteFile("game.sav");
-    TCODSystem::deleteFile("saves/game.sav");
+    std::filesystem::remove("saves/game.sav");
 
   } else {
-    // TCODZip zip;
     std::ofstream os("saves/game.sav", std::ios::binary);
-    // std::ofstream file("game.sav");
     cereal::JSONOutputArchive archive(os);
     world_->save(archive);
-    // zip.saveToFile("game.sav");
   }
 #ifdef __EMSCRIPTEN__
   // clang-format off
@@ -67,10 +61,10 @@ void Engine::save() {
 }
 
 void Engine::load() {
-  if (TCODSystem::fileExists("game.sav")) {
+  if (std::filesystem::exists("saves/game.sav")) {
     // TCODZip zip;
     // zip.loadFromFile("game.sav");
-    std::ifstream is("game.sav", std::ios::binary);
+    std::ifstream is("saves/game.sav", std::ios::binary);
     cereal::JSONInputArchive archive(is);
 
     world_ = std::make_unique<World>();

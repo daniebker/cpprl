@@ -27,7 +27,7 @@ class Dungeon : public Persistent {
   Dungeon() {
     seed_ = TCODRandom::getInstance()->getInt(0, 0x7FFFFFFF);
   };
-  ~Dungeon() { delete rng_; };
+  virtual ~Dungeon() { delete rng_; };
   Map* generate(DungeonConfig config);
   // void save(TCODZip& zip) override;
   void save(cereal::JSONOutputArchive& archive) override;
