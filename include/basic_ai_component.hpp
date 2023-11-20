@@ -15,9 +15,6 @@ class AIComponent : public Persistent {
   AIComponent(){};
   virtual ~AIComponent() = default;
   virtual void update(World& world, Entity* entity) = 0;
-  // static std::unique_ptr<AIComponent> create(TCODZip& zip);
-  // virtual void load(TCODZip& zip) = 0;
-  // virtual void save(TCODZip& zip) = 0;
   static std::unique_ptr<AIComponent> create(cereal::JSONInputArchive& archive);
   virtual void load(cereal::JSONInputArchive& archive) = 0;
   virtual void save(cereal::JSONOutputArchive& archive) = 0;
@@ -30,8 +27,6 @@ class HostileAI final : public AIComponent {
  public:
   HostileAI() : AIComponent(){};
   void update(World& world, Entity* entity) override;
-  // void load(TCODZip& zip) override;
-  // void save(TCODZip& zip) override;
   void load(cereal::JSONInputArchive& archive) override;
   void save(cereal::JSONOutputArchive& archive) override;
 };
@@ -46,8 +41,6 @@ class ConfusionAI final : public AIComponent {
 
   ~ConfusionAI() override = default;
   void update(World& world, Entity* entity) override;
-  // void load(TCODZip& zip) override;
-  // void save(TCODZip& zip) override;
   void load(cereal::JSONInputArchive& archive) override;
   void save(cereal::JSONOutputArchive& archive) override;
 };
