@@ -13,6 +13,7 @@ std::unique_ptr<Map> Dungeon::generate(DungeonConfig dungeon_config) {
       dungeon_config.map_width, dungeon_config.map_height);
   auto rooms = std::vector<RectangularRoom>{};
 
+  Vector2D last_room_center = {0, 0};
   for (int i = 0; i < dungeon_config.max_rooms; i++) {
     int room_width = rng_->getInt(
         dungeon_config.room_min_size, dungeon_config.room_max_size);
@@ -30,19 +31,24 @@ std::unique_ptr<Map> Dungeon::generate(DungeonConfig dungeon_config) {
       continue;
     }
 
-    map->set_tiles_range(new_room.innerBounds(), {false, TileType::floor});
+    map->set_tiles_range(
+        new_room.innerBounds(), {false, TileType::floor, false});
 
+    last_room_center = new_room.get_center();
     if (!rooms.empty()) {
       Vector2D previous_room_center = rooms.back().get_center();
       std::vector<Vector2D> tunnel =
           l_tunnel_between(previous_room_center, new_room.get_center());
 
       for (const Vector2D position : tunnel) {
-        map->set_tiles_at(position, {false, TileType::floor});
+        map->set_tiles_at(position, Tile{false, TileType::floor, false});
       }
     }
     rooms.push_back(new_room);
   }
+  map->set_tiles_at(
+      last_room_center, Tile{false, TileType::down_stairs, false});
+  map->set_down_stairs_location(last_room_center);
   map->set_rooms(rooms);
 
   return map;
@@ -72,11 +78,4 @@ std::vector<Vector2D> Dungeon::l_tunnel_between(Vector2D start, Vector2D end) {
 
   return tunnel;
 }
-
-// void Dungeon::save(TCODZip& zip) { zip.putInt(seed_); }
-// void Dungeon::save(cereal::JSONOutputArchive& archive) { archive(seed_); }
-
-// void Dungeon::load(TCODZip& zip) { seed_ = zip.getInt(); }
-// void Dungeon::load(cereal::JSONInputArchive& archive) { archive(seed_); }
-
 }  // namespace cpprl

@@ -7,10 +7,7 @@
 #include "nparray.hpp"
 
 namespace cpprl {
-enum class TileType {
-  wall = 0,
-  floor,
-};
+enum class TileType { wall = 0, floor, down_stairs };
 
 /**
  * Tile struct. Gives us the type of the tile
@@ -19,6 +16,11 @@ enum class TileType {
 struct Tile {
   bool explored;
   TileType type;
+  bool blocking;
+
+  Tile() = default;
+  Tile(bool explored, TileType type, bool blocking)
+      : explored(explored), type(type), blocking(blocking) {}
 
   template <class Archive>
   void serialize(Archive& archive) {
@@ -66,6 +68,9 @@ class Map {
   Array2D<Tile>& get_tiles() { return tiles_; }
   void set_tiles_range(std::tuple<Vector2D, Vector2D> bounds, Tile tile);
   void set_rooms(std::vector<RectangularRoom> rooms) { _rooms = rooms; }
+  void set_down_stairs_location(Vector2D position) {
+    down_stairs_location_ = position;
+  }
   RectangularRoom get_first_room() { return _rooms.front(); }
   std::vector<RectangularRoom> get_rooms() { return _rooms; }
   void set_tiles_at(Vector2D position, Tile tile);
@@ -109,6 +114,7 @@ class Map {
   TileGraphic wall_tile_;
   /** The floor tile */
   TileGraphic floor_tile_;
+  TileGraphic downstairs_tile_;
   /** The width and height of this map. */
   int width_, height_;
   /** This maps tiles */
@@ -119,6 +125,7 @@ class Map {
   Vector2D target_tile_ = {0, 0};
   bool target_mode_ = false;
   float max_range_ = 0.0f;
+  Vector2D down_stairs_location_{0, 0};
 };
 
 }  // namespace cpprl
