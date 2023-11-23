@@ -142,7 +142,9 @@ ActionResult LightningBolt::use(Entity* owner, Entity* wearer, World& world) {
 }
 
 ActionResult FireSpell::use(Entity* owner, Entity* wearer, World& world) {
-  auto on_pick = [&]() {
+  // We need the references of everything except the pointers, where
+  // wee need the pointers.
+  auto on_pick = [&, wearer, owner]() {
     // TODO:: when I get here the pointers are garbage.
     ConsumableComponent::use(owner, wearer, world);
     for (Entity* entity : world.get_entities()) {
@@ -173,7 +175,7 @@ ActionResult FireSpell::use(Entity* owner, Entity* wearer, World& world) {
 }
 
 ActionResult ConfusionSpell::use(Entity* owner, Entity* wearer, World& world) {
-  auto on_pick = [&]() -> StateResult {
+  auto on_pick = [&, wearer, owner]() -> StateResult {
     Entity* target = world.get_entities().get_blocking_entity_at(
         world.get_map().get_highlight_tile());
     if (target) {
