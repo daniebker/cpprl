@@ -27,7 +27,12 @@ StateResult PickupCommand::execute() {
 }
 
 StateResult DropItemCommand::execute() {
+  if (item_index_ <= 1) {
+    return NoOp{"You can't drop that."};
+  }
   Entity* item = entity_->get_container().get_inventory()[item_index_ - 1];
+  // TODO: this is why I can't drop a corpse
+  // Should a corpse be consumable?
   ConsumableComponent* consumable_component = &item->get_consumable_component();
   if (!consumable_component) {
     return NoOp{"There's nothing to drop."};
