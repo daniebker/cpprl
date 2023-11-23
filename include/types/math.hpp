@@ -25,6 +25,11 @@ struct Vector2D {
 
   int x;
   int y;
+
+  template <class Archive>
+  void serialize(Archive& archive) {
+    archive(x, y);
+  }
 };
 
 struct Quadrilateral {
@@ -43,6 +48,11 @@ struct Quadrilateral {
   Vector2D position;
   int width;
   int height;
+
+  template <class Archive>
+  void serialize(Archive& archive) {
+    archive(position, width, height);
+  }
 };
 
 template <typename T>

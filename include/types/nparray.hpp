@@ -15,13 +15,17 @@ class Array2D {
 
   [[deprecated("Use at(Vector2D position) instead")]] T& at(int row, int col) { return at({row, col}); }
 
-  T& at(Vector2D position) {
+  const T& at(Vector2D position) const {
     int row = position.x;
     int col = position.y;
     if (row < 0 || row >= rows_ || col < 0 || col >= cols_) {
       throw std::out_of_range("Array2D index out of bounds");
     }
     return data_[row][col];
+  }
+
+  T& at(Vector2D position) {
+    return const_cast<T&>(static_cast<const Array2D*>(this)->at(position));
   }
 
   void set(Vector2D position, T value) { data_[position.x][position.y] = value; }

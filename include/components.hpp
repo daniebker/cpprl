@@ -1,32 +1,37 @@
 #ifndef INCLUDE_COMPONENTS_HPP_
 #define INCLUDE_COMPONENTS_HPP_
 
+#include <cereal/types/polymorphic.hpp>
 #include <libtcod.hpp>
 #include <string_view>
 #include <variant>
 
-#include "persistent.hpp"
+#include "game_entity.hpp"
 #include "types/action_result.hpp"
-#include "types/entity_fwd.hpp"
 #include "types/math.hpp"
 #include "types/world_fwd.hpp"
 
 namespace cpprl {
 
-class AttackComponent : public Persistent {
+class AttackComponent {
  public:
+  AttackComponent() = default;
   AttackComponent(int damage) : damage_(damage) {}
   virtual ~AttackComponent() = default;
   int get_damage() { return damage_; }
-  void load(cereal::JSONInputArchive& archive) override;
-  void save(cereal::JSONOutputArchive& archive) override;
+
+  template <class Archive>
+  void serialize(Archive& archive) {
+    archive(damage_);
+  }
 
  private:
   int damage_;
 };
 
-class DefenseComponent : public Persistent {
+class DefenseComponent {
  public:
+  DefenseComponent() = default;
   DefenseComponent(int defense, int maxHp)
       : defense_(defense), hp_(maxHp), max_hp_(maxHp) {}
   virtual ~DefenseComponent() = default;
@@ -39,9 +44,12 @@ class DefenseComponent : public Persistent {
   int heal(int amount);
   bool is_dead() { return hp_ <= 0; }
   bool is_not_dead() { return !is_dead(); }
-  void die(Entity& owner);
-  void load(cereal::JSONInputArchive& archive) override;
-  void save(cereal::JSONOutputArchive& archive) override;
+  void die(Entity* owner);
+
+  template <class Archive>
+  void serialize(Archive& archive) {
+    archive(defense_, hp_, max_hp_);
+  }
 
  private:
   int defense_;
@@ -49,23 +57,26 @@ class DefenseComponent : public Persistent {
   int max_hp_;
 };
 
-class TransformComponent : public Persistent {
+class TransformComponent {
  public:
+  TransformComponent() = default;
   TransformComponent(int x, int y) : position_({x, y}) {}
   virtual ~TransformComponent() = default;
   Vector2D get_position() { return position_; }
   void move(Vector2D new_position) { position_ = new_position; }
-  // void load(TCODZip& zip);
-  // void save(TCODZip& zip);
-  void load(cereal::JSONInputArchive& archive) override;
-  void save(cereal::JSONOutputArchive& archive) override;
+
+  template <class Archive>
+  void serialize(Archive& archive) {
+    archive(position_);
+  }
 
  private:
   Vector2D position_;
 };
 
-class ASCIIComponent : public Persistent {
+class ASCIIComponent {
  public:
+  ASCIIComponent() = default;
   ASCIIComponent(std::string_view symbol, tcod::ColorRGB colour, int layer)
       : symbol_(symbol), colour_(colour), layer_(layer) {}
   virtual ~ASCIIComponent() = default;
@@ -73,10 +84,11 @@ class ASCIIComponent : public Persistent {
   std::string_view get_symbol() { return symbol_; }
   tcod::ColorRGB get_colour() { return colour_; }
   int get_layer() { return layer_; }
-  // void load(TCODZip& zip);
-  // void save(TCODZip& zip);
-  void load(cereal::JSONInputArchive& archive) override;
-  void save(cereal::JSONOutputArchive& archive) override;
+
+  template <class Archive>
+  void serialize(Archive& archive) {
+    archive(symbol_, colour_, layer_);
+  }
 
  private:
   std::string symbol_;
@@ -84,12 +96,13 @@ class ASCIIComponent : public Persistent {
   int layer_;
 };
 
-class Container : Persistent {
+class Container {
  private:
   size_t size_;
   std::vector<Entity*> inventory_;
 
  public:
+  Container() = default;
   Container(int size);
   virtual ~Container() = default;
   bool add(Entity* actor);
@@ -97,26 +110,38 @@ class Container : Persistent {
   std::vector<Entity*> get_inventory() { return inventory_; }
   int get_size() { return size_; }
 
-  // void load(TCODZip& zip);
-  // void save(TCODZip& zip);
-  void load(cereal::JSONInputArchive& archive) override;
-  void save(cereal::JSONOutputArchive& archive) override;
+  template <class Archive>
+  void save(Archive& archive) const {
+    archive(size_);
+    archive(inventory_.size());
+    for (auto& item : inventory_) {
+      item->pack(archive);
+    }
+  }
+  template <class Archive>
+  void load(Archive& archive) {
+    archive(size_);
+    int nb_items;
+    archive(nb_items);
+    for (int i = 0; i < nb_items; i++) {
+      Entity* entity = new Entity("", false, nullptr, nullptr);
+      entity->unpack(archive);
+      inventory_.emplace_back(entity);
+    }
+  }
 };
 
-class ConsumableComponent : public Persistent {
+class ConsumableComponent {
  public:
+  ConsumableComponent() = default;
   virtual ~ConsumableComponent() = default;
   // TODO: should also be an action result
   ActionResult pick_up(Entity* owner, Entity* wearer);
   ActionResult drop(Entity* owner, Entity* wearer);
   virtual ActionResult use(Entity* owner, Entity* wearer, World& world);
-  // virtual void load(TCODZip& zip) = 0;
-  // virtual void save(TCODZip& zip) = 0;
-  void load(cereal::JSONInputArchive& archive) = 0;
-  void save(cereal::JSONOutputArchive& archive) = 0;
-  // static std::unique_ptr<ConsumableComponent> create(TCODZip& zip);
-  static std::unique_ptr<ConsumableComponent> create(
-      cereal::JSONInputArchive& archive);
+
+  template <class Archive>
+  void serialize(Archive&) {}
 
  protected:
   enum ConsumableType { HEALER, LIGHTNING_BOLT, CONFUSER, FIREBALL };
@@ -124,14 +149,14 @@ class ConsumableComponent : public Persistent {
 
 class HealingConsumable final : public ConsumableComponent {
  public:
+  HealingConsumable() = default;
   HealingConsumable(int amount);
   virtual ~HealingConsumable() = default;
   ActionResult use(Entity* owner, Entity* wearer, World& world) override;
-
-  // void load(TCODZip& zip);
-  // void save(TCODZip& zip);
-  void load(cereal::JSONInputArchive& archive) override;
-  void save(cereal::JSONOutputArchive& archive) override;
+  template <class Archive>
+  void serialize(Archive& archive) {
+    archive(cereal::base_class<ConsumableComponent>(this), amount_);
+  }
 
  private:
   int amount_;
@@ -142,14 +167,15 @@ class LightningBolt final : public ConsumableComponent {
   float range_, damage_;
 
  public:
+  LightningBolt() = default;
   LightningBolt(float range, float damage) : range_(range), damage_(damage) {}
   virtual ~LightningBolt() = default;
   ActionResult use(Entity* owner, Entity* wearer, World& world) override;
 
-  // void load(TCODZip& zip);
-  // void save(TCODZip& zip);
-  void load(cereal::JSONInputArchive& archive) override;
-  void save(cereal::JSONOutputArchive& archive) override;
+  template <class Archive>
+  void serialize(Archive& archive) {
+    archive(cereal::base_class<ConsumableComponent>(this), range_, damage_);
+  }
 };
 
 class FireSpell final : public ConsumableComponent {
@@ -157,16 +183,20 @@ class FireSpell final : public ConsumableComponent {
   float max_range_, aoe_, damage_;
 
  public:
+  FireSpell() = default;
   FireSpell(float max_range, float aoe, float damage)
       : max_range_(max_range), aoe_(aoe), damage_(damage) {}
   virtual ~FireSpell() = default;
 
   ActionResult use(Entity* owner, Entity* Wearer, World& world) override;
-
-  // void load(TCODZip& zip);
-  // void save(TCODZip& zip);
-  void load(cereal::JSONInputArchive& archive) override;
-  void save(cereal::JSONOutputArchive& archive) override;
+  template <class Archive>
+  void serialize(Archive& archive) {
+    archive(
+        cereal::base_class<ConsumableComponent>(this),
+        max_range_,
+        aoe_,
+        damage_);
+  }
 };
 
 class ConfusionSpell final : public ConsumableComponent {
@@ -174,17 +204,25 @@ class ConfusionSpell final : public ConsumableComponent {
   int num_turns_, max_range_;
 
  public:
+  ConfusionSpell() = default;
   ConfusionSpell(int num_turns, int max_range)
       : num_turns_(num_turns), max_range_(max_range) {}
   virtual ~ConfusionSpell() = default;
 
   ActionResult use(Entity* owner, Entity* wearer, World& world) override;
 
-  // void load(TCODZip& zip);
-  // void save(TCODZip& zip);
-  void load(cereal::JSONInputArchive& archive) override;
-  void save(cereal::JSONOutputArchive& archive) override;
+  template <class Archive>
+  void serialize(Archive& archive) {
+    archive(
+        cereal::base_class<ConsumableComponent>(this), num_turns_, max_range_);
+  }
 };
 
 }  // namespace cpprl
+
+CEREAL_REGISTER_TYPE(cpprl::HealingConsumable);
+CEREAL_REGISTER_TYPE(cpprl::LightningBolt);
+CEREAL_REGISTER_TYPE(cpprl::FireSpell);
+CEREAL_REGISTER_TYPE(cpprl::ConfusionSpell);
+
 #endif

@@ -4,7 +4,7 @@
 #include <libtcod.hpp>
 #include <string_view>
 
-#include "persistent.hpp"
+#include "basic_ai_component.hpp"
 #include "types/math.hpp"
 #include "types/world_fwd.hpp"
 
@@ -15,7 +15,7 @@ class ASCIIComponent;
 class AttackComponent;
 class DefenseComponent;
 class ConsumableComponent;
-class AIComponent;
+// class AIComponent;
 class Container;
 
 class Entity {
@@ -51,7 +51,6 @@ class Entity {
   AIComponent& get_ai_component() { return *aiComponent_; };
   std::unique_ptr<AIComponent> transfer_ai_component();
   Container& get_container() { return *container_; };
-
   float get_distance_to(Entity* other);
 
   bool is_blocking() { return blocker_; };
@@ -68,10 +67,63 @@ class Entity {
       std::unique_ptr<ConsumableComponent> consumableComponent);
   void set_ai_component(std::unique_ptr<AIComponent> aiComponent);
   void set_container(std::unique_ptr<Container> container);
-  // void save(TCODZip& zip);
-  // void load(TCODZip& zip);
-  void save(cereal::JSONOutputArchive& archive);
-  void load(cereal::JSONInputArchive& archive);
+
+  template <class Archive>
+  void pack(Archive& archive) {
+    archive(name_, blocker_);
+    archive(transformComponent_ != nullptr);
+    archive(defenseComponent_ != nullptr);
+    archive(attackComponent_ != nullptr);
+    archive(consumableComponent_ != nullptr);
+    archive(asciiComponent_ != nullptr);
+    archive(aiComponent_ != nullptr);
+    archive(container_ != nullptr);
+    if (transformComponent_) archive(transformComponent_);
+
+    if (asciiComponent_) archive(asciiComponent_);
+    if (attackComponent_) archive(attackComponent_);
+    if (defenseComponent_) archive(defenseComponent_);
+    if (consumableComponent_) archive(consumableComponent_);
+    if (aiComponent_) archive(aiComponent_);
+    if (container_) archive(container_);
+  }
+
+  template <class Archive>
+  void unpack(Archive& archive) {
+    bool hasTransformComponent, hasDefenseComponent, hasAttackComponent,
+        hasConsumableComponent, hasAsciiComponent, hasAIComponent, hasContainer;
+
+    archive(name_, blocker_);
+    archive(hasTransformComponent);
+    archive(hasDefenseComponent);
+    archive(hasAttackComponent);
+    archive(hasConsumableComponent);
+    archive(hasAsciiComponent);
+    archive(hasAIComponent);
+    archive(hasContainer);
+
+    if (hasTransformComponent) {
+      archive(transformComponent_);
+    }
+    if (hasAsciiComponent) {
+      archive(asciiComponent_);
+    }
+    if (hasAttackComponent) {
+      archive(attackComponent_);
+    }
+    if (hasDefenseComponent) {
+      archive(defenseComponent_);
+    }
+    if (hasConsumableComponent) {
+      archive(consumableComponent_);
+    }
+    if (hasAIComponent) {
+      archive(aiComponent_);
+    }
+    if (hasContainer) {
+      archive(container_);
+    }
+  }
 };
 
 }  // namespace cpprl

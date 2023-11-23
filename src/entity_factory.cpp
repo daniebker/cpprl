@@ -15,7 +15,7 @@ Entity* AbstractEntityFactory::create_base(
 }
 
 Entity* OrcFactory::create() {
-  auto* entity = create_base("Orc", DARK_GREEN, "o");
+  Entity* entity = create_base("Orc", DARK_GREEN, "o");
 
   entity->set_attack_component(std::make_unique<AttackComponent>(3));
   entity->set_defense_component(std::make_unique<DefenseComponent>(0, 10));
@@ -25,7 +25,7 @@ Entity* OrcFactory::create() {
 }
 
 Entity* TrollFactory::create() {
-  auto* entity = create_base("Troll", DARK_GREEN, "T");
+  Entity* entity = create_base("Troll", DARK_GREEN, "T");
 
   entity->set_attack_component(std::make_unique<AttackComponent>(4));
   entity->set_defense_component(std::make_unique<DefenseComponent>(1, 16));
@@ -35,7 +35,7 @@ Entity* TrollFactory::create() {
 }
 
 Entity* PlayerFactory::create() {
-  auto* entity = create_base("Player", TEAL, "@");
+  Entity* entity = create_base("Player", TEAL, "@");
 
   entity->set_attack_component(std::make_unique<AttackComponent>(5));
   entity->set_defense_component(std::make_unique<DefenseComponent>(2, 30));

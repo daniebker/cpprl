@@ -17,7 +17,7 @@ struct DungeonConfig {
 };
 
 namespace cpprl {
-class Dungeon : public Persistent {
+class Dungeon {
  private:
   std::vector<Vector2D> l_tunnel_between(Vector2D start, Vector2D end);
   TCODRandom* rng_;
@@ -28,11 +28,12 @@ class Dungeon : public Persistent {
     seed_ = TCODRandom::getInstance()->getInt(0, 0x7FFFFFFF);
   };
   virtual ~Dungeon() { delete rng_; };
-  Map* generate(DungeonConfig config);
-  // void save(TCODZip& zip) override;
-  void save(cereal::JSONOutputArchive& archive) override;
-  // void load(TCODZip& zip) override;
-  void load(cereal::JSONInputArchive& archive) override;
+  std::unique_ptr<Map> generate(DungeonConfig config);
+
+  template <class Archive>
+  void serialize(Archive& archive) {
+    archive(seed_);
+  }
 };
 }  // namespace cpprl
 

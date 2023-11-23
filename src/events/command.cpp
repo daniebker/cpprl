@@ -20,7 +20,7 @@ StateResult PickupCommand::execute() {
     entity_->get_container().add(item);
     world_.get_entities().remove(item);
   } else {
-    throw Impossible("There is nothing here to pick up.");
+    return NoOp{"There is nothing here to pick up."};
   }
 
   return EndTurn{};
@@ -30,13 +30,13 @@ StateResult DropItemCommand::execute() {
   Entity* item = entity_->get_container().get_inventory()[item_index_ - 1];
   ConsumableComponent* consumable_component = &item->get_consumable_component();
   if (!consumable_component) {
-    throw Impossible("There's nothing to drop.");
+    return NoOp{"There's nothing to drop."};
   }
   ActionResult result = consumable_component->drop(item, entity_);
   world_.get_entities().spawn(item);
   if (std::holds_alternative<Failure>(result)) {
     std::string message = std::get<Failure>(result).message;
-    throw Impossible(message.c_str());
+    return NoOp{message.c_str()};
   } else if (std::holds_alternative<Poll>(result)) {
     return Change{std::move(std::get<Poll>(result).new_state)};
   } else if (std::holds_alternative<Success>(result)) {
@@ -83,12 +83,12 @@ StateResult UseItemCommand::execute() {
   Entity* item = entity_->get_container().get_inventory()[item_index_ - 1];
   ConsumableComponent* consumable_component = &item->get_consumable_component();
   if (!consumable_component) {
-    throw Impossible("There's nothing to use.");
+    return NoOp{"There's nothing to use."};
   }
   ActionResult result = consumable_component->use(item, entity_, world_);
   if (std::holds_alternative<Failure>(result)) {
     std::string message = std::get<Failure>(result).message;
-    throw Impossible(message.c_str());
+    return NoOp{message};
   } else if (std::holds_alternative<Poll>(result)) {
     return Change{std::move(std::get<Poll>(result).new_state)};
   } else if (std::holds_alternative<Success>(result)) {
@@ -104,7 +104,7 @@ StateResult CloseViewCommand::execute() {
 StateResult DieEvent::execute() {
   world_.get_message_log().add_message(
       fmt::format("{} has died!", util::capitalize(entity_->get_name())));
-  entity_->get_defense_component().die(*entity_);
+  entity_->get_defense_component().die(entity_);
   return {};
 }
 
@@ -177,7 +177,7 @@ StateResult MovementCommand::execute() {
   auto& map = world_.get_map();
 
   if (map.is_not_in_bounds(new_position)) {
-    throw Impossible("You can't move out the bounds of space and time.");
+    return NoOp{"You can't move out the bounds of space and time."};
   }
 
   if (world_.get_entities().get_blocking_entity_at(new_position)) {
@@ -187,7 +187,7 @@ StateResult MovementCommand::execute() {
   if (map.is_walkable(new_position)) {
     entity_->get_transform_component().move(new_position);
   } else {
-    throw Impossible("You can't walk on that.");
+    return NoOp{"You can't walk on that."};
   }
   return EndTurn{};
 }

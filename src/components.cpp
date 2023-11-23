@@ -32,77 +32,11 @@ int DefenseComponent::heal(int amount) {
   return healed;
 }
 
-void DefenseComponent::die(Entity& owner) {
-  owner.set_name("corpse of " + owner.get_name());
-  owner.set_ascii_component(std::make_unique<ASCIIComponent>("%", RED, -1));
-  owner.set_blocking(false);
-  owner.set_ai_component(nullptr);
-}
-
-// void DefenseComponent::save(TCODZip& zip) {
-//   zip.putInt(defense_);
-//   zip.putInt(hp_);
-//   zip.putInt(max_hp_);
-// }
-
-// void DefenseComponent::load(TCODZip& zip) {
-//   defense_ = zip.getInt();
-//   hp_ = zip.getInt();
-//   max_hp_ = zip.getInt();
-// }
-void DefenseComponent::save(cereal::JSONOutputArchive& archive) {
-  archive(defense_, hp_, max_hp_);
-}
-void DefenseComponent::load(cereal::JSONInputArchive& archive) {
-  archive(defense_, hp_, max_hp_);
-}
-
-// void AttackComponent::save(TCODZip& zip) { zip.putInt(damage_); }
-// void AttackComponent::load(TCODZip& zip) { damage_ = zip.getInt(); }
-void AttackComponent::save(cereal::JSONOutputArchive& archive) {
-  archive(damage_);
-}
-void AttackComponent::load(cereal::JSONInputArchive& archive) {
-  archive(damage_);
-}
-
-// void TransformComponent::save(TCODZip& zip) {
-//   zip.putInt(position_.x);
-//   zip.putInt(position_.y);
-// }
-
-// void TransformComponent::load(TCODZip& zip) {
-//   position_.x = zip.getInt();
-//   position_.y = zip.getInt();
-// }
-void TransformComponent::save(cereal::JSONOutputArchive& archive) {
-  archive(position_.x, position_.y);
-}
-void TransformComponent::load(cereal::JSONInputArchive& archive) {
-  archive(position_.x, position_.y);
-}
-
-// void ASCIIComponent::save(TCODZip& zip) {
-//   zip.putString(symbol_.c_str());
-//   zip.putInt(colour_.r);
-//   zip.putInt(colour_.g);
-//   zip.putInt(colour_.b);
-//   zip.putInt(layer_);
-// }
-
-// void ASCIIComponent::load(TCODZip& zip) {
-//   symbol_ = zip.getString();
-//   colour_.r = zip.getInt();
-//   colour_.g = zip.getInt();
-//   colour_.b = zip.getInt();
-//   layer_ = zip.getInt();
-// }
-
-void ASCIIComponent::save(cereal::JSONOutputArchive& archive) {
-  archive(symbol_, colour_, layer_);
-}
-void ASCIIComponent::load(cereal::JSONInputArchive& archive) {
-  archive(symbol_, colour_, layer_);
+void DefenseComponent::die(Entity* owner) {
+  owner->set_name("corpse of " + owner->get_name());
+  owner->set_ascii_component(std::make_unique<ASCIIComponent>("%", RED, -1));
+  owner->set_blocking(false);
+  owner->set_ai_component(nullptr);
 }
 
 Container::Container(int size) : size_(size), inventory_({}) {
@@ -113,7 +47,7 @@ bool Container::add(Entity* entity) {
   if (size_ > 0 && inventory_.size() >= size_) {
     return false;
   }
-  inventory_.push_back(entity);
+  inventory_.push_back(std::move(entity));
   return true;
 }
 
@@ -122,54 +56,15 @@ void Container::remove(Entity* entityToRemove) {
       std::remove_if(
           inventory_.begin(),
           inventory_.end(),
-          [&entityToRemove](const Entity* entity) {
+          [&entityToRemove](Entity* entity) {
             return entity == entityToRemove;
           }),
       inventory_.end());
 }
 
-// void Container::load(TCODZip& zip) {
-//   size_ = zip.getInt();
-//   int nbActors = zip.getInt();
-//   while (nbActors > 0) {
-//     Entity* entity = new Entity("", false, nullptr, nullptr);
-//     entity->load(zip);
-//     inventory_.emplace_back(entity);
-//     nbActors--;
-//   }
-// }
-
-// void Container::save(TCODZip& zip) {
-//   zip.putInt(size_);
-//   zip.putInt(inventory_.size());
-//   for (Entity* entity : inventory_) {
-//     entity->save(zip);
-//   }
-// }
-
-void Container::load(cereal::JSONInputArchive& archive) {
-  archive(size_);
-  int nbActors;
-  archive(nbActors);
-  while (nbActors > 0) {
-    Entity* entity = new Entity("", false, nullptr, nullptr);
-    entity->load(archive);
-    inventory_.emplace_back(entity);
-    nbActors--;
-  }
-}
-
-void Container::save(cereal::JSONOutputArchive& archive) {
-  archive(size_);
-  archive(inventory_.size());
-  for (Entity* entity : inventory_) {
-    entity->save(archive);
-  }
-}
-
 ActionResult ConsumableComponent::pick_up(Entity* owner, Entity* wearer) {
   auto* container = &wearer->get_container();
-  if (container && container->add(owner)) {
+  if (container && container->add(std::move(owner))) {
     // remove the owner?
     return Success{};
   }
@@ -196,43 +91,7 @@ ActionResult ConsumableComponent::use(Entity* owner, Entity* wearer, World&) {
   return Failure{""};
 }
 
-std::unique_ptr<ConsumableComponent> ConsumableComponent::create(
-    cereal::JSONInputArchive& archive) {
-  // ConsumableType type = (ConsumableType)zip.getInt();
-  ConsumableType type;
-  archive(type);
-  std::unique_ptr<ConsumableComponent> component = nullptr;
-  switch (type) {
-    case HEALER:
-      component = std::make_unique<HealingConsumable>(0);
-      break;
-    case LIGHTNING_BOLT:
-      component = std::make_unique<LightningBolt>(0, 0);
-      break;
-    case CONFUSER:
-      component = std::make_unique<ConfusionSpell>(0, 0);
-      break;
-    case FIREBALL:
-      component = std::make_unique<FireSpell>(0, 0, 0);
-      break;
-  }
-  component->load(archive);
-  return component;
-}
-
 HealingConsumable::HealingConsumable(int amount) : amount_(amount){};
-// void HealingConsumable::save(TCODZip& zip) {
-//   zip.putInt(HEALER);
-//   zip.putInt(amount_);
-// }
-// void HealingConsumable::load(TCODZip& zip) { amount_ = zip.getInt(); }
-
-void HealingConsumable::save(cereal::JSONOutputArchive& archive) {
-  archive(HEALER, amount_);
-}
-void HealingConsumable::load(cereal::JSONInputArchive& archive) {
-  archive(amount_);
-}
 
 ActionResult HealingConsumable::use(
     Entity* owner, Entity* wearer, World& world) {
@@ -253,13 +112,12 @@ ActionResult HealingConsumable::use(
 }
 
 ActionResult LightningBolt::use(Entity* owner, Entity* wearer, World& world) {
-  Entity* closest_monster = nullptr;
-  closest_monster = world.get_entities().get_closest_living_monster(
+  Entity* closest_monster = world.get_entities().get_closest_living_monster(
       wearer->get_transform_component().get_position(), range_);
   if (!closest_monster) {
     return Failure{"No enemy is close enough to strike."};
   }
-  // closest_monster->get_defense_component()->take_damage(damage_);
+
   int inflicted = combat_system::handle_spell(damage_, *closest_monster);
   ConsumableComponent::use(owner, wearer, world);
   if (inflicted > 0) {
@@ -282,29 +140,9 @@ ActionResult LightningBolt::use(Entity* owner, Entity* wearer, World& world) {
         closest_monster->get_name())};
   }
 }
-// void LightningBolt::save(TCODZip& zip) {
-//   zip.putInt(LIGHTNING_BOLT);
-//   zip.putInt(range_);
-//   zip.putInt(damage_);
-// }
-
-// void LightningBolt::load(TCODZip& zip) {
-//   range_ = zip.getInt();
-//   damage_ = zip.getInt();
-// }
-
-void LightningBolt::save(cereal::JSONOutputArchive& archive) {
-  archive(LIGHTNING_BOLT, range_, damage_);
-}
-void LightningBolt::load(cereal::JSONInputArchive& archive) {
-  archive(range_, damage_);
-}
 
 ActionResult FireSpell::use(Entity* owner, Entity* wearer, World& world) {
-  // We want everything by reference, except the pointers which
-  // we need by value. I need the memory address of the owner and
-  // wearer in order to update them and have it persist beyond the lambda.
-  auto on_pick = [&, owner, wearer]() {
+  auto on_pick = [&]() {
     // TODO:: when I get here the pointers are garbage.
     ConsumableComponent::use(owner, wearer, world);
     for (Entity* entity : world.get_entities()) {
@@ -333,26 +171,9 @@ ActionResult FireSpell::use(Entity* owner, Entity* wearer, World& world) {
   return Poll{
       std::make_unique<PickTileAOEState>(world, on_pick, max_range_, aoe_)};
 }
-// void FireSpell::save(TCODZip& zip) {
-//   zip.putInt(FIREBALL);
-//   zip.putInt(max_range_);
-//   zip.putInt(aoe_);
-//   zip.putInt(damage_);
-// }
-// void FireSpell::load(TCODZip& zip) {
-//   max_range_ = zip.getInt();
-//   aoe_ = zip.getInt();
-//   damage_ = zip.getInt();
-// }
-void FireSpell::save(cereal::JSONOutputArchive& archive) {
-  archive(FIREBALL, max_range_, aoe_, damage_);
-}
-void FireSpell::load(cereal::JSONInputArchive& archive) {
-  archive(max_range_, aoe_, damage_);
-}
 
 ActionResult ConfusionSpell::use(Entity* owner, Entity* wearer, World& world) {
-  auto on_pick = [&, owner, wearer]() {
+  auto on_pick = [&]() -> StateResult {
     Entity* target = world.get_entities().get_blocking_entity_at(
         world.get_map().get_highlight_tile());
     if (target) {
@@ -368,26 +189,12 @@ ActionResult ConfusionSpell::use(Entity* owner, Entity* wearer, World& world) {
               target->get_name()),
           GREEN);
       ConsumableComponent::use(owner, wearer, world);
+      return {};
+
     } else {
-      throw Impossible("There is no enemy at that location.");
+      return NoOp{"There is no enemy at that location."};
     }
   };
   return Poll{std::make_unique<PickTileState>(world, on_pick, max_range_)};
-}
-// void ConfusionSpell::save(TCODZip& zip) {
-//   zip.putInt(CONFUSER);
-//   zip.putInt(num_turns_);
-//   zip.putInt(max_range_);
-// }
-
-// void ConfusionSpell::load(TCODZip& zip) {
-//   num_turns_ = zip.getInt();
-//   max_range_ = zip.getInt();
-// }
-void ConfusionSpell::save(cereal::JSONOutputArchive& archive) {
-  archive(CONFUSER, num_turns_, max_range_);
-}
-void ConfusionSpell::load(cereal::JSONInputArchive& archive) {
-  archive(num_turns_, max_range_);
 }
 }  // namespace cpprl

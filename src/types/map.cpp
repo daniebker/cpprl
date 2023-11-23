@@ -17,8 +17,6 @@ Map::Map(int width, int height)
   target_tile_ = Vector2D{0, 0};
 }
 
-Map::~Map() {}
-
 bool Map::is_in_bounds(Vector2D position) const {
   return position.x >= 0 && position.x < width_ && position.y >= 0 &&
          position.y < height_;
@@ -95,13 +93,13 @@ void Map::set_highlight_tile(Vector2D position) { target_tile_ = position; }
 //     }
 //   }
 // }
-void Map::save(cereal::JSONOutputArchive& archive) {
-  for (int y = 0; y < get_height(); y++) {
-    for (int x = 0; x < get_width(); x++) {
-      archive(tiles_.at({x, y}).explored);
-    }
-  }
-}
+// void Map::save(cereal::JSONOutputArchive& archive) {
+//   for (int y = 0; y < get_height(); y++) {
+//     for (int x = 0; x < get_width(); x++) {
+//       archive(tiles_.at({x, y}).explored);
+//     }
+//   }
+// }
 
 // void Map::load(TCODZip& zip) {
 //   for (int y = 0; y < get_height(); y++) {
@@ -111,13 +109,13 @@ void Map::save(cereal::JSONOutputArchive& archive) {
 //     }
 //   }
 // }
-void Map::load(cereal::JSONInputArchive& archive) {
-  for (int y = 0; y < get_height(); y++) {
-    for (int x = 0; x < get_width(); x++) {
-      bool explored;
-      archive(explored);
-      tiles_.at({x, y}).explored = explored;
-    }
-  }
-}
+// void Map::load(cereal::JSONInputArchive& archive) {
+//   for (int y = 0; y < get_height(); y++) {
+//     for (int x = 0; x < get_width(); x++) {
+//       bool explored;
+//       archive(explored);
+//       tiles_.at({x, y}).explored = explored;
+//     }
+//   }
+// }
 }  // namespace cpprl

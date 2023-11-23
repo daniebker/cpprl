@@ -2,18 +2,19 @@
 #ifdef __EMSCRIPTEN__
 #include <emscripten.h>
 #endif  // __EMSCRIPTEN__
-#include "engine.hpp"
-
 #include <SDL2/SDL.h>
 
 #include <cereal/archives/binary.hpp>
-// #include <cereal/types/memory.hpp>
+#include <cereal/types/memory.hpp>
+#include <filesystem>
 #include <fstream>
 #include <iostream>
 #include <memory>
 
+#include "engine.hpp"
 #include "events/command.hpp"
 #include "exceptions.hpp"
+#include "serialization/json_serializer_strategy.hpp"
 #include "state.hpp"
 #include "types/math.hpp"
 #include "types/state_result.hpp"
@@ -39,14 +40,16 @@ void Engine::init(int argc, char** argv) {
 }
 
 void Engine::save() {
-  std::filesystem::create_directories("saves");
+  std::filesystem::create_directories(std::filesystem::path("saves"));
   if (world_->get_player()->get_defense_component().is_dead()) {
-    std::filesystem::remove("saves/game.sav");
+    std::filesystem::remove(std::filesystem::path("saves/game.sav"));
 
   } else {
     std::ofstream os("saves/game.sav", std::ios::binary);
     cereal::JSONOutputArchive archive(os);
-    world_->save(archive);
+    // world_->save(archive);
+    serialization::JsonSerializerStrategy serializer("saves/game.sav");
+    serializer.serialize(*world_);
   }
 #ifdef __EMSCRIPTEN__
   // clang-format off
@@ -61,17 +64,13 @@ void Engine::save() {
 }
 
 void Engine::load() {
-  if (std::filesystem::exists("saves/game.sav")) {
-    // TCODZip zip;
-    // zip.loadFromFile("game.sav");
+  if (std::filesystem::exists(std::filesystem::path("saves/game.sav"))) {
     std::ifstream is("saves/game.sav", std::ios::binary);
     cereal::JSONInputArchive archive(is);
 
     world_ = std::make_unique<World>();
+    archive(*world_);
 
-    // Use load function for loading
-    // archive(world_);
-    world_->load(archive);
     engine_state_->on_exit();
     engine_state_ = std::make_unique<InGameState>(*world_);
     engine_state_->on_enter();
@@ -112,6 +111,9 @@ void Engine::handle_events() {
         } else if (std::holds_alternative<Quit>(result)) {
           save();
           std::exit(EXIT_SUCCESS);
+        } else if (std::holds_alternative<NoOp>(result)) {
+          world_->get_message_log().add_message(
+              std::get<NoOp>(result).message, WHITE);
         }
       } catch (Impossible& e) {
         world_->get_message_log().add_message(e.what(), RED);

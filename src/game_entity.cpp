@@ -50,62 +50,6 @@ float Entity::get_distance_to(Entity* other) {
 //   if (aiComponent_) aiComponent_->save(zip);
 //   if (container_) container_->save(zip);
 // }
-void Entity::save(cereal::JSONOutputArchive& archive) {
-  archive(name_, blocker_);
-  archive(transformComponent_ != nullptr);
-  archive(defenseComponent_ != nullptr);
-  archive(attackComponent_ != nullptr);
-  archive(consumableComponent_ != nullptr);
-  archive(asciiComponent_ != nullptr);
-  archive(aiComponent_ != nullptr);
-  archive(container_ != nullptr);
-  if (transformComponent_) transformComponent_->save(archive);
-  if (asciiComponent_) asciiComponent_->save(archive);
-  if (attackComponent_) attackComponent_->save(archive);
-  if (defenseComponent_) defenseComponent_->save(archive);
-  if (consumableComponent_) consumableComponent_->save(archive);
-  if (aiComponent_) aiComponent_->save(archive);
-  if (container_) container_->save(archive);
-}
-
-void Entity::load(cereal::JSONInputArchive& archive) {
-  archive(name_, blocker_);
-  bool hasTransformComponent, hasDefenseComponent, hasAttackComponent,
-      hasConsumableComponent, hasAsciiComponent, hasAIComponent, hasContainer;
-  archive(hasTransformComponent);
-  archive(hasDefenseComponent);
-  archive(hasAttackComponent);
-  archive(hasConsumableComponent);
-  archive(hasAsciiComponent);
-  archive(hasAIComponent);
-  archive(hasContainer);
-  if (hasTransformComponent) {
-    transformComponent_ = std::make_unique<TransformComponent>(0, 0);
-    transformComponent_->load(archive);
-  }
-  if (hasAsciiComponent) {
-    asciiComponent_ = std::make_unique<ASCIIComponent>("", WHITE, 0);
-    asciiComponent_->load(archive);
-  }
-  if (hasAttackComponent) {
-    attackComponent_ = std::make_unique<AttackComponent>(0);
-    attackComponent_->load(archive);
-  }
-  if (hasDefenseComponent) {
-    defenseComponent_ = std::make_unique<DefenseComponent>(0, 0);
-    defenseComponent_->load(archive);
-  }
-  if (hasConsumableComponent) {
-    consumableComponent_ = ConsumableComponent::create(archive);
-  }
-  if (hasAIComponent) {
-    aiComponent_ = AIComponent::create(archive);
-  }
-  if (hasContainer) {
-    container_ = std::make_unique<Container>(0);
-    container_->load(archive);
-  }
-}
 
 // void Entity::load(TCODZip& zip) {
 //   name_ = zip.getString();

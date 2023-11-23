@@ -138,7 +138,10 @@
     "typeindex": "cpp",
     "valarray": "cpp",
     "__std_stream": "cpp",
-    "__tree": "cpp"
+    "__tree": "cpp",
+    "queue": "cpp",
+    "regex": "cpp",
+    "unordered_set": "cpp"
   },
   "[cpp]": {
     "editor.defaultFormatter": "xaver.clang-format"
