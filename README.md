@@ -44,6 +44,28 @@ Now that you know the template works you'll want to take care the following:
   - When CMake Tools asks for a project select `libtcod-vcpkg-template`.
 - The project will now build and run with F5.
 
+## Building Web Locally
+
+Install `emsdk` [by following the official instructions](https://emscripten.org/docs/getting_started/downloads.html#installation-instructions)
+
+Generate the cmake build with the following command:
+
+```sh
+emcmake cmake -S . -B build_web -G Ninja \
+          -DVCPKG_CHAINLOAD_TOOLCHAIN_FILE="${EMSDK}/upstream/emscripten/cmake/Modules/Platform/Emscripten.cmake" \
+          -DCMAKE_TOOLCHAIN_FILE=vcpkg/scripts/buildsystems/vcpkg.cmake \
+          -DVCPKG_TARGET_TRIPLET=wasm32-emscripten \
+          -DCMAKE_BUILD_TYPE="production"
+```
+
+If the command fails with emcmake not found then you probably forgot to source the `emsdk_end.sh` file.
+
+Run `cmake --build build_web`
+
+To launch a web server run `npx serve ./build_web/bin`
+
+This will launch a server where you will be able to play the game.
+
 ## Resources
 
 - [cpp implementation of the tutorials](https://gitlab.com/libtcod-tutorials/libtcod-tutorials)
