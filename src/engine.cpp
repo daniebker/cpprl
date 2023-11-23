@@ -109,6 +109,8 @@ void Engine::handle_events() {
             engine_state_->on_enter();
           }
         } else if (std::holds_alternative<Quit>(result)) {
+          // TODO: there's a bug here. We should only save
+          // when exiting the game, not when quitting to the main menu.
           save();
           std::exit(EXIT_SUCCESS);
         } else if (std::holds_alternative<NoOp>(result)) {

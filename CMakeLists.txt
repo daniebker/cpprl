@@ -11,6 +11,10 @@ project(
     LANGUAGES C CXX
 )
 
+# Static analysis.
+# set(CMAKE_CXX_CLANG_TIDY "clang-tidy;-checks=*")
+set(CMAKE_CXX_ANALYZE_ON_COMPILE True)
+
 set(CMAKE_RUNTIME_OUTPUT_DIRECTORY "${PROJECT_BINARY_DIR}/bin")  # Keep all runtime files in one directory.
 
 file(

@@ -5,7 +5,6 @@
 
 #include "entity_factory.hpp"
 #include "message_log.hpp"
-#include "persistent.hpp"
 #include "rendering.hpp"
 #include "types/map.hpp"
 
@@ -60,6 +59,7 @@ class World {
     }
     archive(entities_);
     player_->pack(archive);
+    archive(message_log_);
   }
 
   template <class Archive>
@@ -77,6 +77,7 @@ class World {
     player_ = new Entity("", false, nullptr, nullptr);
     player_->unpack(archive);
     spawn_player(player_);
+    archive(message_log_);
   }
 };
 }  // namespace cpprl

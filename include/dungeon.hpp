@@ -4,7 +4,6 @@
 #include <vector>
 
 #include "game_entity.hpp"
-#include "persistent.hpp"
 #include "types/map.hpp"
 
 struct DungeonConfig {

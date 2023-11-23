@@ -4,11 +4,12 @@
 #include <fmt/core.h>
 #include <fmt/format.h>
 
+#include <cereal/types/memory.hpp>
+#include <cereal/types/vector.hpp>
 #include <iostream>
 #include <libtcod.hpp>
 
 #include "colours.hpp"
-#include "persistent.hpp"
 
 namespace cpprl {
 
@@ -17,15 +18,21 @@ struct Message {
   tcod::ColorRGB colour_;
   int count_;
 
+  Message() = default;
   Message(std::string text, tcod::ColorRGB color = WHITE, int count = 1)
       : text_(text), colour_(color), count_(count) {}
 
   std::string full_text() const {
     return count_ > 1 ? fmt::format("{} (x{})", text_, count_) : text_;
   }
+
+  template <class Archive>
+  void serialize(Archive& archive) {
+    archive(text_, colour_, count_);
+  }
 };
 
-class MessageLog : public Persistent {
+class MessageLog {
  private:
   /**
    * The stored messages.
@@ -63,10 +70,10 @@ class MessageLog : public Persistent {
   void render(
       tcod::Console& console, int x, int y, int width, int height) const;
 
-  // void save(TCODZip& zip) override;
-  // void load(TCODZip& zip) override;
-  void save(cereal::JSONOutputArchive& archive) override;
-  void load(cereal::JSONInputArchive& archive) override;
+  template <class Archive>
+  void serialize(Archive& archive) {
+    archive(messages_, max_messages_);
+  }
 };
 
 }  // namespace cpprl
