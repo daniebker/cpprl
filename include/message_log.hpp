@@ -72,6 +72,8 @@ class MessageLog {
 
   template <class Archive>
   void serialize(Archive& archive) {
+    // TODO: this is where we blow up
+    // when using binary serialisation (tested on a mac m1)
     archive(messages_, max_messages_);
   }
 };

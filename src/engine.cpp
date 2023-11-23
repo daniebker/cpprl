@@ -45,6 +45,8 @@ void Engine::save() {
     std::filesystem::remove(std::filesystem::path("saves/game.sav"));
 
   } else {
+    // TODO: this doesn't work with binary serialization
+    // but it works fine for JSON ?!
     serialization::JsonSerializerStrategy serializer("saves/game.sav");
     serializer.serialize(*world_);
   }
@@ -62,9 +64,13 @@ void Engine::save() {
 
 void Engine::load() {
   if (std::filesystem::exists(std::filesystem::path("saves/game.sav"))) {
-
+    // TODO: maybe I can use the build flags to use a
+    // different strategy for web vs native?
     serialization::JsonSerializerStrategy serializer("saves/game.sav");
     world_ = std::make_unique<World>();
+    // TODO: Web serialization is completely broken. Get a memory error
+    // when trying to load. Can't even inspect the file in the browser.
+    // get's as far as setting the dungeon seed and then blows up.
     serializer.deserialize(*world_);
 
     engine_state_->on_exit();
