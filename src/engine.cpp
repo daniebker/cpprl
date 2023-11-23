@@ -45,9 +45,6 @@ void Engine::save() {
     std::filesystem::remove(std::filesystem::path("saves/game.sav"));
 
   } else {
-    std::ofstream os("saves/game.sav", std::ios::binary);
-    cereal::JSONOutputArchive archive(os);
-    // world_->save(archive);
     serialization::JsonSerializerStrategy serializer("saves/game.sav");
     serializer.serialize(*world_);
   }
@@ -65,11 +62,10 @@ void Engine::save() {
 
 void Engine::load() {
   if (std::filesystem::exists(std::filesystem::path("saves/game.sav"))) {
-    std::ifstream is("saves/game.sav", std::ios::binary);
-    cereal::JSONInputArchive archive(is);
 
+    serialization::JsonSerializerStrategy serializer("saves/game.sav");
     world_ = std::make_unique<World>();
-    archive(*world_);
+    serializer.deserialize(*world_);
 
     engine_state_->on_exit();
     engine_state_ = std::make_unique<InGameState>(*world_);
