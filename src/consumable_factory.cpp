@@ -1,5 +1,7 @@
 #include "consumable_factory.hpp"
 
+#include <memory>
+
 #include "components.hpp"
 
 namespace cpprl {
@@ -13,25 +15,25 @@ Entity* AbstractConsumableFactory::create_base(
 }
 
 Entity* HealthPotionFactory::create() {
-  auto* entity = create_base("Health Potion", RED, "!");
+  Entity* entity = create_base("Health Potion", RED, "!");
   entity->set_consumable_component(std::make_unique<HealingConsumable>(10));
   return entity;
 }
 
 Entity* LightningScrollFactory::create() {
-  auto* entity = create_base("Lightning Scroll", DARK_RED, "#");
+  Entity* entity = create_base("Lightning Scroll", DARK_RED, "#");
   entity->set_consumable_component(std::make_unique<LightningBolt>(5, 20));
   return entity;
 }
 
 Entity* FireballScrollFactory::create() {
-  auto* entity = create_base("Fireball Scroll", DARK_RED, "#");
+  Entity* entity = create_base("Fireball Scroll", DARK_RED, "#");
   entity->set_consumable_component(std::make_unique<FireSpell>(3, 5, 20));
   return entity;
 }
 
 Entity* ConfusionScrollFactory::create() {
-  auto* entity = create_base("Confusion Scroll", DARK_RED, "#");
+  Entity* entity = create_base("Confusion Scroll", DARK_RED, "#");
   entity->set_consumable_component(std::make_unique<ConfusionSpell>(5, 0));
   return entity;
 }

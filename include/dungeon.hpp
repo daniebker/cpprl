@@ -4,7 +4,6 @@
 #include <vector>
 
 #include "game_entity.hpp"
-#include "persistent.hpp"
 #include "types/map.hpp"
 
 struct DungeonConfig {
@@ -17,7 +16,7 @@ struct DungeonConfig {
 };
 
 namespace cpprl {
-class Dungeon : public Persistent {
+class Dungeon {
  private:
   std::vector<Vector2D> l_tunnel_between(Vector2D start, Vector2D end);
   TCODRandom* rng_;
@@ -27,10 +26,13 @@ class Dungeon : public Persistent {
   Dungeon() {
     seed_ = TCODRandom::getInstance()->getInt(0, 0x7FFFFFFF);
   };
-  ~Dungeon() { delete rng_; };
-  Map* generate(DungeonConfig config);
-  void save(TCODZip& zip) override;
-  void load(TCODZip& zip) override;
+  virtual ~Dungeon() { delete rng_; };
+  std::unique_ptr<Map> generate(DungeonConfig config);
+
+  template <class Archive>
+  void serialize(Archive& archive) {
+    archive(seed_);
+  }
 };
 }  // namespace cpprl
 

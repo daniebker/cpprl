@@ -1,14 +1,16 @@
 #include "dungeon.hpp"
 
+#include <memory>
 #include <tuple>
 
 #include "rectangular_room.hpp"
 #include "types/map.hpp"
 
 namespace cpprl {
-Map* Dungeon::generate(DungeonConfig dungeon_config) {
+std::unique_ptr<Map> Dungeon::generate(DungeonConfig dungeon_config) {
   rng_ = new TCODRandom(seed_, TCOD_RNG_CMWC);
-  Map* map = new Map(dungeon_config.map_width, dungeon_config.map_height);
+  std::unique_ptr<Map> map = std::make_unique<Map>(
+      dungeon_config.map_width, dungeon_config.map_height);
   auto rooms = std::vector<RectangularRoom>{};
 
   for (int i = 0; i < dungeon_config.max_rooms; i++) {
@@ -71,8 +73,10 @@ std::vector<Vector2D> Dungeon::l_tunnel_between(Vector2D start, Vector2D end) {
   return tunnel;
 }
 
-void Dungeon::save(TCODZip& zip) { zip.putInt(seed_); }
+// void Dungeon::save(TCODZip& zip) { zip.putInt(seed_); }
+// void Dungeon::save(cereal::JSONOutputArchive& archive) { archive(seed_); }
 
-void Dungeon::load(TCODZip& zip) { seed_ = zip.getInt(); }
+// void Dungeon::load(TCODZip& zip) { seed_ = zip.getInt(); }
+// void Dungeon::load(cereal::JSONInputArchive& archive) { archive(seed_); }
 
 }  // namespace cpprl

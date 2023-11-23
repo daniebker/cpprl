@@ -33,10 +33,10 @@ void EntityManager::place_entities(
     if (random->getFloat(0.0f, 1.0f) < 0.8f) {
       Entity* entity = orc_factory_->create();
       entity->get_transform_component().move({x, y});
-      spawn(entity);
+      spawn(std::move(entity));
     } else {
       Entity* entity = troll_factory_->create();
-      spawn(entity, {x, y});
+      spawn(std::move(entity), {x, y});
     }
   }
 
@@ -56,20 +56,20 @@ void EntityManager::place_entities(
     if (dice <= 0.7f) {
       auto health_potion_factory = std::make_unique<HealthPotionFactory>();
       Entity* entity = health_potion_factory->create();
-      spawn(entity, {x, y});
+      spawn(std::move(entity), {x, y});
     } else if (dice <= .8f) {
       auto lighting_scroll_factory = std::make_unique<LightningScrollFactory>();
       Entity* entity = lighting_scroll_factory->create();
-      spawn(entity, {x, y});
+      spawn(std::move(entity), {x, y});
     } else if (dice <= .9f) {
       auto fireball_scroll_factory = std::make_unique<FireballScrollFactory>();
       Entity* entity = fireball_scroll_factory->create();
-      spawn(entity, {x, y});
+      spawn(std::move(entity), {x, y});
     } else if (dice <= 1.0f) {
       auto confusion_scroll_factory =
           std::make_unique<ConfusionScrollFactory>();
       Entity* entity = confusion_scroll_factory->create();
-      spawn(entity, {x, y});
+      spawn(std::move(entity), {x, y});
     }
   }
 }
@@ -103,7 +103,7 @@ std::vector<Entity*> EntityManager::get_entities_at(Vector2D position) {
 }
 
 Entity* EntityManager::get_blocking_entity_at(Vector2D position) {
-  for (Entity* entity : entities_) {
+  for (const auto& entity : entities_) {
     if (entity->is_blocking() &&
         entity->get_transform_component().get_position() == position) {
       return entity;
@@ -113,7 +113,7 @@ Entity* EntityManager::get_blocking_entity_at(Vector2D position) {
 }
 
 Entity* EntityManager::get_non_blocking_entity_at(Vector2D position) {
-  for (Entity* entity : entities_) {
+  for (const auto& entity : entities_) {
     if (!entity->is_blocking() &&
         entity->get_transform_component().get_position() == position) {
       return entity;
@@ -135,7 +135,7 @@ Entity* EntityManager::get_closest_living_monster(
     Vector2D position, float range) const {
   Entity* closest = nullptr;
   float best_distance = 1E6f;
-  for (Entity* entity : entities_) {
+  for (const auto& entity : entities_) {
     auto* defense_component = &entity->get_defense_component();
     auto* ai_component = &entity->get_ai_component();
     if (ai_component && defense_component) {

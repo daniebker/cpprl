@@ -1,7 +1,9 @@
 #pragma once
 
+#include <memory>
 #include <vector>
 
+#include "colours.hpp"
 #include "entity_factory.hpp"
 #include "game_entity.hpp"
 #include "rectangular_room.hpp"
@@ -10,6 +12,7 @@
 namespace cpprl {
 class EntityManager {
  public:
+  EntityManager() = default;
   EntityManager(
       std::unique_ptr<AbstractEntityFactory> orc_factory,
       std::unique_ptr<AbstractEntityFactory> troll_factory)
@@ -30,10 +33,11 @@ class EntityManager {
   void remove(Entity* entity);
   size_t size() const { return entities_.size(); }
 
-  Entity& at(int index) { return *entities_.at(index); }
+  Entity* at(int index) { return entities_.at(index); }
 
   using iterator = std::vector<Entity*>::iterator;
   using const_iterator = std::vector<Entity*>::const_iterator;
+  // Iterator for EntityManager
 
   iterator begin() { return entities_.begin(); }
 
@@ -42,6 +46,29 @@ class EntityManager {
   const_iterator begin() const { return entities_.begin(); }
 
   const_iterator end() const { return entities_.end(); }
+
+  template <class Archive>
+  void save(Archive& archive) const {
+    archive(entities_.size() - 1);
+    for (auto& entity : entities_) {
+      if (entity->get_name() == "Player") {
+        continue;
+      }
+      entity->pack(archive);
+    }
+  }
+
+  template <class Archive>
+  void load(Archive& archive) {
+    size_t size;
+    archive(size);
+    entities_.reserve(size);
+    for (size_t i = 0; i < size; i++) {
+      Entity* entity = new Entity("", false, nullptr, nullptr);
+      entity->unpack(archive);
+      entities_.emplace_back(entity);
+    }
+  }
 
  private:
   std::vector<Entity*> entities_;

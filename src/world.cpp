@@ -12,9 +12,9 @@ namespace cpprl {
 World::World()
     : entities_(std::make_unique<EntityManager>(
           std::make_unique<OrcFactory>(), std::make_unique<TrollFactory>())),
-      player_(nullptr),
       map_(nullptr),
-      current_window_(nullptr) {
+      current_window_(nullptr),
+      player_(nullptr) {
   controller_ = std::make_unique<Controller>();
   dungeon_ = std::make_unique<Dungeon>();
   message_log_ = std::make_unique<MessageLog>();
@@ -48,7 +48,7 @@ void World::generate_map(int width, int height, bool with_entities) {
   auto player_factory_ = std::make_unique<PlayerFactory>();
   Entity* player = player_factory_->create();
   player_ = entities_->spawn(
-      player, {rooms[0].get_center().x, rooms[0].get_center().y});
+      std::move(player), {rooms[0].get_center().x, rooms[0].get_center().y});
   map_->compute_fov(player_->get_transform_component().get_position(), 4);
   DefenseComponent& player_defense = player_->get_defense_component();
   health_bar_ = new HealthBar(20, 1, {2, 36}, player_defense);
@@ -59,7 +59,7 @@ void World::render(Renderer& renderer) {
   map_->compute_fov(player_->get_transform_component().get_position(), 10);
   map_->render(g_console);
 
-  for (Entity* entity : *entities_) {
+  for (const auto& entity : *entities_) {
     if (map_->is_in_fov(entity->get_transform_component().get_position())) {
       renderer.render(
           entity->get_sprite_component(), entity->get_transform_component());
@@ -85,7 +85,7 @@ void World::render(Renderer& renderer) {
 }
 
 void World::handle_enemy_turns() {
-  for (Entity* entity : *entities_) {
+  for (const auto& entity : *entities_) {
     auto* ai_component = &entity->get_ai_component();
     if (ai_component && entity->get_defense_component().is_not_dead()) {
       try {
@@ -97,47 +97,18 @@ void World::handle_enemy_turns() {
   }
 }
 
+void World::spawn_player(Entity* player) {
+  player_ = entities_->spawn(player);
+  DefenseComponent& player_defense = player_->get_defense_component();
+  health_bar_ = new HealthBar(20, 1, {2, 36}, player_defense);
+}
+
 void World::reset() { entities_->clear(); }
 
 void World::scroll_current_view(int scroll_amount) {
   if (current_window_) {
     current_window_->set_cursor(current_window_->get_cursor() + scroll_amount);
   }
-}
-
-void World::save(TCODZip& zip) {
-  zip.putInt(get_map().get_width());
-  zip.putInt(get_map().get_height());
-  dungeon_->save(zip);
-  map_->save(zip);
-  get_player()->save(zip);
-  zip.putInt(get_entities().size() - 1);
-  for (auto& entity : get_entities()) {
-    if (entity->get_name() != "Player") {
-      entity->save(zip);
-    }
-  }
-  get_message_log().save(zip);
-}
-
-void World::load(TCODZip& zip) {
-  int width = zip.getInt();
-  int height = zip.getInt();
-  dungeon_->load(zip);
-  generate_map(width, height, false);
-  map_->load(zip);
-  Entity* player = new Entity("", false, nullptr, nullptr);
-  player->load(zip);
-  player_ = entities_->spawn(player);
-  DefenseComponent& player_defense = player_->get_defense_component();
-  health_bar_ = new HealthBar(20, 1, {2, 36}, player_defense);
-  int num_entities = zip.getInt();
-  for (int i = 0; i < num_entities; ++i) {
-    Entity* entity = new Entity("", false, nullptr, nullptr);
-    entity->load(zip);
-    entities_->spawn(entity);
-  }
-  get_message_log().load(zip);
 }
 
 }  // namespace cpprl

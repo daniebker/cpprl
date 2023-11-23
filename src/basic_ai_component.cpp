@@ -22,27 +22,11 @@ bool can_path_to_target(tcod::BresenhamLine& path, World& world) {
   return true;
 }
 
-std::unique_ptr<AIComponent> AIComponent::create(TCODZip& zip) {
-  AiType type = static_cast<AiType>(zip.getInt());
-  std::unique_ptr<AIComponent> ai = nullptr;
-  switch (type) {
-    case HOSTILE:
-      ai = std::make_unique<HostileAI>();
-      break;
-    case CONFUSED:
-      ai = std::make_unique<ConfusionAI>(0, nullptr);
-      break;
-  }
-  ai->load(zip);
-  return ai;
-}
-
 void HostileAI::update(World& world, Entity* entity) {
   Vector2D position = entity->get_transform_component().get_position();
   if (world.get_map().is_in_fov(position)) {
     Entity* player = world.get_player();
-    Vector2D player_position =
-        player->get_transform_component().get_position();
+    Vector2D player_position = player->get_transform_component().get_position();
     Vector2D delta = player_position - position;
 
     int distance = std::max(std::abs(delta.x), std::abs(delta.y));
@@ -68,12 +52,9 @@ void HostileAI::update(World& world, Entity* entity) {
     action.execute();
   }
 }
-void HostileAI::load(TCODZip&) {}
-void HostileAI::save(TCODZip& zip) { zip.putInt(HOSTILE); }
 
 ConfusionAI::ConfusionAI(int num_turns, std::unique_ptr<AIComponent> old_ai)
     : num_turns_(num_turns), old_ai_(std::move(old_ai)) {}
-
 void ConfusionAI::update(World& world, Entity* entity) {
   TCODRandom* random = TCODRandom::getInstance();
   int dx = random->getInt(-1, 1);
@@ -85,16 +66,5 @@ void ConfusionAI::update(World& world, Entity* entity) {
   } else {
     entity->set_ai_component(std::move(old_ai_));
   }
-}
-
-void ConfusionAI::load(TCODZip& zip) {
-  num_turns_ = zip.getInt();
-  old_ai_ = AIComponent::create(zip);
-}
-
-void ConfusionAI::save(TCODZip& zip) {
-  zip.putInt(CONFUSED);
-  zip.putInt(num_turns_);
-  old_ai_->save(zip);
 }
 }  // namespace cpprl

@@ -121,5 +121,6 @@ Temporary Items
 # Default build directory
 build
 
+saves/
 game.sav
 build_web/

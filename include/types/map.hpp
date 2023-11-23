@@ -19,6 +19,11 @@ enum class TileType {
 struct Tile {
   bool explored;
   TileType type;
+
+  template <class Archive>
+  void serialize(Archive& archive) {
+    archive(explored, type);
+  }
 };
 
 struct TileGraphic {
@@ -39,10 +44,11 @@ inline void with_indexes(const Array& array, F func) {
   with_indexes(array.get_width(), array.get_height(), func);
 }
 
-class Map : public Persistent {
+class Map {
  public:
+  Map() : Map(0, 0){};
   Map(int width, int height);
-  ~Map();
+  ~Map() = default;
   int get_height() const { return height_; }
   int get_width() const { return width_; }
   bool is_in_bounds(Vector2D position) const;
@@ -76,8 +82,27 @@ class Map : public Persistent {
   }
   bool set_target_tile(Vector2D position, Entity& player);
   Vector2D get_highlight_tile() { return target_tile_; }
-  void save(TCODZip& zip) override;
-  void load(TCODZip& zip) override;
+
+  template <class Archive>
+  void save(Archive& archive) const {
+    archive(width_, height_);
+    for (int y{0}; y < get_height(); ++y) {
+      for (int x{0}; x < get_width(); ++x) {
+        archive(tiles_.at({x, y}).explored);
+      }
+    }
+  }
+
+  template <class Archive>
+  void load(Archive& archive) {
+    archive(width_, height_);
+    // TODO: Failing here because map is 0,0
+    for (int y{0}; y < get_height(); ++y) {
+      for (int x{0}; x < get_width(); ++x) {
+        archive(tiles_.at({x, y}).explored);
+      }
+    }
+  }
 
  private:
   /** The wall tile */

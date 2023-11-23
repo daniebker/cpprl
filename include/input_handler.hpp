@@ -19,7 +19,7 @@ class EventHandler {
       : world_(world),
         noop_(new NoOpEvent(world)),
         quitCommand_(new QuitCommand(world)){};
-  virtual ~EventHandler() { delete quitCommand_; };
+  virtual ~EventHandler() = default;
   virtual EngineEvent* handle_sdl_event(SDL_Event event) noexcept = 0;
 
  protected:
@@ -59,20 +59,7 @@ class GameInputHandler final : public EventHandler {
 
  public:
   GameInputHandler(World& world, Entity* controllable_entity);
-  ~GameInputHandler() {
-    delete button_right_;
-    delete button_up_;
-    delete button_down_;
-    delete button_up_right_;
-    delete button_up_left_;
-    delete button_left_;
-    delete button_down_right_;
-    delete button_down_left_;
-    delete view_history_command_;
-    delete pick_up_command_;
-    delete inventory_command_;
-    delete main_menu_command_;
-  };
+  ~GameInputHandler() = default;
 
   virtual EngineEvent* handle_sdl_event(SDL_Event event) noexcept override;
 };
@@ -84,7 +71,7 @@ class MenuInputHandler final : public EventHandler {
  public:
   MenuInputHandler(World& world)
       : EventHandler(world), resetGameCommand_(new ResetGameCommand(world)){};
-  ~MenuInputHandler() { delete resetGameCommand_; };
+  ~MenuInputHandler() = default;
   virtual EngineEvent* handle_sdl_event(SDL_Event event) noexcept override;
 };
 
@@ -99,14 +86,7 @@ class GuiInputHandler : public EventHandler {
 
  public:
   GuiInputHandler(World& world, UiWindow& ui_window);
-  ~GuiInputHandler() {
-    delete closeViewCommand_;
-    delete scrollDownCommand_;
-    delete scrollUpCommand_;
-    delete jumpUpCommand_;
-    delete jumpDownCommand_;
-    delete jumpToHome_;
-  };
+  ~GuiInputHandler() = default;
 
   virtual EngineEvent* handle_sdl_event(SDL_Event event) noexcept override;
 };
@@ -132,7 +112,7 @@ class InventoryInputHandler final : public GuiInputHandler {
             world, entity, ui_window, ItemSubCommand::USE_ITEM)),
         dropItemCommand_(new SelectItemCommand(
             world, entity, ui_window, ItemSubCommand::DROP_ITEM)){};
-  ~InventoryInputHandler() { delete selectItemCommand_; };
+  ~InventoryInputHandler() = default;
   EngineEvent* handle_sdl_event(SDL_Event event) noexcept override;
 };
 
@@ -144,7 +124,7 @@ class MainMenuInputHandler final : public GuiInputHandler {
   MainMenuInputHandler(World& world, UiWindow& ui_window)
       : GuiInputHandler(world, ui_window),
         selectMenuItemCommand_(new SelectMenuItemCommand(world, ui_window)){};
-  ~MainMenuInputHandler() { delete selectMenuItemCommand_; };
+  ~MainMenuInputHandler() = default;
   EngineEvent* handle_sdl_event(SDL_Event event) noexcept override;
 };
 }  // namespace cpprl

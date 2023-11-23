@@ -11,6 +11,10 @@ project(
     LANGUAGES C CXX
 )
 
+# Static analysis.
+# set(CMAKE_CXX_CLANG_TIDY "clang-tidy;-checks=*")
+set(CMAKE_CXX_ANALYZE_ON_COMPILE True)
+
 set(CMAKE_RUNTIME_OUTPUT_DIRECTORY "${PROJECT_BINARY_DIR}/bin")  # Keep all runtime files in one directory.
 
 file(
@@ -43,7 +47,7 @@ endif()
 
 if (EMSCRIPTEN)
     # Attach data folder to Emscripten builds.
-    target_link_options(${PROJECT_NAME} PRIVATE --preload-file "${CMAKE_CURRENT_SOURCE_DIR}/data@data" -fexceptions)
+    target_link_options(${PROJECT_NAME} PRIVATE --preload-file "${CMAKE_CURRENT_SOURCE_DIR}/data@data" -fexceptions -lidbfs.js)
     target_compile_options(${PROJECT_NAME} PRIVATE -fexceptions)
     # Set output to html to generate preview pages, otherwise you'll have to make your own html.
     configure_file(
@@ -61,11 +65,13 @@ endif()
 find_package(fmt CONFIG REQUIRED)
 find_package(SDL2 CONFIG REQUIRED)
 find_package(libtcod CONFIG REQUIRED)
+find_package(cereal CONFIG REQUIRED)
 target_link_libraries(
     ${PROJECT_NAME}
     PRIVATE
         SDL2::SDL2
         SDL2::SDL2main
         libtcod::libtcod
+        cereal::cereal
         fmt::fmt
 )
