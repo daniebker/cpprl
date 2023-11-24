@@ -15,11 +15,10 @@ class ASCIIComponent;
 class AttackComponent;
 class DefenseComponent;
 class ConsumableComponent;
-// class AIComponent;
 class Container;
 
 class Entity {
- protected:
+ private:
   std::string name_;
   bool blocker_;
   std::unique_ptr<TransformComponent> transformComponent_;
@@ -53,12 +52,12 @@ class Entity {
   Container& get_container() { return *container_; };
   float get_distance_to(Entity* other);
 
-  bool is_blocking() { return blocker_; };
-  std::string get_name() { return name_; };
+  bool is_blocking() const { return blocker_; };
+  std::string get_name() const { return name_; };
 
   void update(World& world);
   void set_blocking(bool blocker) { blocker_ = blocker; };
-  void set_name(std::string name) { name_ = name; };
+  void set_name(std::string_view const& name) { name_ = name; };
   void set_ascii_component(std::unique_ptr<ASCIIComponent> asciiComponent);
   void set_defense_component(
       std::unique_ptr<DefenseComponent> defenseComponent);
@@ -90,8 +89,13 @@ class Entity {
 
   template <class Archive>
   void unpack(Archive& archive) {
-    bool hasTransformComponent, hasDefenseComponent, hasAttackComponent,
-        hasConsumableComponent, hasAsciiComponent, hasAIComponent, hasContainer;
+    bool hasTransformComponent;
+    bool hasDefenseComponent;
+    bool hasAttackComponent;
+    bool hasConsumableComponent;
+    bool hasAsciiComponent;
+    bool hasAIComponent;
+    bool hasContainer;
 
     archive(name_, blocker_);
     archive(hasTransformComponent);
