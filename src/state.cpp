@@ -10,8 +10,8 @@ namespace cpprl {
 
 StateResult State::on_update(SDL_Event& event) {
   try {
-    EngineEvent* command = input_handler_->handle_sdl_event(event);
-    return command->execute();
+    EngineEvent& command = input_handler_->handle_sdl_event(event);
+    return command.execute();
   } catch (const Impossible& impossible) {
     world_.get_message_log().add_message(impossible.what(), RED);
     return {};
@@ -40,9 +40,8 @@ void PickTileState::on_enter() {
 
 StateResult PickTileState::on_update(SDL_Event& event) {
   try {
-    EngineEvent* command = input_handler_->handle_sdl_event(event);
-    StateResult result = command->execute();
-    delete command;
+    EngineEvent& command = input_handler_->handle_sdl_event(event);
+    StateResult result = command.execute();
     return result;
   } catch (const Impossible& impossible) {
     world_.get_message_log().add_message(impossible.what(), RED);
