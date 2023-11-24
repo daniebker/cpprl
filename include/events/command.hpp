@@ -9,13 +9,25 @@
 namespace cpprl {
 class UiWindow;
 
+/**
+ * @brief Base class for all events that can be executed by the engine.
+ */
 class EngineEvent {
  protected:
   World& world_;
 
  public:
+  /**
+   * @brief Construct a new Engine Event object
+   * @param world The world that the event will be executed in.
+   */
   EngineEvent(World& world) : world_(world) {}
   virtual ~EngineEvent() {}
+  /**
+   * @brief Execute the event.
+   * @return StateResult The result of the event.
+   * @see StateResult
+   */
   virtual StateResult execute() = 0;
 };
 
