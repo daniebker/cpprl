@@ -65,9 +65,9 @@ class Map {
   bool is_walkable(Vector2D position) const;
   Array2D<Tile>& get_tiles() { return tiles_; }
   void set_tiles_range(std::tuple<Vector2D, Vector2D> bounds, Tile tile);
-  void set_rooms(std::vector<RectangularRoom> rooms) { _rooms = rooms; }
-  RectangularRoom get_first_room() { return _rooms.front(); }
-  std::vector<RectangularRoom> get_rooms() { return _rooms; }
+  void set_rooms(std::vector<RectangularRoom> rooms) { rooms_ = rooms; }
+  RectangularRoom get_first_room() { return rooms_.front(); }
+  std::vector<RectangularRoom> get_rooms() { return rooms_; }
   void set_tiles_at(Vector2D position, Tile tile);
   /** Returns the wall tile for this map */
   TileGraphic& get_wall_tile() { return wall_tile_; }
@@ -115,7 +115,7 @@ class Map {
   Array2D<Tile> tiles_;
   /** The tcod map */
   TCODMap tcod_map_;
-  std::vector<RectangularRoom> _rooms;
+  std::vector<RectangularRoom> rooms_;
   Vector2D target_tile_ = {0, 0};
   bool target_mode_ = false;
   float max_range_ = 0.0f;
