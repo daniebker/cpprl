@@ -20,7 +20,7 @@ class Dungeon {
  private:
   std::vector<Vector2D> l_tunnel_between(Vector2D start, Vector2D end);
   TCODRandom rng_;
-  long seed_;
+  uint32_t seed_;
 
  public:
   Dungeon() {

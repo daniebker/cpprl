@@ -31,7 +31,7 @@ class World {
   virtual ~World() = default;
 
   MessageLog& get_message_log() { return *message_log_; }
-  Map& get_map() { return *map_; }
+  Map& get_map() const { return *map_; }
   EntityManager& get_entities() { return *entities_; }
   void reset();
 

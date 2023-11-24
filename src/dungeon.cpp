@@ -9,7 +9,7 @@
 namespace cpprl {
 std::unique_ptr<Map> Dungeon::generate(DungeonConfig dungeon_config) {
   rng_ = TCODRandom(seed_, TCOD_RNG_CMWC);
-  std::unique_ptr<Map> map = std::make_unique<Map>(
+  auto map = std::make_unique<Map>(
       dungeon_config.map_width, dungeon_config.map_height);
   auto rooms = std::vector<RectangularRoom>{};
 
@@ -22,9 +22,9 @@ std::unique_ptr<Map> Dungeon::generate(DungeonConfig dungeon_config) {
     int x = rng_.getInt(0, dungeon_config.map_width - room_width - 1);
     int y = rng_.getInt(0, dungeon_config.map_height - room_height - 1);
 
-    RectangularRoom new_room = RectangularRoom({x, y}, room_width, room_height);
+    auto new_room = RectangularRoom({x, y}, room_width, room_height);
 
-    if (std::any_of(rooms.begin(), rooms.end(), [&](RectangularRoom room) {
+    if (std::ranges::any_of(rooms, [&](RectangularRoom room) {
           return room.intersects(new_room);
         })) {
       continue;
@@ -72,11 +72,4 @@ std::vector<Vector2D> Dungeon::l_tunnel_between(Vector2D start, Vector2D end) {
 
   return tunnel;
 }
-
-// void Dungeon::save(TCODZip& zip) { zip.putInt(seed_); }
-// void Dungeon::save(cereal::JSONOutputArchive& archive) { archive(seed_); }
-
-// void Dungeon::load(TCODZip& zip) { seed_ = zip.getInt(); }
-// void Dungeon::load(cereal::JSONInputArchive& archive) { archive(seed_); }
-
 }  // namespace cpprl
