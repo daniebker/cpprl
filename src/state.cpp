@@ -34,6 +34,25 @@ void ViewInventoryState::on_enter() {
       world_, world_.get_player(), *window_);
 }
 
+void NextLevelState::on_enter() {
+  // gen a new dungeon?
+  world_.get_message_log().add_message(
+      "You take a moment to rest to recover your strength.", WHITE);
+  world_.get_player()->get_defense_component().heal(
+      world_.get_player()->get_defense_component().get_max_hp() / 2);
+  world_.get_message_log().add_message(
+      "After a rare moment of peace, you descend deeper into the heart of the "
+      "dungeon...",
+      WHITE);
+
+  world_.get_entities().clear_except_player();
+  world_.generate_map(80, 35, true);
+}
+
+StateResult NextLevelState::on_update(SDL_Event&) {
+  return Change{std::make_unique<InGameState>(world_)};
+}
+
 void PickTileState::on_enter() {
   input_handler_ = std::make_unique<TargetingInputHandler>(world_);
 }

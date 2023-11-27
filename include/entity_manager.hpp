@@ -20,6 +20,7 @@ class EntityManager {
         orc_factory_(std::move(orc_factory)),
         troll_factory_(std::move(troll_factory)){};
   void clear();
+  void clear_except_player();
   Entity* get_blocking_entity_at(Vector2D position);
   Entity* get_non_blocking_entity_at(Vector2D position);
   Entity* get_closest_living_monster(Vector2D position, float range) const;

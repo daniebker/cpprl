@@ -71,7 +71,8 @@ GameInputHandler::GameInputHandler(World& world, Entity* controllable_entity)
       view_history_command_(new ViewHistoryCommand(world_)),
       pick_up_command_(new PickupCommand(world, controllable_entity)),
       inventory_command_(new InventoryCommand(world, controllable_entity)),
-      main_menu_command_(new MainMenuCommand(world)){};
+      main_menu_command_(new MainMenuCommand(world)),
+      controllable_entity_(controllable_entity){};
 
 EngineEvent* GameInputHandler::handle_sdl_event(SDL_Event event) noexcept {
   // TODO: Move this to its own handler.
@@ -85,50 +86,35 @@ EngineEvent* GameInputHandler::handle_sdl_event(SDL_Event event) noexcept {
 
   SDL_Keycode key = event.key.keysym.sym;
 
-  switch (key) {
-    case SDLK_e:
-      return button_up_right_;
-      break;
-    case SDLK_q:
-      return button_up_left_;
-      break;
-    case SDLK_z:
-      return button_down_left_;
-      break;
-    case SDLK_c:
-      return button_down_right_;
-      break;
-    case SDLK_w:
-    case SDLK_UP:
-      return button_up_;
-      break;
-    case SDLK_s:
-    case SDLK_DOWN:
-      return button_down_;
-      break;
-    case SDLK_a:
-    case SDLK_LEFT:
-      return button_left_;
-      break;
-    case SDLK_d:
-    case SDLK_RIGHT:
-      return button_right_;
-      break;
-    case SDLK_v:
-      return view_history_command_;
-      break;
-    case SDLK_g:
-      return pick_up_command_;
-      break;
-    case SDLK_i:
-      return inventory_command_;
-      break;
-    case SDLK_COMMA:
-      return main_menu_command_;
-      break;
-    default:
-      return EventHandler::handle_sdl_event(event);
-      break;
+  if (key == SDLK_e) {
+    return button_up_right_;
+  } else if (key == SDLK_q) {
+    return button_up_left_;
+  } else if (key == SDLK_z) {
+    return button_down_left_;
+  } else if (key == SDLK_c) {
+    return button_down_right_;
+  } else if (key == SDLK_w || key == SDLK_UP) {
+    return button_up_;
+  } else if (key == SDLK_s || key == SDLK_DOWN) {
+    return button_down_;
+  } else if (key == SDLK_a || key == SDLK_LEFT) {
+    return button_left_;
+  } else if (key == SDLK_d || key == SDLK_RIGHT) {
+    return button_right_;
+  } else if (key == SDLK_v) {
+    return view_history_command_;
+  } else if (key == SDLK_g) {
+    return pick_up_command_;
+  } else if (key == SDLK_i) {
+    return inventory_command_;
+  } else if (key == SDLK_COMMA) {
+    return main_menu_command_;
+  } else if (key == SDLK_LEFTBRACKET) {
+    return new UseCommand(
+        world_, controllable_entity_->get_transform_component().get_position());
+  } else {
+    return EventHandler::handle_sdl_event(event);
   }
 };
 

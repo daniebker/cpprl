@@ -5,6 +5,7 @@
 
 #include "rectangular_room.hpp"
 #include "types/map.hpp"
+#include "types/tile.hpp"
 
 namespace cpprl {
 std::unique_ptr<Map> Dungeon::generate(DungeonConfig dungeon_config) {
@@ -31,8 +32,7 @@ std::unique_ptr<Map> Dungeon::generate(DungeonConfig dungeon_config) {
       continue;
     }
 
-    map->set_tiles_range(
-        new_room.innerBounds(), {false, TileType::floor, false});
+    map->set_tiles_range(new_room.innerBounds(), FLOOR_TILE);
 
     last_room_center = new_room.get_center();
     if (!rooms.empty()) {
@@ -41,13 +41,12 @@ std::unique_ptr<Map> Dungeon::generate(DungeonConfig dungeon_config) {
           l_tunnel_between(previous_room_center, new_room.get_center());
 
       for (const Vector2D position : tunnel) {
-        map->set_tiles_at(position, Tile{false, TileType::floor, false});
+        map->set_tiles_at(position, FLOOR_TILE);
       }
     }
     rooms.push_back(new_room);
   }
-  map->set_tiles_at(
-      last_room_center, Tile{false, TileType::down_stairs, false});
+  map->set_tiles_at(last_room_center, DOWN_STAIRS_TILE);
   map->set_down_stairs_location(last_room_center);
   map->set_rooms(rooms);
 

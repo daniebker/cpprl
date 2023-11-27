@@ -33,6 +33,13 @@ class InGameState final : public State {
   void on_enter() override;
 };
 
+class NextLevelState final : public State {
+ public:
+  NextLevelState(World& world) : State(world) {}
+  void on_enter() override;
+  StateResult on_update(SDL_Event& sdl_event) override;
+};
+
 class PickTileState : public State {
  protected:
   int max_range_;

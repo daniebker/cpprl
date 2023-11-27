@@ -197,27 +197,28 @@ StateResult MovementCommand::execute() {
   return EndTurn{};
 }
 
+StateResult UseCommand::execute() {
+  auto tile_at = world_.get_map().get_tiles().at(position_);
+  if (tile_at.type == TileType::down_stairs) {
+    return Change{std::make_unique<NextLevelState>(world_)};
+  } else {
+    return NoOp{"There are no stairs here."};
+  }
+}
+
 StateResult QuitCommand::execute() { return Quit{}; }
 
 StateResult SelectMenuItemCommand::execute() {
   int cursor = ui_window_.get_cursor();
   MenuSubCommand sub_command;
 
-  // could also be a map in the select menu item command
-  // convert to a map
-  switch (cursor) {
-    case 1:
-      sub_command = MenuSubCommand::NEW_GAME;
-      break;
-    case 2:
-      sub_command = MenuSubCommand::CONTINUE;
-      break;
-    case 3:
-      sub_command = MenuSubCommand::QUIT;
-      break;
-    default:
-      break;
-  }
+  auto subcommand_map = std::map<int, MenuSubCommand>{
+      {1, MenuSubCommand::NEW_GAME},
+      {2, MenuSubCommand::CONTINUE},
+      {3, MenuSubCommand::QUIT},
+  };
+
+  sub_command = subcommand_map[cursor];
 
   if (sub_command && sub_command == MenuSubCommand::CONTINUE) {
     return LoadGame{};

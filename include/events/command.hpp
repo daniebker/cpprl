@@ -78,6 +78,16 @@ class MainMenuCommand final : public EngineEvent {
   StateResult execute() override;
 };
 
+class UseCommand final : public EngineEvent {
+ private:
+  Vector2D position_;
+
+ public:
+  UseCommand(World& world, Vector2D position)
+      : EngineEvent(world), position_(position) {}
+  StateResult execute() override;
+};
+
 enum ItemSubCommand { USE_ITEM, DROP_ITEM };
 class SelectItemCommand final : public Command {
  private:

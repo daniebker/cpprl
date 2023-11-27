@@ -56,6 +56,7 @@ class GameInputHandler final : public EventHandler {
   PickupCommand* pick_up_command_;
   InventoryCommand* inventory_command_;
   MainMenuCommand* main_menu_command_;
+  Entity* controllable_entity_;
 
  public:
   GameInputHandler(World& world, Entity* controllable_entity);

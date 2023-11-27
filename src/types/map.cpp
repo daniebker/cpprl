@@ -7,7 +7,7 @@ namespace cpprl {
 Map::Map(int width, int height)
     : width_(width),
       height_(height),
-      tiles_(width, height, {false, TileType::wall, true}),
+      tiles_(width, height, WALL_TILE),
       tcod_map_(width, height) {
   wall_tile_.light = TCOD_ConsoleTile{'#', WHITE, BLACK};
   wall_tile_.dark = TCOD_ConsoleTile{'#', GREY, BLACK};
@@ -34,10 +34,8 @@ void Map::set_tiles_range(std::tuple<Vector2D, Vector2D> bounds, Tile tile) {
   }
 }
 void Map::set_tiles_at(Vector2D position, Tile tile) {
-  // TODO: why do I have my own tiles array, and the tcod tiles
-  // array? tcod does fov calcs. So why keep my own?
   tcod_map_.setProperties(
-      position.x, position.y, tile.type == TileType::floor, !tile.blocking);
+      position.x, position.y, tile.is_transparent, !tile.blocking);
   tiles_.set(position, tile);
 }
 
@@ -64,25 +62,26 @@ void Map::render(tcod::Console& console) {
   for (int y{0}; y < get_height(); ++y) {
     for (int x{0}; x < get_width(); ++x) {
       if (!console.in_bounds({x, y})) continue;
-      bool isFloor = get_tiles().at({x, y}).type == TileType::floor;
+      Tile tile = get_tiles().at({x, y});
+      bool isFloor = tile.type == TileType::floor;
+      TileGraphic tile_graphic = get_tile_graphic(tile.type);
       if (is_in_fov({x, y})) {
         set_is_explored({x, y});
         TCOD_ConsoleTile floor;
         if (target_mode_) {
-          floor = get_floor_tile().target;
+          floor = tile_graphic.target;
         } else {
-          floor = get_floor_tile().light;
+          floor = tile_graphic.light;
         }
         if (isFloor) {
           console.at({x, y}) = floor;
-        } else if (get_tiles().at({x, y}).type == TileType::down_stairs) {
+        } else if (tile.type == TileType::down_stairs) {
           console.at({x, y}) = downstairs_tile_.light;
         } else {
           console.at({x, y}) = wall_tile_.light;
         }
       } else if (is_explored({x, y})) {
-        console.at({x, y}) =
-            isFloor ? get_floor_tile().dark : get_wall_tile().dark;
+        console.at({x, y}) = isFloor ? tile_graphic.dark : tile_graphic.dark;
       } else {
         console.at({x, y}) = TCOD_ConsoleTile{' ', BLACK_DARK, BLACK_DARK};
       }

@@ -5,6 +5,7 @@
 
 #include "game_entity.hpp"
 #include "types/map.hpp"
+#include "types/tile.hpp"
 
 struct DungeonConfig {
   int max_rooms;
@@ -34,6 +35,7 @@ class Dungeon {
     archive(seed_);
   }
 };
+
 }  // namespace cpprl
 
 #endif

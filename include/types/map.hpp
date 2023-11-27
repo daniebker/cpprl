@@ -5,32 +5,9 @@
 #include "../rectangular_room.hpp"
 #include "math.hpp"
 #include "nparray.hpp"
+#include "types/tile.hpp"
 
 namespace cpprl {
-enum class TileType { wall = 0, floor, down_stairs };
-
-/**
- * Tile struct. Gives us the type of the tile
- * it's current visibility and if it's been explored.
- */
-struct Tile {
-  bool explored;
-  TileType type;
-  bool blocking;
-
-  Tile() = default;
-  Tile(bool explored, TileType type, bool blocking)
-      : explored(explored), type(type), blocking(blocking) {}
-
-  template <class Archive>
-  void serialize(Archive& archive) {
-    archive(explored, type);
-  }
-};
-
-struct TileGraphic {
-  TCOD_ConsoleTile light, dark, target;
-};
 
 template <typename Func>
 inline void with_indexes(int width, int height, Func func) {
@@ -78,6 +55,24 @@ class Map {
   TileGraphic& get_wall_tile() { return wall_tile_; }
   /** Returns the floor tile for this map */
   TileGraphic& get_floor_tile() { return floor_tile_; }
+
+  /**
+   * @brief Returns the tile graphic for the given tile type.
+   * @param type The tile type.
+   * @return The tile graphic.
+   */
+  TileGraphic& get_tile_graphic(TileType type) {
+    if (type == TileType::wall) {
+      return wall_tile_;
+    } else if (type == TileType::floor) {
+      return floor_tile_;
+    } else if (type == TileType::down_stairs) {
+      return downstairs_tile_;
+    } else {
+      return wall_tile_;
+    }
+  }
+
   /** Render the map */
   void render(tcod::Console& console);
   void set_highlight_tile(Vector2D position);
@@ -119,7 +114,10 @@ class Map {
   int width_, height_;
   /** This maps tiles */
   Array2D<Tile> tiles_;
-  /** The tcod map */
+
+  /**
+   * @brief tcod map used for fov calculations
+   */
   TCODMap tcod_map_;
   std::vector<RectangularRoom> _rooms;
   Vector2D target_tile_ = {0, 0};

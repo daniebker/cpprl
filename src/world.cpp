@@ -45,6 +45,8 @@ void World::generate_map(int width, int height, bool with_entities) {
     entities_->place_entities(*it, 2, 1);
   }
 
+  // TODO: This won't work with the levels system.
+  // Player will be created twice.
   auto player_factory_ = std::make_unique<PlayerFactory>();
   Entity* player = player_factory_->create();
   player_ = entities_->spawn(
