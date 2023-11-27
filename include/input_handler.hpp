@@ -17,79 +17,82 @@ class EventHandler {
  public:
   EventHandler(World& world)
       : world_(world),
-        noop_(new NoOpEvent(world)),
-        quitCommand_(new QuitCommand(world)){};
+        noop_(std::make_unique<NoOpEvent>(world)),
+        quitCommand_(std::make_unique<QuitCommand>(world)){};
   virtual ~EventHandler() = default;
-  virtual EngineEvent* handle_sdl_event(SDL_Event event) noexcept = 0;
+  virtual EngineEvent& handle_sdl_event(SDL_Event event) noexcept = 0;
 
  protected:
   World& world_;
-  NoOpEvent* noop_;
+  std::unique_ptr<NoOpEvent> noop_;
 
  private:
-  QuitCommand* quitCommand_;
+  std::unique_ptr<QuitCommand> quitCommand_;
 };
 
 class TargetingInputHandler final : public EventHandler {
  private:
-  ExitTargetingModeCommand* exit_targeting_mode_command_;
+  std::unique_ptr<ExitTargetingModeCommand> exit_targeting_mode_command_;
 
  public:
   TargetingInputHandler(World& world)
       : EventHandler(world),
-        exit_targeting_mode_command_(new ExitTargetingModeCommand(world)){};
+        exit_targeting_mode_command_(
+            std::make_unique<ExitTargetingModeCommand>(world)){};
   ~TargetingInputHandler(){};
-  virtual EngineEvent* handle_sdl_event(SDL_Event event) noexcept override;
+  EngineEvent& handle_sdl_event(SDL_Event event) noexcept override;
 };
 
 class GameInputHandler final : public EventHandler {
  private:
-  DirectionalCommand* button_right_;
-  DirectionalCommand* button_up_;
-  DirectionalCommand* button_down_;
-  DirectionalCommand* button_up_right_;
-  DirectionalCommand* button_up_left_;
-  DirectionalCommand* button_left_;
-  DirectionalCommand* button_down_right_;
-  DirectionalCommand* button_down_left_;
-  ViewHistoryCommand* view_history_command_;
-  PickupCommand* pick_up_command_;
-  InventoryCommand* inventory_command_;
-  MainMenuCommand* main_menu_command_;
+  std::unique_ptr<DirectionalCommand> button_right_;
+  std::unique_ptr<DirectionalCommand> button_up_;
+  std::unique_ptr<DirectionalCommand> button_down_;
+  std::unique_ptr<DirectionalCommand> button_up_right_;
+  std::unique_ptr<DirectionalCommand> button_up_left_;
+  std::unique_ptr<DirectionalCommand> button_left_;
+  std::unique_ptr<DirectionalCommand> button_down_right_;
+  std::unique_ptr<DirectionalCommand> button_down_left_;
+  std::unique_ptr<ViewHistoryCommand> view_history_command_;
+  std::unique_ptr<PickupCommand> pick_up_command_;
+  std::unique_ptr<InventoryCommand> inventory_command_;
+  std::unique_ptr<MainMenuCommand> main_menu_command_;
+  std::unique_ptr<UseCommand> use_command_;
   Entity* controllable_entity_;
 
  public:
   GameInputHandler(World& world, Entity* controllable_entity);
-  ~GameInputHandler() = default;
+   ~GameInputHandler() = default;
 
-  virtual EngineEvent* handle_sdl_event(SDL_Event event) noexcept override;
+  EngineEvent& handle_sdl_event(SDL_Event event) noexcept override;
 };
 
 class MenuInputHandler final : public EventHandler {
  private:
-  ResetGameCommand* resetGameCommand_;
+  std::unique_ptr<ResetGameCommand> resetGameCommand_;
 
  public:
   MenuInputHandler(World& world)
-      : EventHandler(world), resetGameCommand_(new ResetGameCommand(world)){};
+      : EventHandler(world),
+        resetGameCommand_(std::make_unique<ResetGameCommand>(world)){};
   ~MenuInputHandler() = default;
-  virtual EngineEvent* handle_sdl_event(SDL_Event event) noexcept override;
+  EngineEvent& handle_sdl_event(SDL_Event event) noexcept override;
 };
 
 class GuiInputHandler : public EventHandler {
  protected:
-  CloseViewCommand* closeViewCommand_;
-  ScrollCommand* scrollDownCommand_;
-  ScrollCommand* scrollUpCommand_;
-  ScrollCommand* jumpUpCommand_;
-  ScrollCommand* jumpDownCommand_;
-  ScrollCommand* jumpToHome_;
+  std::unique_ptr<CloseViewCommand> closeViewCommand_;
+  std::unique_ptr<ScrollCommand> scrollDownCommand_;
+  std::unique_ptr<ScrollCommand> scrollUpCommand_;
+  std::unique_ptr<ScrollCommand> jumpUpCommand_;
+  std::unique_ptr<ScrollCommand> jumpDownCommand_;
+  std::unique_ptr<ScrollCommand> jumpToHome_;
 
  public:
   GuiInputHandler(World& world, UiWindow& ui_window);
   ~GuiInputHandler() = default;
 
-  virtual EngineEvent* handle_sdl_event(SDL_Event event) noexcept override;
+  EngineEvent& handle_sdl_event(SDL_Event event) noexcept override;
 };
 
 class HistoryViewInputHandler final : public GuiInputHandler {
@@ -98,35 +101,36 @@ class HistoryViewInputHandler final : public GuiInputHandler {
       : GuiInputHandler(world, ui_window){};
   ~HistoryViewInputHandler() = default;
 
-  virtual EngineEvent* handle_sdl_event(SDL_Event event) noexcept override;
+  EngineEvent& handle_sdl_event(SDL_Event event) noexcept override;
 };
 
 class InventoryInputHandler final : public GuiInputHandler {
  private:
-  SelectItemCommand* selectItemCommand_;
-  SelectItemCommand* dropItemCommand_;
+  std::unique_ptr<SelectItemCommand> selectItemCommand_;
+  std::unique_ptr<SelectItemCommand> dropItemCommand_;
 
  public:
   InventoryInputHandler(World& world, Entity* entity, UiWindow& ui_window)
       : GuiInputHandler(world, ui_window),
-        selectItemCommand_(new SelectItemCommand(
+        selectItemCommand_(std::make_unique<SelectItemCommand>(
             world, entity, ui_window, ItemSubCommand::USE_ITEM)),
-        dropItemCommand_(new SelectItemCommand(
+        dropItemCommand_(std::make_unique<SelectItemCommand>(
             world, entity, ui_window, ItemSubCommand::DROP_ITEM)){};
   ~InventoryInputHandler() = default;
-  EngineEvent* handle_sdl_event(SDL_Event event) noexcept override;
+  EngineEvent& handle_sdl_event(SDL_Event event) noexcept override;
 };
 
 class MainMenuInputHandler final : public GuiInputHandler {
  private:
-  SelectMenuItemCommand* selectMenuItemCommand_;
+  std::unique_ptr<SelectMenuItemCommand> selectMenuItemCommand_;
 
  public:
   MainMenuInputHandler(World& world, UiWindow& ui_window)
       : GuiInputHandler(world, ui_window),
-        selectMenuItemCommand_(new SelectMenuItemCommand(world, ui_window)){};
-  ~MainMenuInputHandler() = default;
-  EngineEvent* handle_sdl_event(SDL_Event event) noexcept override;
+        selectMenuItemCommand_(
+            std::make_unique<SelectMenuItemCommand>(world, ui_window)){};
+  virtual ~MainMenuInputHandler() = default;
+  EngineEvent& handle_sdl_event(SDL_Event event) noexcept override;
 };
 }  // namespace cpprl
 #endif
