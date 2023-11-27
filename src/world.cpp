@@ -9,6 +9,8 @@
 #include "health_bar.hpp"
 
 namespace cpprl {
+// TODO: When loading from state this constructor is not called
+// need to ensure the orc and troll factories are set.
 World::World()
     : entities_(std::make_unique<EntityManager>(
           std::make_unique<OrcFactory>(), std::make_unique<TrollFactory>())),
