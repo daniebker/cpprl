@@ -47,7 +47,6 @@ class World {
 
   template <class Archive>
   void save(Archive& archive) const {
-    // Map is archiving width and height
     archive(dungeon_);
     int width = map_->get_width();
     int height = map_->get_height();
