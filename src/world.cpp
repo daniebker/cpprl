@@ -46,17 +46,6 @@ void World::generate_map(int width, int height, bool with_entities) {
   for (auto it = rooms.begin() + 1; it != rooms.end(); ++it) {
     entities_->place_entities(*it, 2, 1);
   }
-
-  // TODO: This won't work with the levels system.
-  // Player will be created twice.
-  auto player_factory_ = std::make_unique<PlayerFactory>();
-  Entity* player = player_factory_->create();
-  player_ = entities_->spawn(
-      std::move(player), {rooms[0].get_center().x, rooms[0].get_center().y});
-  map_->compute_fov(player_->get_transform_component().get_position(), 4);
-  DefenseComponent& player_defense = player_->get_defense_component();
-  health_bar_ = new HealthBar(20, 1, {2, 36}, player_defense);
-  entities_->shrink_to_fit();
 }
 
 void World::render(Renderer& renderer) {
@@ -92,19 +81,24 @@ void World::handle_enemy_turns() {
   for (const auto& entity : *entities_) {
     auto* ai_component = &entity->get_ai_component();
     if (ai_component && entity->get_defense_component().is_not_dead()) {
-      try {
-        // dance puppet dance!
-        entity->update(*this);
-      } catch (Impossible&) {
-      }
+      entity->update(*this);
     }
   }
 }
 
+void World::spawn_player() {
+  auto player_factory_ = std::make_unique<PlayerFactory>();
+  Entity* player = player_factory_->create();
+  player->get_transform_component().move(map_->get_rooms().at(0).get_center());
+  World::spawn_player(player);
+}
+
 void World::spawn_player(Entity* player) {
   player_ = entities_->spawn(player);
+  map_->compute_fov(player_->get_transform_component().get_position(), 4);
   DefenseComponent& player_defense = player_->get_defense_component();
   health_bar_ = new HealthBar(20, 1, {2, 36}, player_defense);
+  entities_->shrink_to_fit();
 }
 
 void World::reset() { entities_->clear(); }

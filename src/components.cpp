@@ -142,8 +142,7 @@ ActionResult LightningBolt::use(Entity* owner, Entity* wearer, World& world) {
 }
 
 ActionResult FireSpell::use(Entity* owner, Entity* wearer, World& world) {
-  auto on_pick = [&]() {
-    // TODO:: when I get here the pointers are garbage.
+  auto on_pick = [&, owner, wearer]() {
     ConsumableComponent::use(owner, wearer, world);
     for (Entity* entity : world.get_entities()) {
       auto* defense_component = &entity->get_defense_component();
@@ -167,13 +166,12 @@ ActionResult FireSpell::use(Entity* owner, Entity* wearer, World& world) {
       }
     }
   };
-  // world.set_targeting_tile(max_range_, on_pick);
   return Poll{
       std::make_unique<PickTileAOEState>(world, on_pick, max_range_, aoe_)};
 }
 
 ActionResult ConfusionSpell::use(Entity* owner, Entity* wearer, World& world) {
-  auto on_pick = [&]() -> StateResult {
+  auto on_pick = [&, owner, wearer]() -> StateResult {
     Entity* target = world.get_entities().get_blocking_entity_at(
         world.get_map().get_highlight_tile());
     if (target) {

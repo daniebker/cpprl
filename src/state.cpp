@@ -45,8 +45,12 @@ void NextLevelState::on_enter() {
       "dungeon...",
       WHITE);
 
-  world_.get_entities().clear_except_player();
+  world_.get_entities().clear();
+  // TODO: Should this go in on exit?
   world_.generate_map(80, 35, true);
+  // Add the player back to the entities.
+  world_.get_entities().spawn(
+      world_.get_player(), world_.get_map().get_rooms().at(0).get_center());
 }
 
 StateResult NextLevelState::on_update(SDL_Event&) {

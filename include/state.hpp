@@ -89,8 +89,7 @@ class ViewMessageHistoryState final : public GuiViewState {
 
 class ViewInventoryState final : public GuiViewState {
  public:
-  ViewInventoryState(World& world, UiWindow* window)
-      : GuiViewState(world, window) {}
+  using GuiViewState::GuiViewState;
   void on_enter() override;
 };
 

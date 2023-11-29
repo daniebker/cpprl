@@ -43,6 +43,7 @@ class World {
   void set_targeting_tile(
       float max_range = 0.0f, std::function<void()> callback = nullptr);
   Entity* get_player() const { return player_; }
+  void spawn_player();
   void spawn_player(Entity* player);
 
   template <class Archive>

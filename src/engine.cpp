@@ -141,6 +141,7 @@ void Engine::reset_game() {
   engine_state_->on_exit();
   engine_state_ = std::make_unique<InGameState>(*world_);
   world_->generate_map(80, 35, true);
+  world_->spawn_player();
   engine_state_->on_enter();
 }
 }  // namespace cpprl

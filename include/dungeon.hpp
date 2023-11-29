@@ -7,6 +7,7 @@
 #include "types/map.hpp"
 #include "types/tile.hpp"
 
+namespace cpprl {
 struct DungeonConfig {
   int max_rooms;
   int room_min_size;
@@ -16,18 +17,18 @@ struct DungeonConfig {
   int max_monsters_per_room;
 };
 
-namespace cpprl {
 class Dungeon {
  private:
   std::vector<Vector2D> l_tunnel_between(Vector2D start, Vector2D end);
-  TCODRandom* rng_;
-  long seed_;
+  TCODRandom rng_;
+  u_int32_t seed_;
+  u_int32_t level_ = 0;
 
  public:
   Dungeon() {
     seed_ = TCODRandom::getInstance()->getInt(0, 0x7FFFFFFF);
   };
-  virtual ~Dungeon() { delete rng_; };
+  virtual ~Dungeon(){};
   std::unique_ptr<Map> generate(DungeonConfig config);
 
   template <class Archive>
