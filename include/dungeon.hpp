@@ -33,7 +33,7 @@ class Dungeon {
 
   template <class Archive>
   void serialize(Archive& archive) {
-    archive(seed_);
+    archive(seed_, level_);
   }
 };
 
