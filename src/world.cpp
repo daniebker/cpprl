@@ -7,6 +7,7 @@
 #include "exceptions.hpp"
 #include "game_entity.hpp"
 #include "health_bar.hpp"
+#include "ui/dungeon_level.hpp"
 
 namespace cpprl {
 // TODO: When loading from state this constructor is not called
@@ -16,10 +17,13 @@ World::World()
           std::make_unique<OrcFactory>(), std::make_unique<TrollFactory>())),
       map_(nullptr),
       current_window_(nullptr),
-      player_(nullptr) {
+      player_(nullptr),
+      dungeon_level_(nullptr) {
   controller_ = std::make_unique<Controller>();
   dungeon_ = std::make_unique<Dungeon>();
   message_log_ = std::make_unique<MessageLog>();
+  dungeon_level_ =
+      std::make_unique<DungeonLevel>(20, 1, Vector2D{2, 35}, *dungeon_);
 
   message_log_->add_message("Welcome to your eternal doom!", WHITE);
   // TODO: add help menu
@@ -59,6 +63,7 @@ void World::render(Renderer& renderer) {
     }
   }
   health_bar_->render(g_console);
+  dungeon_level_->render(g_console);
 
   message_log_->render(g_console, 23, 35, 45, 5);
   auto entities_at = entities_->get_entities_at(controller_->cursor);

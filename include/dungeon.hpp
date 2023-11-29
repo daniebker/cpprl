@@ -22,7 +22,7 @@ class Dungeon {
   std::vector<Vector2D> l_tunnel_between(Vector2D start, Vector2D end);
   TCODRandom rng_;
   u_int32_t seed_;
-  u_int32_t level_ = 0;
+  int level_ = 0;
 
  public:
   Dungeon() {
@@ -30,6 +30,7 @@ class Dungeon {
   };
   virtual ~Dungeon(){};
   std::unique_ptr<Map> generate(DungeonConfig config);
+  u_int32_t get_level() const { return level_; }
 
   template <class Archive>
   void serialize(Archive& archive) {

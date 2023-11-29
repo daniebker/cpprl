@@ -7,6 +7,7 @@
 #include "message_log.hpp"
 #include "rendering.hpp"
 #include "types/map.hpp"
+#include "ui/dungeon_level.hpp"
 
 namespace cpprl {
 class Dungeon;
@@ -22,6 +23,8 @@ class World {
   std::unique_ptr<Map> map_;
   std::unique_ptr<MessageLog> message_log_;
   UiWindow* health_bar_;
+  // TODO: makes more sense as part of a gui class
+  std::unique_ptr<DungeonLevel> dungeon_level_;
   std::unique_ptr<Controller> controller_;
   UiWindow* current_window_;
   Entity* player_;
