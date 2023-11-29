@@ -12,7 +12,11 @@
 namespace cpprl {
 class EntityManager {
  public:
-  EntityManager() = default;
+  EntityManager() {
+    orc_factory_ = std::make_unique<OrcFactory>();
+    troll_factory_ = std::make_unique<TrollFactory>();
+  };
+
   EntityManager(
       std::unique_ptr<AbstractEntityFactory> orc_factory,
       std::unique_ptr<AbstractEntityFactory> troll_factory)
