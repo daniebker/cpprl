@@ -20,16 +20,16 @@ EngineEvent& EventHandler::handle_sdl_event(SDL_Event event) noexcept {
 EngineEvent& TargetingInputHandler::handle_sdl_event(SDL_Event event) noexcept {
   if (event.type == SDL_MOUSEMOTION) {
     g_context.convert_event_coordinates(event);
-    auto mouse_input_event = std::make_unique<MouseInputEvent>(
+    mouse_input_event_ = std::make_unique<MouseInputEvent>(
         world_, Vector2D{event.motion.x, event.motion.y});
-    return *mouse_input_event;
+    return *mouse_input_event_;
   } else if (event.type == SDL_MOUSEBUTTONDOWN) {
     g_context.convert_event_coordinates(event);
-    auto mouse_click_event = std::make_unique<MouseClickEvent>(
+    mouse_click_event_ = std::make_unique<MouseClickEvent>(
         world_, Vector2D{event.motion.x, event.motion.y});
-    return *mouse_click_event;
+    return *mouse_click_event_;
   } else if (event.type == SDL_KEYDOWN) {
-    auto mouse_click_event = std::make_unique<MouseClickEvent>(
+    mouse_click_event_ = std::make_unique<MouseClickEvent>(
         world_, Vector2D{event.motion.x, event.motion.y});
 
     SDL_Keycode key = event.key.keysym.sym;
@@ -39,7 +39,7 @@ EngineEvent& TargetingInputHandler::handle_sdl_event(SDL_Event event) noexcept {
         return *exit_targeting_mode_command_;
         break;
       case SDLK_RETURN:
-        return *mouse_click_event;
+        return *mouse_click_event_;
         break;
       default:
         return *noop_;

@@ -33,6 +33,8 @@ class EventHandler {
 class TargetingInputHandler final : public EventHandler {
  private:
   std::unique_ptr<ExitTargetingModeCommand> exit_targeting_mode_command_;
+  std::unique_ptr<MouseInputEvent> mouse_input_event_;
+  std::unique_ptr<MouseClickEvent> mouse_click_event_;
 
  public:
   TargetingInputHandler(World& world)
