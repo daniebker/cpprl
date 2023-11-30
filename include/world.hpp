@@ -20,7 +20,6 @@ class World {
  private:
   std::unique_ptr<EntityManager> entities_;
   std::unique_ptr<Dungeon> dungeon_;
-  std::unique_ptr<Map> map_;
   std::unique_ptr<MessageLog> message_log_;
   UiWindow* health_bar_;
   // TODO: makes more sense as part of a gui class
@@ -34,7 +33,7 @@ class World {
   virtual ~World() = default;
 
   MessageLog& get_message_log() { return *message_log_; }
-  Map& get_map() { return *map_; }
+  Map& get_map() { return dungeon_->get_map(); }
   EntityManager& get_entities() { return *entities_; }
   void reset();
 
@@ -53,12 +52,12 @@ class World {
   template <class Archive>
   void save(Archive& archive) const {
     archive(dungeon_);
-    int width = map_->get_width();
-    int height = map_->get_height();
+    int width = dungeon_->get_map().get_width();
+    int height = dungeon_->get_map().get_height();
     archive(width, height);
-    for (int y{0}; y < map_->get_height(); ++y) {
-      for (int x{0}; x < map_->get_width(); ++x) {
-        archive(map_->get_tiles().at({x, y}).explored);
+    for (int y{0}; y < dungeon_->get_map().get_height(); ++y) {
+      for (int x{0}; x < dungeon_->get_map().get_width(); ++x) {
+        archive(dungeon_->get_map().get_tiles().at({x, y}).explored);
       }
     }
     archive(entities_);
@@ -73,13 +72,15 @@ class World {
     int height;
     archive(width, height);
     generate_map(width, height, false);
-    for (int y{0}; y < map_->get_height(); ++y) {
-      for (int x{0}; x < map_->get_width(); ++x) {
-        archive(map_->get_tiles().at({x, y}).explored);
+    for (int y{0}; y < dungeon_->get_map().get_height(); ++y) {
+      for (int x{0}; x < dungeon_->get_map().get_width(); ++x) {
+        archive(dungeon_->get_map().get_tiles().at({x, y}).explored);
       }
     }
     archive(entities_);
     player_ = new Entity("", false, nullptr, nullptr);
+    // TODO: If player is confused, quitting and reopening the game removes the
+    // confused state
     player_->unpack(archive);
     spawn_player(player_);
     archive(message_log_);

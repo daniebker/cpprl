@@ -23,15 +23,19 @@ class Dungeon {
   TCODRandom rng_;
   u_int32_t seed_;
   int level_ = 0;
+  std::unique_ptr<Map> current_map_;
 
  public:
   Dungeon() {
     seed_ = TCODRandom::getInstance()->getInt(0, 0x7FFFFFFF);
   };
-  virtual ~Dungeon(){};
-  std::unique_ptr<Map> generate(DungeonConfig config);
+  virtual ~Dungeon() = default;
+
+  // std::unique_ptr<Map> generate(DungeonConfig config);
+  void generate(DungeonConfig config);
   int get_level() const { return level_; }
   int increase_level() { return ++level_; }
+  Map& get_map() { return *current_map_; }
 
   template <class Archive>
   void serialize(Archive& archive) {

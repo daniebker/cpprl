@@ -8,11 +8,10 @@
 #include "types/tile.hpp"
 
 namespace cpprl {
-std::unique_ptr<Map> Dungeon::generate(DungeonConfig dungeon_config) {
-  // TODO: Is there a chance that these overflow?
+void Dungeon::generate(DungeonConfig dungeon_config) {
   u_int32_t level_seed = seed_ + level_;
   rng_ = TCODRandom(level_seed, TCOD_RNG_CMWC);
-  auto map = std::make_unique<Map>(
+  current_map_ = std::make_unique<Map>(
       dungeon_config.map_width, dungeon_config.map_height);
   auto rooms = std::vector<RectangularRoom>{};
 
@@ -34,7 +33,7 @@ std::unique_ptr<Map> Dungeon::generate(DungeonConfig dungeon_config) {
       continue;
     }
 
-    map->set_tiles_range(new_room.innerBounds(), FLOOR_TILE);
+    current_map_->set_tiles_range(new_room.innerBounds(), FLOOR_TILE);
 
     last_room_center = new_room.get_center();
     if (!rooms.empty()) {
@@ -43,15 +42,14 @@ std::unique_ptr<Map> Dungeon::generate(DungeonConfig dungeon_config) {
           l_tunnel_between(previous_room_center, new_room.get_center());
 
       for (const Vector2D position : tunnel) {
-        map->set_tiles_at(position, FLOOR_TILE);
+        current_map_->set_tiles_at(position, FLOOR_TILE);
       }
     }
     rooms.push_back(new_room);
   }
-  map->set_tiles_at(last_room_center, DOWN_STAIRS_TILE);
-  map->set_down_stairs_location(last_room_center);
-  map->set_rooms(rooms);
-  return map;
+  current_map_->set_tiles_at(last_room_center, DOWN_STAIRS_TILE);
+  current_map_->set_down_stairs_location(last_room_center);
+  current_map_->set_rooms(rooms);
 }
 
 constexpr float half_chance = 0.5F;

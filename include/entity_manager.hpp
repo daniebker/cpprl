@@ -38,8 +38,6 @@ class EntityManager {
   void remove(Entity* entity);
   size_t size() const { return entities_.size(); }
 
-  Entity* at(int index) { return entities_.at(index); }
-
   using iterator = std::vector<Entity*>::iterator;
   using const_iterator = std::vector<Entity*>::const_iterator;
   // Iterator for EntityManager
@@ -69,7 +67,7 @@ class EntityManager {
     archive(size);
     entities_.reserve(size);
     for (size_t i = 0; i < size; i++) {
-      Entity* entity = new Entity("", false, nullptr, nullptr);
+      auto entity = new Entity("", false, nullptr, nullptr);
       entity->unpack(archive);
       entities_.emplace_back(entity);
     }

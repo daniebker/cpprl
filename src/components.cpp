@@ -148,7 +148,7 @@ ActionResult FireSpell::use(Entity* owner, Entity* wearer, World& world) {
       auto* defense_component = &entity->get_defense_component();
       if (defense_component && defense_component->is_not_dead() &&
           entity->get_transform_component().get_position().distance_to(
-              world.get_map().get_highlight_tile()) <= max_range_) {
+              world.get_map().get_highlight_tile()) <= aoe_) {
         world.get_message_log().add_message(
             fmt::format(
                 "The {} gets burned for {} hit points.",
