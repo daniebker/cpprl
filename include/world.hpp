@@ -39,6 +39,7 @@ class World {
   void reset();
 
   void generate_map(int width, int height, bool with_entities = false);
+  Dungeon& get_dungeon() { return *dungeon_; }
   void render(Renderer& renderer);
   void handle_enemy_turns();
   void scroll_current_view(int scroll_amount);
@@ -68,7 +69,8 @@ class World {
   template <class Archive>
   void load(Archive& archive) {
     archive(dungeon_);
-    int width, height;
+    int width;
+    int height;
     archive(width, height);
     generate_map(width, height, false);
     for (int y{0}; y < map_->get_height(); ++y) {

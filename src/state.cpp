@@ -47,6 +47,7 @@ void NextLevelState::on_enter() {
 
   world_.get_entities().clear();
   // TODO: Should this go in on exit?
+  world_.get_dungeon().increase_level();
   world_.generate_map(80, 35, true);
   // Add the player back to the entities.
   world_.get_entities().spawn(

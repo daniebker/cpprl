@@ -51,7 +51,6 @@ std::unique_ptr<Map> Dungeon::generate(DungeonConfig dungeon_config) {
   map->set_tiles_at(last_room_center, DOWN_STAIRS_TILE);
   map->set_down_stairs_location(last_room_center);
   map->set_rooms(rooms);
-  level_++;
   return map;
 }
 

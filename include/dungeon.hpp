@@ -30,7 +30,8 @@ class Dungeon {
   };
   virtual ~Dungeon(){};
   std::unique_ptr<Map> generate(DungeonConfig config);
-  u_int32_t get_level() const { return level_; }
+  int get_level() const { return level_; }
+  int increase_level() { return ++level_; }
 
   template <class Archive>
   void serialize(Archive& archive) {
