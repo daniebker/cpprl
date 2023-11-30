@@ -58,12 +58,12 @@ class PickTileState : public State {
 
 class PickTileAOEState final : public PickTileState {
  private:
-  float aoe_;
-  float aoe_squared_;
+  int aoe_;
+  int aoe_squared_;
 
  public:
   PickTileAOEState(
-      World& world, std::function<void()> on_pick, int max_range_, float aoe)
+      World& world, std::function<void()> on_pick, int max_range_, int aoe)
       : PickTileState(world, on_pick, max_range_),
         aoe_(aoe),
         aoe_squared_(aoe_ * aoe_) {}
