@@ -14,7 +14,7 @@ class EngineEvent {
   World& world_;
 
  public:
-  EngineEvent(World& world) : world_(world) {}
+  explicit EngineEvent(World& world) : world_(world) {}
   virtual ~EngineEvent() {}
   virtual StateResult execute() = 0;
 };
