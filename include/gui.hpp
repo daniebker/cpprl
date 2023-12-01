@@ -30,7 +30,8 @@ static constexpr std::array<int, 9> LEGEND = {
 
 class UiWindow {
  protected:
-  int width_, height_;
+  int width_;
+  int height_;
   Vector2D position_;
   std::unique_ptr<TCODConsole> console_;
   int cursor_;

@@ -17,13 +17,13 @@ World::World()
           std::make_unique<OrcFactory>(), std::make_unique<TrollFactory>())),
       current_window_(nullptr),
       player_(nullptr),
-      dungeon_level_(nullptr) {
+      ui_(nullptr) {
   controller_ = std::make_unique<Controller>();
   dungeon_ = std::make_unique<Dungeon>();
   message_log_ = std::make_unique<MessageLog>();
-  dungeon_level_ =
-      std::make_unique<DungeonLevel>(20, 1, Vector2D{2, 35}, *dungeon_);
-
+  // dungeon_level_ =
+  //     std::make_unique<DungeonLevel>(20, 1, Vector2D{2, 35}, *dungeon_);
+  ui_ = std::make_unique<UI>(*dungeon_);
   message_log_->add_message("Welcome to your eternal doom!", WHITE);
   // TODO: add help menu
   // message_log_->add_message("Press '?' for help.", WHITE);
@@ -63,8 +63,8 @@ void World::render(Renderer& renderer) {
           entity->get_sprite_component(), entity->get_transform_component());
     }
   }
-  health_bar_->render(g_console);
-  dungeon_level_->render(g_console);
+  // health_bar_->render(g_console);
+  ui_->render(g_console);
 
   message_log_->render(g_console, 23, 35, 45, 5);
   auto entities_at = entities_->get_entities_at(controller_->cursor);
@@ -105,7 +105,8 @@ void World::spawn_player(Entity* player) {
   dungeon_->get_map().compute_fov(
       player_->get_transform_component().get_position(), 4);
   DefenseComponent& player_defense = player_->get_defense_component();
-  health_bar_ = new HealthBar(20, 1, {2, 36}, player_defense);
+  ui_->set_health_bar(player_defense);
+  // health_bar_ = new HealthBar(20, 1, {2, 36}, player_defense);
   entities_->shrink_to_fit();
 }
 
