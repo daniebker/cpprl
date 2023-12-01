@@ -31,7 +31,6 @@ class Dungeon {
   };
   virtual ~Dungeon() = default;
 
-  // std::unique_ptr<Map> generate(DungeonConfig config);
   void generate(DungeonConfig config);
   int get_level() const { return level_; }
   int increase_level() { return ++level_; }
