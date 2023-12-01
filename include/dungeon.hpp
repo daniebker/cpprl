@@ -21,7 +21,7 @@ class Dungeon {
  private:
   std::vector<Vector2D> l_tunnel_between(Vector2D start, Vector2D end);
   TCODRandom rng_;
-  u_int32_t seed_;
+  int seed_;
   int level_ = 0;
   std::unique_ptr<Map> current_map_;
 
