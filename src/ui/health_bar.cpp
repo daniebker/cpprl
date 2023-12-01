@@ -29,9 +29,6 @@ void HealthBar::render(tcod::Console& console) {
       std::nullopt,
       DARK_GREEN);
 
-  // health bar text
-  // std::string_view health_text =
-  //     std::format("{}/{}", health_.hp, health_.max_hp);
   tcod::print_rect(
       console,
       {position_.x, position_.y, width_, height_},

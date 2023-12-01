@@ -14,7 +14,7 @@ class EngineEvent {
   World& world_;
 
  public:
-  EngineEvent(World& world) : world_(world) {}
+  explicit EngineEvent(World& world) : world_(world) {}
   virtual ~EngineEvent() {}
   virtual StateResult execute() = 0;
 };
@@ -75,6 +75,16 @@ class InventoryCommand final : public Command {
 class MainMenuCommand final : public EngineEvent {
  public:
   MainMenuCommand(World& world) : EngineEvent(world) {}
+  StateResult execute() override;
+};
+
+class UseCommand final : public EngineEvent {
+ private:
+  Vector2D position_;
+
+ public:
+  UseCommand(World& world, Vector2D position)
+      : EngineEvent(world), position_(position) {}
   StateResult execute() override;
 };
 

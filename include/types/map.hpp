@@ -5,30 +5,9 @@
 #include "../rectangular_room.hpp"
 #include "math.hpp"
 #include "nparray.hpp"
+#include "types/tile.hpp"
 
 namespace cpprl {
-enum class TileType {
-  wall = 0,
-  floor,
-};
-
-/**
- * Tile struct. Gives us the type of the tile
- * it's current visibility and if it's been explored.
- */
-struct Tile {
-  bool explored;
-  TileType type;
-
-  template <class Archive>
-  void serialize(Archive& archive) {
-    archive(explored, type);
-  }
-};
-
-struct TileGraphic {
-  TCOD_ConsoleTile light, dark, target;
-};
 
 template <typename Func>
 inline void with_indexes(int width, int height, Func func) {
@@ -66,6 +45,9 @@ class Map {
   Array2D<Tile>& get_tiles() { return tiles_; }
   void set_tiles_range(std::tuple<Vector2D, Vector2D> bounds, Tile tile);
   void set_rooms(std::vector<RectangularRoom> rooms) { _rooms = rooms; }
+  void set_down_stairs_location(Vector2D position) {
+    down_stairs_location_ = position;
+  }
   RectangularRoom get_first_room() { return _rooms.front(); }
   std::vector<RectangularRoom> get_rooms() { return _rooms; }
   void set_tiles_at(Vector2D position, Tile tile);
@@ -73,6 +55,24 @@ class Map {
   TileGraphic& get_wall_tile() { return wall_tile_; }
   /** Returns the floor tile for this map */
   TileGraphic& get_floor_tile() { return floor_tile_; }
+
+  /**
+   * @brief Returns the tile graphic for the given tile type.
+   * @param type The tile type.
+   * @return The tile graphic.
+   */
+  TileGraphic& get_tile_graphic(TileType type) {
+    if (type == TileType::wall) {
+      return wall_tile_;
+    } else if (type == TileType::floor) {
+      return floor_tile_;
+    } else if (type == TileType::down_stairs) {
+      return downstairs_tile_;
+    } else {
+      return wall_tile_;
+    }
+  }
+
   /** Render the map */
   void render(tcod::Console& console);
   void set_highlight_tile(Vector2D position);
@@ -109,16 +109,21 @@ class Map {
   TileGraphic wall_tile_;
   /** The floor tile */
   TileGraphic floor_tile_;
+  TileGraphic downstairs_tile_;
   /** The width and height of this map. */
   int width_, height_;
   /** This maps tiles */
   Array2D<Tile> tiles_;
-  /** The tcod map */
+
+  /**
+   * @brief tcod map used for fov calculations
+   */
   TCODMap tcod_map_;
   std::vector<RectangularRoom> _rooms;
   Vector2D target_tile_ = {0, 0};
   bool target_mode_ = false;
   float max_range_ = 0.0f;
+  Vector2D down_stairs_location_{0, 0};
 };
 
 }  // namespace cpprl

@@ -54,7 +54,7 @@ class Entity {
   float get_distance_to(Entity* other);
 
   bool is_blocking() { return blocker_; };
-  std::string get_name() { return name_; };
+  std::string get_name() const { return name_; };
 
   void update(World& world);
   void set_blocking(bool blocker) { blocker_ = blocker; };

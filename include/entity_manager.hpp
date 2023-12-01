@@ -12,7 +12,11 @@
 namespace cpprl {
 class EntityManager {
  public:
-  EntityManager() = default;
+  EntityManager() {
+    orc_factory_ = std::make_unique<OrcFactory>();
+    troll_factory_ = std::make_unique<TrollFactory>();
+  };
+
   EntityManager(
       std::unique_ptr<AbstractEntityFactory> orc_factory,
       std::unique_ptr<AbstractEntityFactory> troll_factory)
@@ -20,6 +24,7 @@ class EntityManager {
         orc_factory_(std::move(orc_factory)),
         troll_factory_(std::move(troll_factory)){};
   void clear();
+  void clear_except_player();
   Entity* get_blocking_entity_at(Vector2D position);
   Entity* get_non_blocking_entity_at(Vector2D position);
   Entity* get_closest_living_monster(Vector2D position, float range) const;
@@ -32,8 +37,6 @@ class EntityManager {
   void shrink_to_fit() { entities_.shrink_to_fit(); }
   void remove(Entity* entity);
   size_t size() const { return entities_.size(); }
-
-  Entity* at(int index) { return entities_.at(index); }
 
   using iterator = std::vector<Entity*>::iterator;
   using const_iterator = std::vector<Entity*>::const_iterator;
@@ -64,7 +67,7 @@ class EntityManager {
     archive(size);
     entities_.reserve(size);
     for (size_t i = 0; i < size; i++) {
-      Entity* entity = new Entity("", false, nullptr, nullptr);
+      auto entity = new Entity("", false, nullptr, nullptr);
       entity->unpack(archive);
       entities_.emplace_back(entity);
     }

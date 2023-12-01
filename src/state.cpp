@@ -10,8 +10,8 @@ namespace cpprl {
 
 StateResult State::on_update(SDL_Event& event) {
   try {
-    EngineEvent* command = input_handler_->handle_sdl_event(event);
-    return command->execute();
+    EngineEvent& command = input_handler_->handle_sdl_event(event);
+    return command.execute();
   } catch (const Impossible& impossible) {
     world_.get_message_log().add_message(impossible.what(), RED);
     return {};
@@ -34,15 +34,38 @@ void ViewInventoryState::on_enter() {
       world_, world_.get_player(), *window_);
 }
 
+void NextLevelState::on_enter() {
+  // gen a new dungeon?
+  world_.get_message_log().add_message(
+      "You take a moment to rest to recover your strength.", WHITE);
+  world_.get_player()->get_defense_component().heal(
+      world_.get_player()->get_defense_component().get_max_hp() / 2);
+  world_.get_message_log().add_message(
+      "After a rare moment of peace, you descend deeper into the heart of the "
+      "dungeon...",
+      WHITE);
+
+  world_.get_entities().clear();
+  // TODO: Should this go in on exit?
+  world_.get_dungeon().increase_level();
+  world_.generate_map(80, 35, true);
+  // Add the player back to the entities.
+  world_.get_entities().spawn(
+      world_.get_player(), world_.get_map().get_rooms().at(0).get_center());
+}
+
+StateResult NextLevelState::on_update(SDL_Event&) {
+  return Change{std::make_unique<InGameState>(world_)};
+}
+
 void PickTileState::on_enter() {
   input_handler_ = std::make_unique<TargetingInputHandler>(world_);
 }
 
 StateResult PickTileState::on_update(SDL_Event& event) {
   try {
-    EngineEvent* command = input_handler_->handle_sdl_event(event);
-    StateResult result = command->execute();
-    delete command;
+    EngineEvent& command = input_handler_->handle_sdl_event(event);
+    StateResult result = command.execute();
     return result;
   } catch (const Impossible& impossible) {
     world_.get_message_log().add_message(impossible.what(), RED);

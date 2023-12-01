@@ -33,6 +33,13 @@ class InGameState final : public State {
   void on_enter() override;
 };
 
+class NextLevelState final : public State {
+ public:
+  NextLevelState(World& world) : State(world) {}
+  void on_enter() override;
+  StateResult on_update(SDL_Event& sdl_event) override;
+};
+
 class PickTileState : public State {
  protected:
   int max_range_;
@@ -51,12 +58,15 @@ class PickTileState : public State {
 
 class PickTileAOEState final : public PickTileState {
  private:
-  float aoe_;
-  float aoe_squared_;
+  int aoe_;
+  int aoe_squared_;
 
  public:
   PickTileAOEState(
-      World& world, std::function<void()> on_pick, int max_range_, float aoe)
+      World& world,
+      std::function<void()> const& on_pick,
+      int max_range_,
+      int aoe)
       : PickTileState(world, on_pick, max_range_),
         aoe_(aoe),
         aoe_squared_(aoe_ * aoe_) {}
@@ -82,8 +92,7 @@ class ViewMessageHistoryState final : public GuiViewState {
 
 class ViewInventoryState final : public GuiViewState {
  public:
-  ViewInventoryState(World& world, UiWindow* window)
-      : GuiViewState(world, window) {}
+  using GuiViewState::GuiViewState;
   void on_enter() override;
 };
 

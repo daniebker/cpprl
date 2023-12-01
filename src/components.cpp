@@ -142,16 +142,13 @@ ActionResult LightningBolt::use(Entity* owner, Entity* wearer, World& world) {
 }
 
 ActionResult FireSpell::use(Entity* owner, Entity* wearer, World& world) {
-  // We need the references of everything except the pointers, where
-  // wee need the pointers.
-  auto on_pick = [&, wearer, owner]() {
-    // TODO:: when I get here the pointers are garbage.
+  auto on_pick = [&, owner, wearer]() {
     ConsumableComponent::use(owner, wearer, world);
     for (Entity* entity : world.get_entities()) {
       auto* defense_component = &entity->get_defense_component();
       if (defense_component && defense_component->is_not_dead() &&
           entity->get_transform_component().get_position().distance_to(
-              world.get_map().get_highlight_tile()) <= max_range_) {
+              world.get_map().get_highlight_tile()) <= aoe_) {
         world.get_message_log().add_message(
             fmt::format(
                 "The {} gets burned for {} hit points.",
@@ -169,13 +166,12 @@ ActionResult FireSpell::use(Entity* owner, Entity* wearer, World& world) {
       }
     }
   };
-  // world.set_targeting_tile(max_range_, on_pick);
   return Poll{
       std::make_unique<PickTileAOEState>(world, on_pick, max_range_, aoe_)};
 }
 
 ActionResult ConfusionSpell::use(Entity* owner, Entity* wearer, World& world) {
-  auto on_pick = [&, wearer, owner]() -> StateResult {
+  auto on_pick = [&, owner, wearer]() -> StateResult {
     Entity* target = world.get_entities().get_blocking_entity_at(
         world.get_map().get_highlight_tile());
     if (target) {

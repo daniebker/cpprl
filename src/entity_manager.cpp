@@ -12,6 +12,15 @@ namespace cpprl {
 
 void EntityManager::clear() { entities_.clear(); }
 
+void EntityManager::clear_except_player() {
+  entities_.erase(
+      std::remove_if(
+          entities_.begin(),
+          entities_.end(),
+          [](const Entity* entity) { return entity->get_name() != "Player"; }),
+      entities_.end());
+}
+
 void EntityManager::place_entities(
     RectangularRoom room, int max_monsters_per_room, int max_items_per_room) {
   auto* random = TCODRandom::getInstance();
