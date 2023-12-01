@@ -9,7 +9,7 @@
 
 namespace cpprl {
 void Dungeon::generate(DungeonConfig dungeon_config) {
-  u_int32_t level_seed = seed_ + level_;
+  int level_seed = seed_ + level_;
   rng_ = TCODRandom(level_seed, TCOD_RNG_CMWC);
   current_map_ = std::make_unique<Map>(
       dungeon_config.map_width, dungeon_config.map_height);
