@@ -12,13 +12,15 @@
 namespace cpprl {
 
 StateResult PickupCommand::execute() {
-  Entity* item = world_.get_entities().get_non_blocking_entity_at(
-      entity_->get_transform_component().get_position());
-  if (item) {
+  std::optional<std::reference_wrapper<Entity>> optional_item_ref =
+      world_.get_entities().get_non_blocking_entity_at(
+          entity_->get_transform_component().get_position());
+  if (optional_item_ref.has_value()) {
+    Entity& item = optional_item_ref.value().get();
     world_.get_message_log().add_message(
-        "You pick up the " + item->get_name() + ".", WHITE);
-    entity_->get_container().add(item);
-    world_.get_entities().remove(item);
+        "You pick up the " + item.get_name() + ".", WHITE);
+    entity_->get_container().add(&item);
+    world_.get_entities().remove(&item);
   } else {
     return NoOp{"There is nothing here to pick up."};
   }

@@ -124,14 +124,15 @@ EntityManager::get_blocking_entity_at(Vector2D position) {
   return std::nullopt;
 }
 
-Entity* EntityManager::get_non_blocking_entity_at(Vector2D position) {
+std::optional<std::reference_wrapper<Entity>>
+EntityManager::get_non_blocking_entity_at(Vector2D position) {
   for (const auto& entity : entities_) {
     if (!entity->is_blocking() &&
         entity->get_transform_component().get_position() == position) {
-      return entity;
+      return std::reference_wrapper<Entity>(*entity);
     }
   }
-  return nullptr;
+  return std::nullopt;
 }
 
 void EntityManager::remove(Entity* entity) {
