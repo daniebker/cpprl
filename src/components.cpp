@@ -172,19 +172,21 @@ ActionResult FireSpell::use(Entity* owner, Entity* wearer, World& world) {
 
 ActionResult ConfusionSpell::use(Entity* owner, Entity* wearer, World& world) {
   auto on_pick = [&, owner, wearer]() -> StateResult {
-    Entity* target = world.get_entities().get_blocking_entity_at(
-        world.get_map().get_highlight_tile());
-    if (target) {
-      std::unique_ptr<AIComponent> old_ai = target->transfer_ai_component();
+    std::optional<std::reference_wrapper<Entity>> optional_ref_target =
+        world.get_entities().get_blocking_entity_at(
+            world.get_map().get_highlight_tile());
+    if (optional_ref_target.has_value()) {
+      auto& target = optional_ref_target.value().get();
+      std::unique_ptr<AIComponent> old_ai = target.transfer_ai_component();
 
       std::unique_ptr<AIComponent> confusion_ai =
           std::make_unique<ConfusionAI>(num_turns_, std::move(old_ai));
-      target->set_ai_component(std::move(confusion_ai));
+      target.set_ai_component(std::move(confusion_ai));
       world.get_message_log().add_message(
           fmt::format(
               "The eyes of the {} look vacant, as it starts to "
               "stumble around!",
-              target->get_name()),
+              target.get_name()),
           GREEN);
       ConsumableComponent::use(owner, wearer, world);
       return {};

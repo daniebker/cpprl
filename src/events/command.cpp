@@ -142,33 +142,34 @@ StateResult ExitTargetingModeCommand::execute() {
 StateResult MeleeCommand::execute() {
   auto targetPos =
       entity_->get_transform_component().get_position() + move_vector_;
-  Entity* target = world_.get_entities().get_blocking_entity_at(targetPos);
+  std::optional<std::reference_wrapper<Entity>> target =
+      world_.get_entities().get_blocking_entity_at(targetPos);
 
   tcod::ColorRGB attack_colour = WHITE;
   if (entity_->get_name() != "player") {
     attack_colour = RED;
   }
 
-  if (target) {
-    int damage = combat_system::handle_attack(*entity_, *target);
+  if (target.has_value()) {
+    int damage = combat_system::handle_attack(*entity_, target.value().get());
     if (damage > 0) {
       std::string message = fmt::format(
           "{} attacks {} for {} hit points.",
           util::capitalize(entity_->get_name()),
-          util::capitalize(target->get_name()),
+          util::capitalize(target.value().get().get_name()),
           damage);
 
       world_.get_message_log().add_message(message, attack_colour, true);
 
-      if (target->get_defense_component().is_dead()) {
-        auto action = DieEvent(world_, target);
+      if (target.value().get().get_defense_component().is_dead()) {
+        auto action = DieEvent(world_, &target.value().get());
         return action.execute();
       }
     } else {
       std::string message = fmt::format(
           "{} attacks {} but does no damage.",
           util::capitalize(entity_->get_name()),
-          util::capitalize(target->get_name()));
+          util::capitalize(target.value().get().get_name()));
 
       world_.get_message_log().add_message(message, attack_colour, true);
     }

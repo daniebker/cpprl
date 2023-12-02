@@ -1,6 +1,7 @@
 #pragma once
 
 #include <memory>
+#include <optional>
 #include <vector>
 
 #include "colours.hpp"
@@ -25,7 +26,8 @@ class EntityManager {
         troll_factory_(std::move(troll_factory)){};
   void clear();
   void clear_except_player();
-  Entity* get_blocking_entity_at(Vector2D position);
+  std::optional<std::reference_wrapper<Entity>> get_blocking_entity_at(
+      Vector2D position);
   Entity* get_non_blocking_entity_at(Vector2D position);
   Entity* get_closest_living_monster(Vector2D position, float range) const;
   std::vector<Entity*> get_entities_at(Vector2D position);
