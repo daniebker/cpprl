@@ -144,9 +144,10 @@ void EntityManager::remove(Entity* entity) {
       entities_.end());
 }
 
-Entity* EntityManager::get_closest_living_monster(
+std::optional<std::reference_wrapper<Entity>>
+EntityManager::get_closest_living_monster(
     Vector2D position, float range) const {
-  Entity* closest = nullptr;
+  std::optional<std::reference_wrapper<Entity>> closest = std::nullopt;
   float best_distance = 1E6f;
   for (const auto& entity : entities_) {
     auto* defense_component = &entity->get_defense_component();
@@ -156,7 +157,7 @@ Entity* EntityManager::get_closest_living_monster(
           entity->get_transform_component().get_position());
       if (distance < best_distance && (distance <= range || range == 0.0f)) {
         best_distance = distance;
-        closest = entity;
+        closest = *entity;
       }
     }
   }

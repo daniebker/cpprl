@@ -30,7 +30,8 @@ class EntityManager {
       Vector2D position);
   std::optional<std::reference_wrapper<Entity>> get_non_blocking_entity_at(
       Vector2D position);
-  Entity* get_closest_living_monster(Vector2D position, float range) const;
+  std::optional<std::reference_wrapper<Entity>> get_closest_living_monster(
+      Vector2D position, float range) const;
   std::vector<Entity*> get_entities_at(Vector2D position);
   void place_entities(
       RectangularRoom room, int max_monsters_per_room, int max_items_per_room);

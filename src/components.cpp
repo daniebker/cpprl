@@ -112,32 +112,35 @@ ActionResult HealingConsumable::use(
 }
 
 ActionResult LightningBolt::use(Entity* owner, Entity* wearer, World& world) {
-  Entity* closest_monster = world.get_entities().get_closest_living_monster(
-      wearer->get_transform_component().get_position(), range_);
-  if (!closest_monster) {
+  std::optional<std::reference_wrapper<Entity>> optional_closest_monster_ref =
+      world.get_entities().get_closest_living_monster(
+          wearer->get_transform_component().get_position(), range_);
+  if (!optional_closest_monster_ref.has_value()) {
     return Failure{"No enemy is close enough to strike."};
   }
 
-  int inflicted = combat_system::handle_spell(damage_, *closest_monster);
+  Entity& closest_living_monster = optional_closest_monster_ref.value().get();
+
+  int inflicted = combat_system::handle_spell(damage_, closest_living_monster);
   ConsumableComponent::use(owner, wearer, world);
   if (inflicted > 0) {
     world.get_message_log().add_message(
         fmt::format(
             "A lightning bolt strikes the {} with a loud "
             "thunder! The damage is {} hit points.",
-            closest_monster->get_name(),
+            closest_living_monster.get_name(),
             damage_),
         GREEN);
 
-    if (closest_monster->get_defense_component().is_dead()) {
-      auto action = DieEvent(world, closest_monster);
+    if (closest_living_monster.get_defense_component().is_dead()) {
+      auto action = DieEvent(world, &closest_living_monster);
       action.execute();
     }
     return Success{};
   } else {
     return Failure{fmt::format(
         "The lightning bolt hits the {} but does no damage.",
-        closest_monster->get_name())};
+        closest_living_monster.get_name())};
   }
 }
 
