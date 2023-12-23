@@ -99,14 +99,15 @@ Entity* EntityManager::spawn(Entity* src, Vector2D position) {
   return entity;
 }
 
-std::vector<Entity*> EntityManager::get_entities_at(Vector2D position) {
-  std::vector<Entity*> entities_at_position;
+std::vector<std::reference_wrapper<Entity>> EntityManager::get_entities_at(
+    Vector2D position) {
+  std::vector<std::reference_wrapper<Entity>> entities_at_position;
   // At max there can be 3? things at a position.
   // Corpse, Item, Actor...
   entities_at_position.reserve(3);
   for (auto& entity : entities_) {
     if (entity->get_transform_component().get_position() == position) {
-      entities_at_position.push_back(entity);
+      entities_at_position.push_back(*entity);
     }
   }
   entities_at_position.shrink_to_fit();

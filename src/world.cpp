@@ -68,10 +68,12 @@ void World::render(Renderer& renderer) {
 
   message_log_->render(g_console, 23, 35, 45, 5);
   auto entities_at = entities_->get_entities_at(controller_->cursor);
-  if (entities_at.size() > 0) {
+  if (!entities_at.empty()) {
     std::string names;
-    for (auto& entity : entities_at) {
-      names += entity->get_name() + ", ";
+    for (std::reference_wrapper<Entity> entity_reference_wrapper :
+         entities_at) {
+      auto& entity = entity_reference_wrapper.get();
+      names += entity.get_name() + ", ";
       tcod::print_rect(
           g_console,
           {controller_->cursor.x, controller_->cursor.y - 1, 20, 1},
