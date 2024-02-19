@@ -2,6 +2,7 @@
 
 #include <SDL2/SDL.h>
 
+#include <algorithm>
 #include <optional>
 
 #include "basic_ai_component.hpp"
