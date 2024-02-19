@@ -15,11 +15,10 @@ class ASCIIComponent;
 class AttackComponent;
 class DefenseComponent;
 class ConsumableComponent;
-// class AIComponent;
 class Container;
 
 class Entity {
- protected:
+ private:
   std::string name_;
   bool blocker_;
   std::unique_ptr<TransformComponent> transformComponent_;
@@ -90,8 +89,13 @@ class Entity {
 
   template <class Archive>
   void unpack(Archive& archive) {
-    bool hasTransformComponent, hasDefenseComponent, hasAttackComponent,
-        hasConsumableComponent, hasAsciiComponent, hasAIComponent, hasContainer;
+    bool hasTransformComponent;
+    bool hasDefenseComponent;
+    bool hasAttackComponent;
+    bool hasConsumableComponent;
+    bool hasAsciiComponent;
+    bool hasAIComponent;
+    bool hasContainer;
 
     archive(name_, blocker_);
     archive(hasTransformComponent);
