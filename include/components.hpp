@@ -16,7 +16,7 @@ namespace cpprl {
 class AttackComponent {
  public:
   AttackComponent() = default;
-  AttackComponent(int damage) : damage_(damage) {}
+  explicit AttackComponent(int damage) : damage_(damage) {}
   virtual ~AttackComponent() = default;
   int get_damage() const { return damage_; }
 
@@ -103,7 +103,7 @@ class Container {
 
  public:
   Container() = default;
-  Container(int size);
+  explicit Container(int size);
   virtual ~Container() = default;
   bool add(Entity* actor);
   void remove(const Entity* actor);
@@ -141,17 +141,19 @@ class ConsumableComponent {
   virtual ActionResult use(Entity* owner, Entity* wearer, World& world);
 
   template <class Archive>
-  void serialize(Archive&) {}
+  void serialize(Archive&) const {
+    // nothing to archive
+  }
 
  protected:
-  enum ConsumableType { HEALER, LIGHTNING_BOLT, CONFUSER, FIREBALL };
+  enum class ConsumableType { HEALER, LIGHTNING_BOLT, CONFUSER, FIREBALL };
 };
 
 class HealingConsumable final : public ConsumableComponent {
  public:
   HealingConsumable() = default;
-  HealingConsumable(int amount);
-  virtual ~HealingConsumable() = default;
+  explicit HealingConsumable(int amount);
+  ~HealingConsumable() override = default;
   ActionResult use(Entity* owner, Entity* wearer, World& world) override;
   template <class Archive>
   void serialize(Archive& archive) {
@@ -170,7 +172,7 @@ class LightningBolt final : public ConsumableComponent {
  public:
   LightningBolt() = default;
   LightningBolt(float range, float damage) : range_(range), damage_(damage) {}
-  virtual ~LightningBolt() = default;
+  ~LightningBolt() override = default;
   ActionResult use(Entity* owner, Entity* wearer, World& world) override;
 
   template <class Archive>
@@ -189,7 +191,7 @@ class FireSpell final : public ConsumableComponent {
   FireSpell() = default;
   FireSpell(float max_range, float aoe, float damage)
       : max_range_(max_range), aoe_(aoe), damage_(damage) {}
-  virtual ~FireSpell() = default;
+  ~FireSpell() override = default;
 
   ActionResult use(Entity* owner, Entity* Wearer, World& world) override;
   template <class Archive>
@@ -211,7 +213,7 @@ class ConfusionSpell final : public ConsumableComponent {
   ConfusionSpell() = default;
   ConfusionSpell(int num_turns, int max_range)
       : num_turns_(num_turns), max_range_(max_range) {}
-  virtual ~ConfusionSpell() = default;
+  ~ConfusionSpell() override = default;
 
   ActionResult use(Entity* owner, Entity* wearer, World& world) override;
 
