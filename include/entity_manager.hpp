@@ -1,6 +1,7 @@
 #pragma once
 
 #include <memory>
+#include <optional>
 #include <vector>
 
 #include "colours.hpp"
@@ -25,17 +26,21 @@ class EntityManager {
         troll_factory_(std::move(troll_factory)){};
   void clear();
   void clear_except_player();
-  Entity* get_blocking_entity_at(Vector2D position);
-  Entity* get_non_blocking_entity_at(Vector2D position);
-  Entity* get_closest_living_monster(Vector2D position, float range) const;
-  std::vector<Entity*> get_entities_at(Vector2D position);
+  std::optional<std::reference_wrapper<Entity>> get_blocking_entity_at(
+      Vector2D position);
+  std::optional<std::reference_wrapper<Entity>> get_non_blocking_entity_at(
+      Vector2D position);
+  std::optional<std::reference_wrapper<Entity>> get_closest_living_monster(
+      Vector2D position, float range) const;
+  std::vector<std::reference_wrapper<Entity>> get_entities_at(
+      Vector2D position);
   void place_entities(
       RectangularRoom room, int max_monsters_per_room, int max_items_per_room);
   Entity* spawn(Entity* entity);
   Entity* spawn(Entity* entity, Vector2D position);
   void reserve(size_t size) { entities_.reserve(size); }
   void shrink_to_fit() { entities_.shrink_to_fit(); }
-  void remove(Entity* entity);
+  void remove(const Entity* entity);
   size_t size() const { return entities_.size(); }
 
   using iterator = std::vector<Entity*>::iterator;

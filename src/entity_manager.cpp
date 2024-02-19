@@ -2,6 +2,9 @@
 
 #include <SDL2/SDL.h>
 
+#include <algorithm>
+#include <optional>
+
 #include "basic_ai_component.hpp"
 #include "colours.hpp"
 #include "components.hpp"
@@ -14,10 +17,9 @@ void EntityManager::clear() { entities_.clear(); }
 
 void EntityManager::clear_except_player() {
   entities_.erase(
-      std::remove_if(
-          entities_.begin(),
-          entities_.end(),
-          [](const Entity* entity) { return entity->get_name() != "Player"; }),
+      std::begin(std::ranges::remove_if(
+          entities_,
+          [](const Entity* entity) { return entity->get_name() != "Player"; })),
       entities_.end());
 }
 
@@ -50,14 +52,14 @@ void EntityManager::place_entities(
   }
 
   for (int i = 0; i < number_of_items; i++) {
-    Vector2D bottom_left, top_right;
+    Vector2D bottom_left;
+    Vector2D top_right;
     std::tie(bottom_left, top_right) = room.innerBounds();
     int x = random->getInt(bottom_left.x + 1, top_right.x - 1);
     int y = random->getInt(bottom_left.y + 1, top_right.y - 1);
 
-    auto iterator = util::find_entity_at(entities_, x, y);
-
-    if (iterator != entities_.end()) {
+    if (auto iterator = util::find_entity_at(entities_, x, y);
+        iterator != entities_.end()) {
       continue;
     }
 
@@ -97,62 +99,66 @@ Entity* EntityManager::spawn(Entity* src, Vector2D position) {
   return entity;
 }
 
-std::vector<Entity*> EntityManager::get_entities_at(Vector2D position) {
-  std::vector<Entity*> entities_at_position;
+std::vector<std::reference_wrapper<Entity>> EntityManager::get_entities_at(
+    Vector2D position) {
+  std::vector<std::reference_wrapper<Entity>> entities_at_position;
   // At max there can be 3? things at a position.
   // Corpse, Item, Actor...
   entities_at_position.reserve(3);
   for (auto& entity : entities_) {
     if (entity->get_transform_component().get_position() == position) {
-      entities_at_position.push_back(entity);
+      entities_at_position.push_back(*entity);
     }
   }
   entities_at_position.shrink_to_fit();
   return entities_at_position;
 }
 
-Entity* EntityManager::get_blocking_entity_at(Vector2D position) {
+std::optional<std::reference_wrapper<Entity>>
+EntityManager::get_blocking_entity_at(Vector2D position) {
   for (const auto& entity : entities_) {
     if (entity->is_blocking() &&
         entity->get_transform_component().get_position() == position) {
-      return entity;
+      return std::reference_wrapper<Entity>(*entity);
     }
   }
-  return nullptr;
+  return std::nullopt;
 }
 
-Entity* EntityManager::get_non_blocking_entity_at(Vector2D position) {
+std::optional<std::reference_wrapper<Entity>>
+EntityManager::get_non_blocking_entity_at(Vector2D position) {
   for (const auto& entity : entities_) {
     if (!entity->is_blocking() &&
         entity->get_transform_component().get_position() == position) {
-      return entity;
+      return std::reference_wrapper<Entity>(*entity);
     }
   }
-  return nullptr;
+  return std::nullopt;
 }
 
-void EntityManager::remove(Entity* entity) {
+void EntityManager::remove(const Entity* entity) {
+  const auto condition = [&entity](const Entity* e) { return e == entity; };
   entities_.erase(
-      std::remove_if(
-          entities_.begin(),
-          entities_.end(),
-          [&entity](const Entity* e) { return e == entity; }),
-      entities_.end());
+      std::begin(std::ranges::remove_if(entities_, condition)),
+      std::end(entities_));
 }
 
-Entity* EntityManager::get_closest_living_monster(
+std::optional<std::reference_wrapper<Entity>>
+EntityManager::get_closest_living_monster(
     Vector2D position, float range) const {
-  Entity* closest = nullptr;
+  std::optional<std::reference_wrapper<Entity>> closest = std::nullopt;
   float best_distance = 1E6f;
   for (const auto& entity : entities_) {
-    auto* defense_component = &entity->get_defense_component();
-    auto* ai_component = &entity->get_ai_component();
-    if (ai_component && defense_component) {
+    const auto* defense_component = &entity->get_defense_component();
+    const std::optional<std::reference_wrapper<AIComponent>> ai_component =
+        entity->get_ai_component();
+
+    if (ai_component.has_value() && defense_component) {
       float distance = position.distance_to(
           entity->get_transform_component().get_position());
       if (distance < best_distance && (distance <= range || range == 0.0f)) {
         best_distance = distance;
-        closest = entity;
+        closest = *entity;
       }
     }
   }

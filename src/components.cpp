@@ -32,11 +32,11 @@ int DefenseComponent::heal(int amount) {
   return healed;
 }
 
-void DefenseComponent::die(Entity* owner) {
-  owner->set_name("corpse of " + owner->get_name());
-  owner->set_ascii_component(std::make_unique<ASCIIComponent>("%", RED, -1));
-  owner->set_blocking(false);
-  owner->set_ai_component(nullptr);
+void DefenseComponent::die(Entity& owner) const {
+  owner.set_name("corpse of " + owner.get_name());
+  owner.set_ascii_component(std::make_unique<ASCIIComponent>("%", RED, -1));
+  owner.set_blocking(false);
+  owner.set_ai_component(nullptr);
 }
 
 Container::Container(int size) : size_(size), inventory_({}) {
@@ -51,20 +51,19 @@ bool Container::add(Entity* entity) {
   return true;
 }
 
-void Container::remove(Entity* entityToRemove) {
+void Container::remove(const Entity* entityToRemove) {
   inventory_.erase(
-      std::remove_if(
-          inventory_.begin(),
-          inventory_.end(),
-          [&entityToRemove](Entity* entity) {
+      std::begin(std::ranges::remove_if(
+          inventory_,
+          [&entityToRemove](const Entity* entity) {
             return entity == entityToRemove;
-          }),
+          })),
       inventory_.end());
 }
 
 ActionResult ConsumableComponent::pick_up(Entity* owner, Entity* wearer) {
-  auto* container = &wearer->get_container();
-  if (container && container->add(std::move(owner))) {
+  if (auto* container = &wearer->get_container();
+      container && container->add(std::move(owner))) {
     // remove the owner?
     return Success{};
   }
@@ -72,8 +71,7 @@ ActionResult ConsumableComponent::pick_up(Entity* owner, Entity* wearer) {
 }
 
 ActionResult ConsumableComponent::drop(Entity* owner, Entity* wearer) {
-  auto* container = &wearer->get_container();
-  if (container) {
+  if (auto* container = &wearer->get_container(); container) {
     container->remove(owner);
     owner->get_transform_component().move(
         wearer->get_transform_component().get_position());
@@ -83,8 +81,7 @@ ActionResult ConsumableComponent::drop(Entity* owner, Entity* wearer) {
 }
 
 ActionResult ConsumableComponent::use(Entity* owner, Entity* wearer, World&) {
-  auto* container = &wearer->get_container();
-  if (container) {
+  if (auto* container = &wearer->get_container(); container) {
     container->remove(owner);
     return Success{};
   }
@@ -95,13 +92,14 @@ HealingConsumable::HealingConsumable(int amount) : amount_(amount){};
 
 ActionResult HealingConsumable::use(
     Entity* owner, Entity* wearer, World& world) {
-  DefenseComponent* defense_component = &wearer->get_defense_component();
-  if (defense_component == nullptr) {
+  if (const DefenseComponent* defense_component =
+          &wearer->get_defense_component();
+      defense_component == nullptr) {
     return Failure{"There's nothing to heal."};
   }
 
-  int amount_healed = wearer->get_defense_component().heal(amount_);
-  if (amount_healed > 0) {
+  if (const int amount_healed = wearer->get_defense_component().heal(amount_);
+      amount_healed > 0) {
     ConsumableComponent::use(owner, wearer, world);
     std::string message = fmt::format("You healed for {} HP.", amount_healed);
     world.get_message_log().add_message(message, GREEN);
@@ -112,32 +110,35 @@ ActionResult HealingConsumable::use(
 }
 
 ActionResult LightningBolt::use(Entity* owner, Entity* wearer, World& world) {
-  Entity* closest_monster = world.get_entities().get_closest_living_monster(
-      wearer->get_transform_component().get_position(), range_);
-  if (!closest_monster) {
+  std::optional<std::reference_wrapper<Entity>> optional_closest_monster_ref =
+      world.get_entities().get_closest_living_monster(
+          wearer->get_transform_component().get_position(), range_);
+  if (!optional_closest_monster_ref.has_value()) {
     return Failure{"No enemy is close enough to strike."};
   }
 
-  int inflicted = combat_system::handle_spell(damage_, *closest_monster);
+  Entity& closest_living_monster = optional_closest_monster_ref.value().get();
+
+  int inflicted = combat_system::handle_spell(damage_, closest_living_monster);
   ConsumableComponent::use(owner, wearer, world);
   if (inflicted > 0) {
     world.get_message_log().add_message(
         fmt::format(
             "A lightning bolt strikes the {} with a loud "
             "thunder! The damage is {} hit points.",
-            closest_monster->get_name(),
+            closest_living_monster.get_name(),
             damage_),
         GREEN);
 
-    if (closest_monster->get_defense_component().is_dead()) {
-      auto action = DieEvent(world, closest_monster);
+    if (closest_living_monster.get_defense_component().is_dead()) {
+      auto action = DieEvent(world, &closest_living_monster);
       action.execute();
     }
     return Success{};
   } else {
     return Failure{fmt::format(
         "The lightning bolt hits the {} but does no damage.",
-        closest_monster->get_name())};
+        closest_living_monster.get_name())};
   }
 }
 
@@ -145,8 +146,8 @@ ActionResult FireSpell::use(Entity* owner, Entity* wearer, World& world) {
   auto on_pick = [&, owner, wearer]() {
     ConsumableComponent::use(owner, wearer, world);
     for (Entity* entity : world.get_entities()) {
-      auto* defense_component = &entity->get_defense_component();
-      if (defense_component && defense_component->is_not_dead() &&
+      if (const auto* defense_component = &entity->get_defense_component();
+          defense_component && defense_component->is_not_dead() &&
           entity->get_transform_component().get_position().distance_to(
               world.get_map().get_highlight_tile()) <= aoe_) {
         world.get_message_log().add_message(
@@ -172,19 +173,21 @@ ActionResult FireSpell::use(Entity* owner, Entity* wearer, World& world) {
 
 ActionResult ConfusionSpell::use(Entity* owner, Entity* wearer, World& world) {
   auto on_pick = [&, owner, wearer]() -> StateResult {
-    Entity* target = world.get_entities().get_blocking_entity_at(
-        world.get_map().get_highlight_tile());
-    if (target) {
-      std::unique_ptr<AIComponent> old_ai = target->transfer_ai_component();
+    std::optional<std::reference_wrapper<Entity>> optional_ref_target =
+        world.get_entities().get_blocking_entity_at(
+            world.get_map().get_highlight_tile());
+    if (optional_ref_target.has_value()) {
+      auto& target = optional_ref_target.value().get();
+      std::unique_ptr<AIComponent> old_ai = target.transfer_ai_component();
 
       std::unique_ptr<AIComponent> confusion_ai =
           std::make_unique<ConfusionAI>(num_turns_, std::move(old_ai));
-      target->set_ai_component(std::move(confusion_ai));
+      target.set_ai_component(std::move(confusion_ai));
       world.get_message_log().add_message(
           fmt::format(
               "The eyes of the {} look vacant, as it starts to "
               "stumble around!",
-              target->get_name()),
+              target.get_name()),
           GREEN);
       ConsumableComponent::use(owner, wearer, world);
       return {};

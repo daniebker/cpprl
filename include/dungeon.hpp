@@ -34,7 +34,7 @@ class Dungeon {
   void generate(DungeonConfig config);
   int get_level() const { return level_; }
   int increase_level() { return ++level_; }
-  Map& get_map() { return *current_map_; }
+  Map& get_map() const { return *current_map_; }
 
   template <class Archive>
   void serialize(Archive& archive) {
