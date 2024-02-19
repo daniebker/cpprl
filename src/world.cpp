@@ -1,5 +1,7 @@
 #include "world.hpp"
 
+#include <assert.h>
+
 #include "controller.hpp"
 #include "dungeon.hpp"
 #include "entity_factory.hpp"
@@ -12,17 +14,12 @@
 namespace cpprl {
 // TODO: When loading from state this constructor is not called
 // need to ensure the orc and troll factories are set.
-World::World()
-    : entities_(std::make_unique<EntityManager>(
-          std::make_unique<OrcFactory>(), std::make_unique<TrollFactory>())),
-      current_window_(nullptr),
-      player_(nullptr),
-      ui_(nullptr) {
+World::World() {
+  entities_ = std::make_unique<EntityManager>(
+      std::make_unique<OrcFactory>(), std::make_unique<TrollFactory>());
   controller_ = std::make_unique<Controller>();
   dungeon_ = std::make_unique<Dungeon>();
   message_log_ = std::make_unique<MessageLog>();
-  // dungeon_level_ =
-  //     std::make_unique<DungeonLevel>(20, 1, Vector2D{2, 35}, *dungeon_);
   ui_ = std::make_unique<UI>(*dungeon_);
   message_log_->add_message("Welcome to your eternal doom!", WHITE);
   // TODO: add help menu
@@ -44,7 +41,7 @@ void World::generate_map(int width, int height, bool with_entities) {
   }
 
   std::vector<RectangularRoom> rooms = dungeon_->get_map().get_rooms();
-  int room_count = rooms.size();
+  size_t room_count = rooms.size();
   entities_->reserve(room_count * 2);
   for (auto it = rooms.begin() + 1; it != rooms.end(); ++it) {
     entities_->place_entities(*it, 2, 1);
@@ -63,16 +60,16 @@ void World::render(Renderer& renderer) {
           entity->get_sprite_component(), entity->get_transform_component());
     }
   }
-  // health_bar_->render(g_console);
   ui_->render(g_console);
 
   message_log_->render(g_console, 23, 35, 45, 5);
+  // TODO: this is not working since cursor is not being set
   auto entities_at = entities_->get_entities_at(controller_->cursor);
   if (!entities_at.empty()) {
     std::string names;
     for (std::reference_wrapper<Entity> entity_reference_wrapper :
          entities_at) {
-      auto& entity = entity_reference_wrapper.get();
+      const Entity& entity = entity_reference_wrapper.get();
       names += entity.get_name() + ", ";
       tcod::print_rect(
           g_console,
@@ -87,8 +84,10 @@ void World::render(Renderer& renderer) {
 
 void World::handle_enemy_turns() {
   for (const auto& entity : *entities_) {
-    auto* ai_component = &entity->get_ai_component();
-    if (ai_component && entity->get_defense_component().is_not_dead()) {
+    const std::optional<std::reference_wrapper<AIComponent>> ai_component =
+        entity->get_ai_component();
+    if (ai_component.has_value() &&
+        entity->get_defense_component().is_not_dead()) {
       entity->update(*this);
     }
   }

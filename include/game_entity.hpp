@@ -47,7 +47,13 @@ class Entity {
   ConsumableComponent& get_consumable_component() {
     return *consumableComponent_;
   };
-  AIComponent& get_ai_component() { return *aiComponent_; };
+  std::optional<std::reference_wrapper<AIComponent>> get_ai_component() {
+    if (aiComponent_) {
+      return std::ref(*aiComponent_);
+    } else {
+      return std::nullopt;
+    }
+  };
   std::unique_ptr<AIComponent> transfer_ai_component();
   Container& get_container() { return *container_; };
   float get_distance_to(Entity* other) const;

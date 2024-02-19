@@ -152,8 +152,10 @@ EntityManager::get_closest_living_monster(
   float best_distance = 1E6f;
   for (const auto& entity : entities_) {
     auto* defense_component = &entity->get_defense_component();
-    auto* ai_component = &entity->get_ai_component();
-    if (ai_component && defense_component) {
+    const std::optional<std::reference_wrapper<AIComponent>> ai_component =
+        entity->get_ai_component();
+
+    if (ai_component.has_value() && defense_component) {
       float distance = position.distance_to(
           entity->get_transform_component().get_position());
       if (distance < best_distance && (distance <= range || range == 0.0f)) {
