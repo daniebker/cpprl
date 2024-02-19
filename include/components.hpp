@@ -106,7 +106,7 @@ class Container {
   Container(int size);
   virtual ~Container() = default;
   bool add(Entity* actor);
-  void remove(Entity* actor);
+  void remove(const Entity* actor);
   std::vector<Entity*> get_inventory() const { return inventory_; }
   size_t get_size() const { return size_; }
 

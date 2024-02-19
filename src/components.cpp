@@ -51,20 +51,19 @@ bool Container::add(Entity* entity) {
   return true;
 }
 
-void Container::remove(Entity* entityToRemove) {
+void Container::remove(const Entity* entityToRemove) {
   inventory_.erase(
-      std::remove_if(
-          inventory_.begin(),
-          inventory_.end(),
-          [&entityToRemove](Entity* entity) {
+      std::begin(std::ranges::remove_if(
+          inventory_,
+          [&entityToRemove](const Entity* entity) {
             return entity == entityToRemove;
-          }),
+          })),
       inventory_.end());
 }
 
 ActionResult ConsumableComponent::pick_up(Entity* owner, Entity* wearer) {
-  auto* container = &wearer->get_container();
-  if (container && container->add(std::move(owner))) {
+  if (auto* container = &wearer->get_container();
+      container && container->add(std::move(owner))) {
     // remove the owner?
     return Success{};
   }
