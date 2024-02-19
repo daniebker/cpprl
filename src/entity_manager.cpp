@@ -16,10 +16,9 @@ void EntityManager::clear() { entities_.clear(); }
 
 void EntityManager::clear_except_player() {
   entities_.erase(
-      std::remove_if(
-          entities_.begin(),
-          entities_.end(),
-          [](const Entity* entity) { return entity->get_name() != "Player"; }),
+      std::begin(std::ranges::remove_if(
+          entities_,
+          [](const Entity* entity) { return entity->get_name() != "Player"; })),
       entities_.end());
 }
 
