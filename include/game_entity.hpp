@@ -53,12 +53,12 @@ class Entity {
   Container& get_container() { return *container_; };
   float get_distance_to(Entity* other);
 
-  bool is_blocking() { return blocker_; };
+  bool is_blocking() const { return blocker_; };
   std::string get_name() const { return name_; };
 
   void update(World& world);
   void set_blocking(bool blocker) { blocker_ = blocker; };
-  void set_name(std::string name) { name_ = name; };
+  void set_name(std::string_view name) { name_ = name; };
   void set_ascii_component(std::unique_ptr<ASCIIComponent> asciiComponent);
   void set_defense_component(
       std::unique_ptr<DefenseComponent> defenseComponent);
