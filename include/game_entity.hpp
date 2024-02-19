@@ -50,7 +50,7 @@ class Entity {
   AIComponent& get_ai_component() { return *aiComponent_; };
   std::unique_ptr<AIComponent> transfer_ai_component();
   Container& get_container() { return *container_; };
-  float get_distance_to(Entity* other);
+  float get_distance_to(Entity* other) const;
 
   bool is_blocking() const { return blocker_; };
   std::string get_name() const { return name_; };
