@@ -111,7 +111,7 @@ StateResult CloseViewCommand::execute() {
 StateResult DieEvent::execute() {
   world_.get_message_log().add_message(
       fmt::format("{} has died!", util::capitalize(entity_->get_name())));
-  entity_->get_defense_component().die(entity_);
+  entity_->get_defense_component().die(*entity_);
   return {};
 }
 

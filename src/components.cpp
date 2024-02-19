@@ -32,11 +32,11 @@ int DefenseComponent::heal(int amount) {
   return healed;
 }
 
-void DefenseComponent::die(Entity* owner) {
-  owner->set_name("corpse of " + owner->get_name());
-  owner->set_ascii_component(std::make_unique<ASCIIComponent>("%", RED, -1));
-  owner->set_blocking(false);
-  owner->set_ai_component(nullptr);
+void DefenseComponent::die(Entity& owner) const {
+  owner.set_name("corpse of " + owner.get_name());
+  owner.set_ascii_component(std::make_unique<ASCIIComponent>("%", RED, -1));
+  owner.set_blocking(false);
+  owner.set_ai_component(nullptr);
 }
 
 Container::Container(int size) : size_(size), inventory_({}) {
@@ -71,8 +71,7 @@ ActionResult ConsumableComponent::pick_up(Entity* owner, Entity* wearer) {
 }
 
 ActionResult ConsumableComponent::drop(Entity* owner, Entity* wearer) {
-  auto* container = &wearer->get_container();
-  if (container) {
+  if (auto* container = &wearer->get_container(); container) {
     container->remove(owner);
     owner->get_transform_component().move(
         wearer->get_transform_component().get_position());
@@ -82,8 +81,7 @@ ActionResult ConsumableComponent::drop(Entity* owner, Entity* wearer) {
 }
 
 ActionResult ConsumableComponent::use(Entity* owner, Entity* wearer, World&) {
-  auto* container = &wearer->get_container();
-  if (container) {
+  if (auto* container = &wearer->get_container(); container) {
     container->remove(owner);
     return Success{};
   }
@@ -94,13 +92,14 @@ HealingConsumable::HealingConsumable(int amount) : amount_(amount){};
 
 ActionResult HealingConsumable::use(
     Entity* owner, Entity* wearer, World& world) {
-  DefenseComponent* defense_component = &wearer->get_defense_component();
-  if (defense_component == nullptr) {
+  if (const DefenseComponent* defense_component =
+          &wearer->get_defense_component();
+      defense_component == nullptr) {
     return Failure{"There's nothing to heal."};
   }
 
-  int amount_healed = wearer->get_defense_component().heal(amount_);
-  if (amount_healed > 0) {
+  if (const int amount_healed = wearer->get_defense_component().heal(amount_);
+      amount_healed > 0) {
     ConsumableComponent::use(owner, wearer, world);
     std::string message = fmt::format("You healed for {} HP.", amount_healed);
     world.get_message_log().add_message(message, GREEN);
@@ -147,8 +146,8 @@ ActionResult FireSpell::use(Entity* owner, Entity* wearer, World& world) {
   auto on_pick = [&, owner, wearer]() {
     ConsumableComponent::use(owner, wearer, world);
     for (Entity* entity : world.get_entities()) {
-      auto* defense_component = &entity->get_defense_component();
-      if (defense_component && defense_component->is_not_dead() &&
+      if (const auto* defense_component = &entity->get_defense_component();
+          defense_component && defense_component->is_not_dead() &&
           entity->get_transform_component().get_position().distance_to(
               world.get_map().get_highlight_tile()) <= aoe_) {
         world.get_message_log().add_message(

@@ -44,7 +44,7 @@ class DefenseComponent {
   int heal(int amount);
   bool is_dead() const { return hp_ <= 0; }
   bool is_not_dead() const { return !is_dead(); }
-  void die(Entity* owner);
+  void die(Entity& owner) const;
 
   template <class Archive>
   void serialize(Archive& archive) {
