@@ -136,13 +136,11 @@ EntityManager::get_non_blocking_entity_at(Vector2D position) {
   return std::nullopt;
 }
 
-void EntityManager::remove(Entity* entity) {
+void EntityManager::remove(const Entity* entity) {
+  const auto condition = [&entity](const Entity* e) { return e == entity; };
   entities_.erase(
-      std::remove_if(
-          entities_.begin(),
-          entities_.end(),
-          [&entity](const Entity* e) { return e == entity; }),
-      entities_.end());
+      std::begin(std::ranges::remove_if(entities_, condition)),
+      std::end(entities_));
 }
 
 std::optional<std::reference_wrapper<Entity>>
