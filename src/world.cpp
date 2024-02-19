@@ -19,18 +19,17 @@ World::World() {
       std::make_unique<OrcFactory>(), std::make_unique<TrollFactory>());
   controller_ = std::make_unique<Controller>();
   dungeon_ = std::make_unique<Dungeon>();
-  message_log_ = std::make_unique<MessageLog>();
   ui_ = std::make_unique<UI>(*dungeon_);
-  message_log_->add_message("Welcome to your eternal doom!", WHITE);
+  message_log_.add_message("Welcome to your eternal doom!", WHITE);
   // TODO: add help menu
-  // message_log_->add_message("Press '?' for help.", WHITE);
-  message_log_->add_message("Press 'ESC' to quit.", WHITE);
-  message_log_->add_message("Press 'i' to open your inventory.", WHITE);
-  message_log_->add_message("Press 'g' to pick up items.", WHITE);
-  message_log_->add_message("Press 'd' in the inventory to drop items.", WHITE);
-  message_log_->add_message("Press 'w' 'a' 's' 'd' to move.", WHITE);
-  message_log_->add_message("Press 'v' to view your adventure log", WHITE);
-  message_log_->add_message("Now, fly you fool!", WHITE);
+  // message_log_.add_message("Press '?' for help.", WHITE);
+  message_log_.add_message("Press 'ESC' to quit.", WHITE);
+  message_log_.add_message("Press 'i' to open your inventory.", WHITE);
+  message_log_.add_message("Press 'g' to pick up items.", WHITE);
+  message_log_.add_message("Press 'd' in the inventory to drop items.", WHITE);
+  message_log_.add_message("Press 'w' 'a' 's' 'd' to move.", WHITE);
+  message_log_.add_message("Press 'v' to view your adventure log", WHITE);
+  message_log_.add_message("Now, fly you fool!", WHITE);
 }
 void World::generate_map(int width, int height, bool with_entities) {
   // TODO: will need to pass the seed here
@@ -62,7 +61,7 @@ void World::render(Renderer& renderer) {
   }
   ui_->render(g_console);
 
-  message_log_->render(g_console, 23, 35, 45, 5);
+  message_log_.render(g_console, 23, 35, 45, 5);
   // TODO: this is not working since cursor is not being set
   auto entities_at = entities_->get_entities_at(controller_->cursor);
   if (!entities_at.empty()) {

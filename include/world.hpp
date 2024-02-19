@@ -20,7 +20,7 @@ class World {
  private:
   std::unique_ptr<EntityManager> entities_;
   std::unique_ptr<Dungeon> dungeon_;
-  std::unique_ptr<MessageLog> message_log_;
+  MessageLog message_log_;
   UiWindow* health_bar_;
   // TODO: makes more sense as part of a gui class
   std::unique_ptr<UI> ui_;
@@ -32,7 +32,7 @@ class World {
   World();
   virtual ~World() = default;
 
-  MessageLog& get_message_log() { return *message_log_; }
+  MessageLog& get_message_log() { return message_log_; }
   Map& get_map() { return dungeon_->get_map(); }
   EntityManager& get_entities() { return *entities_; }
   void reset();
