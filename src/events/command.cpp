@@ -1,5 +1,7 @@
 #include "events/command.hpp"
 
+#include <assert.h>
+
 #include "combat_system.hpp"
 #include "entity_manager.hpp"
 #include "exceptions.hpp"
@@ -112,6 +114,20 @@ StateResult DieEvent::execute() {
   world_.get_message_log().add_message(
       fmt::format("{} has died!", util::capitalize(entity_->get_name())));
   entity_->get_defense_component().die(*entity_);
+
+  if (entity_->get_name() != "player") {
+    const std::optional<std::reference_wrapper<StatsComponent>>
+        stats_component = world_.get_player()->get_stats_component();
+    assert(stats_component.has_value());
+    world_.get_message_log().add_message(
+        fmt::format(
+            "You gain {} experience points.",
+            entity_->get_stats_component().value().get().get_xp()),
+        GREEN);
+    stats_component.value().get().add_xp(
+        entity_->get_stats_component().value().get().get_xp());
+  }
+
   return {};
 }
 

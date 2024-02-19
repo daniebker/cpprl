@@ -21,8 +21,6 @@ class World {
   std::unique_ptr<EntityManager> entities_;
   Dungeon dungeon_;
   MessageLog message_log_;
-  UiWindow* health_bar_;
-  // TODO: makes more sense as part of a gui class
   std::unique_ptr<UI> ui_;
   std::unique_ptr<Controller> controller_;
   UiWindow* current_window_;

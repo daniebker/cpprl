@@ -224,6 +224,39 @@ class ConfusionSpell final : public ConsumableComponent {
   }
 };
 
+class StatsComponent {
+ public:
+  StatsComponent() = default;
+  StatsComponent(int xp, int level, int level_up_base, int level_up_factor)
+      : xp_(xp),
+        level_(level),
+        level_up_base_(level_up_base),
+        level_up_factor_(level_up_factor) {}
+  virtual ~StatsComponent() = default;
+
+  int get_xp() const { return xp_; }
+  int get_level() const { return level_; }
+  int get_level_up_base() const { return level_up_base_; }
+  int get_level_up_factor() const { return level_up_factor_; }
+  int get_next_level_xp() const {
+    return level_up_base_ + level_ * level_up_factor_;
+  }
+
+  void add_xp(int xp);
+  void level_up();
+
+  template <class Archive>
+  void serialize(Archive& archive) {
+    archive(xp_, level_, level_up_base_, level_up_factor_);
+  }
+
+ private:
+  int xp_;
+  int level_;
+  int level_up_base_;
+  int level_up_factor_;
+};
+
 }  // namespace cpprl
 
 CEREAL_REGISTER_TYPE(cpprl::HealingConsumable);

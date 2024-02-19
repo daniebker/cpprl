@@ -6,7 +6,7 @@
 
 namespace cpprl {
 Entity* AbstractEntityFactory::create_base(
-    std::string name, tcod::ColorRGB color, std::string_view symbol) {
+    const std::string& name, tcod::ColorRGB color, std::string_view symbol) {
   return new Entity(
       name,
       true,
@@ -20,6 +20,7 @@ Entity* OrcFactory::create() {
   entity->set_attack_component(std::make_unique<AttackComponent>(3));
   entity->set_defense_component(std::make_unique<DefenseComponent>(0, 10));
   entity->set_ai_component(std::make_unique<HostileAI>());
+  entity->set_stats_component(std::make_unique<StatsComponent>(10, 1, 10, 10));
 
   return entity;
 }
@@ -30,6 +31,7 @@ Entity* TrollFactory::create() {
   entity->set_attack_component(std::make_unique<AttackComponent>(4));
   entity->set_defense_component(std::make_unique<DefenseComponent>(1, 16));
   entity->set_ai_component(std::make_unique<HostileAI>());
+  entity->set_stats_component(std::make_unique<StatsComponent>(20, 1, 10, 20));
 
   return entity;
 }
@@ -40,6 +42,7 @@ Entity* PlayerFactory::create() {
   entity->set_attack_component(std::make_unique<AttackComponent>(5));
   entity->set_defense_component(std::make_unique<DefenseComponent>(2, 30));
   entity->set_container(std::make_unique<Container>(26));
+  entity->set_stats_component(std::make_unique<StatsComponent>(0, 1, 150, 2));
 
   return entity;
 }

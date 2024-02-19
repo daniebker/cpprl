@@ -51,6 +51,11 @@ void Entity::set_ai_component(std::unique_ptr<AIComponent> aiComponent) {
   aiComponent_ = std::move(aiComponent);
 };
 
+void Entity::set_stats_component(
+    std::unique_ptr<StatsComponent> statsComponent) {
+  statsComponent_ = std::move(statsComponent);
+};
+
 void Entity::set_container(std::unique_ptr<Container> container) {
   container_ = std::move(container);
 };

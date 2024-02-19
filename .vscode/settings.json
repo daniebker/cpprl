@@ -142,7 +142,8 @@
     "queue": "cpp",
     "regex": "cpp",
     "unordered_set": "cpp",
-    "__availability": "cpp"
+    "__availability": "cpp",
+    "span": "cpp"
   },
   "[cpp]": {
     "editor.defaultFormatter": "xaver.clang-format"

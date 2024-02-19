@@ -32,11 +32,11 @@ int DefenseComponent::heal(int amount) {
   return healed;
 }
 
-void DefenseComponent::die(Entity& owner) const {
-  owner.set_name("corpse of " + owner.get_name());
-  owner.set_ascii_component(std::make_unique<ASCIIComponent>("%", RED, -1));
-  owner.set_blocking(false);
-  owner.set_ai_component(nullptr);
+void DefenseComponent::die(Entity& the_deceased) const {
+  the_deceased.set_name("corpse of " + the_deceased.get_name());
+  the_deceased.set_ascii_component(std::make_unique<ASCIIComponent>("%", RED, -1));
+  the_deceased.set_blocking(false);
+  the_deceased.set_ai_component(nullptr);
 }
 
 Container::Container(int size) : size_(size), inventory_({}) {
@@ -198,4 +198,18 @@ ActionResult ConfusionSpell::use(Entity* owner, Entity* wearer, World& world) {
   };
   return Poll{std::make_unique<PickTileState>(world, on_pick, max_range_)};
 }
+
+void StatsComponent::add_xp(int xp) {
+  xp_ += xp;
+  if (xp_ >= level_up_base_ * level_up_factor_) {
+    level_up();
+  }
+}
+
+void StatsComponent::level_up() {
+  level_++;
+  xp_ -= level_up_base_ * level_up_factor_;
+  level_up_base_ = static_cast<int>(level_up_base_ * 1.5);
+}
+
 }  // namespace cpprl
