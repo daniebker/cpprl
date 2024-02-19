@@ -18,7 +18,7 @@ class AttackComponent {
   AttackComponent() = default;
   AttackComponent(int damage) : damage_(damage) {}
   virtual ~AttackComponent() = default;
-  int get_damage() { return damage_; }
+  int get_damage() const { return damage_; }
 
   template <class Archive>
   void serialize(Archive& archive) {
@@ -36,14 +36,14 @@ class DefenseComponent {
       : defense_(defense), hp_(maxHp), max_hp_(maxHp) {}
   virtual ~DefenseComponent() = default;
 
-  int get_hp() { return hp_; }
-  int get_max_hp() { return max_hp_; }
-  int get_defense() { return defense_; }
+  int get_hp() const { return hp_; }
+  int get_max_hp() const { return max_hp_; }
+  int get_defense() const { return defense_; }
 
   void take_damage(int damage) { hp_ -= damage; }
   int heal(int amount);
-  bool is_dead() { return hp_ <= 0; }
-  bool is_not_dead() { return !is_dead(); }
+  bool is_dead() const { return hp_ <= 0; }
+  bool is_not_dead() const { return !is_dead(); }
   void die(Entity* owner);
 
   template <class Archive>
@@ -62,7 +62,7 @@ class TransformComponent {
   TransformComponent() = default;
   TransformComponent(int x, int y) : position_({x, y}) {}
   virtual ~TransformComponent() = default;
-  Vector2D get_position() { return position_; }
+  Vector2D get_position() const { return position_; }
   void move(Vector2D new_position) { position_ = new_position; }
 
   template <class Archive>
@@ -81,9 +81,9 @@ class ASCIIComponent {
       : symbol_(symbol), colour_(colour), layer_(layer) {}
   virtual ~ASCIIComponent() = default;
 
-  std::string_view get_symbol() { return symbol_; }
-  tcod::ColorRGB get_colour() { return colour_; }
-  int get_layer() { return layer_; }
+  std::string_view get_symbol() const { return symbol_; }
+  tcod::ColorRGB get_colour() const { return colour_; }
+  int get_layer() const { return layer_; }
 
   template <class Archive>
   void serialize(Archive& archive) {
@@ -107,8 +107,8 @@ class Container {
   virtual ~Container() = default;
   bool add(Entity* actor);
   void remove(Entity* actor);
-  std::vector<Entity*> get_inventory() { return inventory_; }
-  int get_size() { return size_; }
+  std::vector<Entity*> get_inventory() const { return inventory_; }
+  size_t get_size() const { return size_; }
 
   template <class Archive>
   void save(Archive& archive) const {
@@ -164,7 +164,8 @@ class HealingConsumable final : public ConsumableComponent {
 
 class LightningBolt final : public ConsumableComponent {
  private:
-  float range_, damage_;
+  float range_;
+  float damage_;
 
  public:
   LightningBolt() = default;
@@ -180,7 +181,9 @@ class LightningBolt final : public ConsumableComponent {
 
 class FireSpell final : public ConsumableComponent {
  private:
-  float max_range_, aoe_, damage_;
+  float max_range_;
+  float aoe_;
+  float damage_;
 
  public:
   FireSpell() = default;
@@ -201,7 +204,8 @@ class FireSpell final : public ConsumableComponent {
 
 class ConfusionSpell final : public ConsumableComponent {
  private:
-  int num_turns_, max_range_;
+  int num_turns_;
+  int max_range_;
 
  public:
   ConfusionSpell() = default;
