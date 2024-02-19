@@ -11,7 +11,6 @@
 #include "ui/ui.hpp"
 
 namespace cpprl {
-// class Dungeon;
 class EntityManager;
 class Entity;
 class UiWindow;
