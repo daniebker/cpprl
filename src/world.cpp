@@ -18,8 +18,7 @@ World::World() {
   entities_ = std::make_unique<EntityManager>(
       std::make_unique<OrcFactory>(), std::make_unique<TrollFactory>());
   controller_ = std::make_unique<Controller>();
-  dungeon_ = std::make_unique<Dungeon>();
-  ui_ = std::make_unique<UI>(*dungeon_);
+  ui_ = std::make_unique<UI>(dungeon_);
   message_log_.add_message("Welcome to your eternal doom!", WHITE);
   // TODO: add help menu
   // message_log_.add_message("Press '?' for help.", WHITE);
@@ -33,13 +32,13 @@ World::World() {
 }
 void World::generate_map(int width, int height, bool with_entities) {
   // TODO: will need to pass the seed here
-  dungeon_->generate(DungeonConfig{30, 6, 10, width, height, 2});
+  dungeon_.generate(DungeonConfig{30, 6, 10, width, height, 2});
 
   if (!with_entities) {
     return;
   }
 
-  std::vector<RectangularRoom> rooms = dungeon_->get_map().get_rooms();
+  std::vector<RectangularRoom> rooms = dungeon_.get_map().get_rooms();
   size_t room_count = rooms.size();
   entities_->reserve(room_count * 2);
   for (auto it = rooms.begin() + 1; it != rooms.end(); ++it) {
@@ -48,12 +47,12 @@ void World::generate_map(int width, int height, bool with_entities) {
 }
 
 void World::render(Renderer& renderer) {
-  dungeon_->get_map().compute_fov(
+  dungeon_.get_map().compute_fov(
       player_->get_transform_component().get_position(), 10);
-  dungeon_->get_map().render(g_console);
+  dungeon_.get_map().render(g_console);
 
   for (const auto& entity : *entities_) {
-    if (dungeon_->get_map().is_in_fov(
+    if (dungeon_.get_map().is_in_fov(
             entity->get_transform_component().get_position())) {
       renderer.render(
           entity->get_sprite_component(), entity->get_transform_component());
@@ -96,13 +95,13 @@ void World::spawn_player() {
   auto player_factory_ = std::make_unique<PlayerFactory>();
   Entity* player = player_factory_->create();
   player->get_transform_component().move(
-      dungeon_->get_map().get_rooms().at(0).get_center());
+      dungeon_.get_map().get_rooms().at(0).get_center());
   World::spawn_player(player);
 }
 
 void World::spawn_player(Entity* player) {
   player_ = entities_->spawn(player);
-  dungeon_->get_map().compute_fov(
+  dungeon_.get_map().compute_fov(
       player_->get_transform_component().get_position(), 4);
   DefenseComponent& player_defense = player_->get_defense_component();
   ui_->set_health_bar(player_defense);
