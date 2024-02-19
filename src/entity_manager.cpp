@@ -52,14 +52,14 @@ void EntityManager::place_entities(
   }
 
   for (int i = 0; i < number_of_items; i++) {
-    Vector2D bottom_left, top_right;
+    Vector2D bottom_left;
+    Vector2D top_right;
     std::tie(bottom_left, top_right) = room.innerBounds();
     int x = random->getInt(bottom_left.x + 1, top_right.x - 1);
     int y = random->getInt(bottom_left.y + 1, top_right.y - 1);
 
-    auto iterator = util::find_entity_at(entities_, x, y);
-
-    if (iterator != entities_.end()) {
+    if (auto iterator = util::find_entity_at(entities_, x, y);
+        iterator != entities_.end()) {
       continue;
     }
 
@@ -151,7 +151,7 @@ EntityManager::get_closest_living_monster(
   std::optional<std::reference_wrapper<Entity>> closest = std::nullopt;
   float best_distance = 1E6f;
   for (const auto& entity : entities_) {
-    auto* defense_component = &entity->get_defense_component();
+    const auto* defense_component = &entity->get_defense_component();
     const std::optional<std::reference_wrapper<AIComponent>> ai_component =
         entity->get_ai_component();
 
