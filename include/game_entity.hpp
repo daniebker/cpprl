@@ -32,7 +32,7 @@ class Entity {
 
  public:
   Entity(
-      std::string name,
+      std::string const& name,
       bool blocker,
       std::unique_ptr<TransformComponent> transformComponent,
       std::unique_ptr<ASCIIComponent> asciiComponent);
