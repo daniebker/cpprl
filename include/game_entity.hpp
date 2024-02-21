@@ -95,6 +95,7 @@ class Entity {
     archive(asciiComponent_ != nullptr);
     archive(aiComponent_ != nullptr);
     archive(container_ != nullptr);
+    archive(statsComponent_ != nullptr);
     if (transformComponent_) archive(transformComponent_);
 
     if (asciiComponent_) archive(asciiComponent_);
@@ -103,6 +104,7 @@ class Entity {
     if (consumableComponent_) archive(consumableComponent_);
     if (aiComponent_) archive(aiComponent_);
     if (container_) archive(container_);
+    if (statsComponent_) archive(statsComponent_);
   }
 
   template <class Archive>

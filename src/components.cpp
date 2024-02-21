@@ -200,16 +200,19 @@ ActionResult ConfusionSpell::use(Entity* owner, Entity* wearer, World& world) {
 }
 
 void StatsComponent::add_xp(int xp) {
-  xp_ += xp;
-  if (xp_ >= level_up_base_ * level_up_factor_) {
+  stats_data_.xp_ += xp;
+  if (stats_data_.xp_ >= this->get_next_level_xp()) {
     level_up();
   }
 }
 
 void StatsComponent::level_up() {
-  level_++;
-  xp_ -= level_up_base_ * level_up_factor_;
-  level_up_base_ = static_cast<int>(level_up_base_ * 1.5);
+  stats_data_.level_++;
+  stats_data_.xp_ = 0;
+
+  stats_data_.level_up_base_ =
+      static_cast<int>(stats_data_.level_up_base_ * 1.5);
+  stats_data_.stats_points_ += 2;
 }
 
 }  // namespace cpprl

@@ -13,7 +13,7 @@
 
 namespace cpprl {
 
-class AttackComponent {
+class  AttackComponent {
  public:
   AttackComponent() = default;
   explicit AttackComponent(int damage) : damage_(damage) {}
@@ -224,22 +224,47 @@ class ConfusionSpell final : public ConsumableComponent {
   }
 };
 
+/**
+ * @brief StatsData
+ * Simple data structure to hold stats data
+ */
+struct StatsData {
+  int xp_;
+  int level_;
+  int level_up_base_;
+  int level_up_factor_;
+  int stats_points_;
+
+  template <class Archive>
+  void serialize(Archive& archive) {
+    archive(xp_, level_, level_up_base_, level_up_factor_, stats_points_);
+  }
+};
+
+/**
+ * @brief StatsComponent
+ * Component used to manipulate stats data.
+ */
 class StatsComponent {
  public:
   StatsComponent() = default;
-  StatsComponent(int xp, int level, int level_up_base, int level_up_factor)
-      : xp_(xp),
-        level_(level),
-        level_up_base_(level_up_base),
-        level_up_factor_(level_up_factor) {}
+  explicit StatsComponent(StatsData stats_data) : stats_data_(stats_data) {}
+  StatsComponent(
+      int xp,
+      int level,
+      int level_up_base,
+      int level_up_factor,
+      int stats_points)
+      : stats_data_{xp, level, level_up_base, level_up_factor, stats_points} {}
   virtual ~StatsComponent() = default;
 
-  int get_xp() const { return xp_; }
-  int get_level() const { return level_; }
-  int get_level_up_base() const { return level_up_base_; }
-  int get_level_up_factor() const { return level_up_factor_; }
+  int get_xp() const { return stats_data_.xp_; }
+  int get_level() const { return stats_data_.level_; }
+  int get_level_up_base() const { return stats_data_.level_up_base_; }
+  int get_level_up_factor() const { return stats_data_.level_up_factor_; }
   int get_next_level_xp() const {
-    return level_up_base_ + level_ * level_up_factor_;
+    return stats_data_.level_up_base_ +
+           stats_data_.level_ * stats_data_.level_up_factor_;
   }
 
   void add_xp(int xp);
@@ -247,14 +272,11 @@ class StatsComponent {
 
   template <class Archive>
   void serialize(Archive& archive) {
-    archive(xp_, level_, level_up_base_, level_up_factor_);
+    archive(stats_data_);
   }
 
  private:
-  int xp_;
-  int level_;
-  int level_up_base_;
-  int level_up_factor_;
+  StatsData stats_data_;
 };
 
 }  // namespace cpprl
@@ -263,5 +285,6 @@ CEREAL_REGISTER_TYPE(cpprl::HealingConsumable);
 CEREAL_REGISTER_TYPE(cpprl::LightningBolt);
 CEREAL_REGISTER_TYPE(cpprl::FireSpell);
 CEREAL_REGISTER_TYPE(cpprl::ConfusionSpell);
-
+CEREAL_REGISTER_TYPE(cpprl::StatsComponent);
+CEREAL_REGISTER_TYPE(cpprl::AttackComponent);
 #endif
