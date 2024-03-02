@@ -73,8 +73,10 @@ GameInputHandler::GameInputHandler(World& world, Entity* controllable_entity)
       inventory_command_(
           std::make_unique<InventoryCommand>(world, controllable_entity)),
       main_menu_command_(std::make_unique<MainMenuCommand>(world)),
+      character_menu_command_(
+          std::make_unique<CharacterMenuCommand>(world, controllable_entity)),
       use_command_(nullptr),
-     controllable_entity_(controllable_entity){};
+      controllable_entity_(controllable_entity){};
 
 EngineEvent& GameInputHandler::handle_sdl_event(SDL_Event event) noexcept {
   // TODO: Move this to its own handler.
@@ -112,10 +114,12 @@ EngineEvent& GameInputHandler::handle_sdl_event(SDL_Event event) noexcept {
     return *inventory_command_;
   } else if (key == SDLK_COMMA) {
     return *main_menu_command_;
+  } else if (key == SDLK_PERIOD) {
+    return *character_menu_command_;
   } else if (key == SDLK_LEFTBRACKET) {
-     use_command_ =std::make_unique<UseCommand>(
+    use_command_ = std::make_unique<UseCommand>(
         world_, controllable_entity_->get_transform_component().get_position());
-        return *use_command_;
+    return *use_command_;
   } else {
     return EventHandler::handle_sdl_event(event);
   }
@@ -204,6 +208,21 @@ EngineEvent& MainMenuInputHandler::handle_sdl_event(SDL_Event event) noexcept {
   switch (key) {
     case SDLK_RETURN:
       return *selectMenuItemCommand_;
+      break;
+    case SDLK_COMMA:
+      return *closeViewCommand_;
+    default:
+      return GuiInputHandler::handle_sdl_event(event);
+      break;
+  }
+}
+
+EngineEvent& CharacterMenuInputHandler::handle_sdl_event(
+    SDL_Event event) noexcept {
+  SDL_Keycode key = event.key.keysym.sym;
+  switch (key) {
+    case SDLK_RETURN:
+      return *boost_stat_command_;
       break;
     case SDLK_COMMA:
       return *closeViewCommand_;

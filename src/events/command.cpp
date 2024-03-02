@@ -255,4 +255,27 @@ StateResult MainMenuCommand::execute() {
   return Change{std::make_unique<MainMenuState>(
       world_, new MainMenuWindow(60, 35, {0, 0}))};
 }
+
+StateResult CharacterMenuCommand::execute() {
+  return Change{std::make_unique<CharacterMenuState>(
+      world_, new CharacterMenuWindow(60, 35, {0, 0}, entity_))};
+}
+
+StateResult BoostStatCommand::execute() {
+  int cursor = ui_window_.get_cursor();
+  Entity* player = world_.get_player();
+  auto& stats = player->get_stats_component().value().get();
+
+  if (stats.get_stats_points() <= 0) {
+    return NoOp{"You don't have any stat points."};
+  }
+
+  if (cursor == 3) {
+    player->get_attack_component().boost_damage(1);
+  } else if (cursor == 4) {
+    player->get_defense_component().boost_defense(1);
+  }
+  stats.reduce_stats_points(1);
+  return EndTurn{};
+}
 }  // namespace cpprl

@@ -60,6 +60,7 @@ class GameInputHandler final : public EventHandler {
   std::unique_ptr<InventoryCommand> inventory_command_;
   std::unique_ptr<MainMenuCommand> main_menu_command_;
   std::unique_ptr<UseCommand> use_command_;
+  std::unique_ptr<CharacterMenuCommand> character_menu_command_;
   Entity* controllable_entity_;
 
  public:
@@ -119,6 +120,18 @@ class InventoryInputHandler final : public GuiInputHandler {
         dropItemCommand_(std::make_unique<SelectItemCommand>(
             world, entity, ui_window, ItemSubCommand::DROP_ITEM)){};
   ~InventoryInputHandler() = default;
+  EngineEvent& handle_sdl_event(SDL_Event event) noexcept override;
+};
+
+class CharacterMenuInputHandler final : public GuiInputHandler {
+ private:
+  std::unique_ptr<BoostStatCommand> boost_stat_command_;
+
+ public:
+  CharacterMenuInputHandler(World& world, UiWindow& ui_window)
+      : GuiInputHandler(world, ui_window),
+        boost_stat_command_(
+            std::make_unique<BoostStatCommand>(world, ui_window)){};
   EngineEvent& handle_sdl_event(SDL_Event event) noexcept override;
 };
 

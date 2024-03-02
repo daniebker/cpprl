@@ -19,6 +19,7 @@ class  AttackComponent {
   explicit AttackComponent(int damage) : damage_(damage) {}
   virtual ~AttackComponent() = default;
   int get_damage() const { return damage_; }
+  void boost_damage(int amount) { damage_ += amount; }
 
   template <class Archive>
   void serialize(Archive& archive) {
@@ -39,6 +40,7 @@ class DefenseComponent {
   int get_hp() const { return hp_; }
   int get_max_hp() const { return max_hp_; }
   int get_defense() const { return defense_; }
+  void boost_defense(int amount) { defense_ += amount; }
 
   void take_damage(int damage) { hp_ -= damage; }
   int heal(int amount);
@@ -262,6 +264,8 @@ class StatsComponent {
   int get_level() const { return stats_data_.level_; }
   int get_level_up_base() const { return stats_data_.level_up_base_; }
   int get_level_up_factor() const { return stats_data_.level_up_factor_; }
+  void reduce_stats_points(int amount) { stats_data_.stats_points_ -= amount; }
+  int get_stats_points() const { return stats_data_.stats_points_; }
   int get_next_level_xp() const {
     return stats_data_.level_up_base_ +
            stats_data_.level_ * stats_data_.level_up_factor_;

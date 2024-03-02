@@ -103,4 +103,11 @@ void MainMenuState::on_enter() {
   window_ = new MainMenuWindow(20, 10, {0, 0}, "Main Menu");
   input_handler_ = std::make_unique<MainMenuInputHandler>(world_, *window_);
 }
+
+void CharacterMenuState::on_enter() {
+  window_ = new CharacterMenuWindow(
+      20, 10, {0, 0}, world_.get_player(), "Character Menu");
+  input_handler_ =
+      std::make_unique<CharacterMenuInputHandler>(world_, *window_);
+}
 }  // namespace cpprl

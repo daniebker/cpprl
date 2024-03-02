@@ -72,6 +72,12 @@ class InventoryCommand final : public Command {
   StateResult execute() override;
 };
 
+class CharacterMenuCommand final : public Command {
+ public:
+  using Command::Command;
+  StateResult execute() override;
+};
+
 class MainMenuCommand final : public EngineEvent {
  public:
   MainMenuCommand(World& world) : EngineEvent(world) {}
@@ -124,6 +130,16 @@ class UseItemCommand final : public Command {
  public:
   UseItemCommand(World& world, Entity* entity, int item_index)
       : Command(world, entity), item_index_(item_index) {}
+  StateResult execute() override;
+};
+
+class BoostStatCommand final : public EngineEvent {
+ private:
+  UiWindow& ui_window_;
+
+ public:
+  BoostStatCommand(World& world, UiWindow& ui_window)
+      : EngineEvent(world), ui_window_(ui_window) {}
   StateResult execute() override;
 };
 
