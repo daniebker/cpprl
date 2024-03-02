@@ -30,7 +30,7 @@ target_include_directories(${PROJECT_NAME}
 )
 
 
-# Ensure the C++17 standard is available.
+# Ensure the C++20 standard is available.
 target_compile_features(${PROJECT_NAME} PRIVATE cxx_std_20)
 
 # Enforce UTF-8 encoding on MSVC.
@@ -48,7 +48,7 @@ endif()
 if (EMSCRIPTEN)
     # Attach data folder to Emscripten builds.
     target_link_options(${PROJECT_NAME} PRIVATE --preload-file "${CMAKE_CURRENT_SOURCE_DIR}/data@data" -fexceptions -lidbfs.js)
-    target_compile_options(${PROJECT_NAME} PRIVATE -fexceptions)
+    target_compile_options(${PROJECT_NAME} PRIVATE -fexceptions -std=c++20)
     # Set output to html to generate preview pages, otherwise you'll have to make your own html.
     configure_file(
         ${PROJECT_SOURCE_DIR}/emscripten/index.html
