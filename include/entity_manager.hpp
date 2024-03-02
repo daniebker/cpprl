@@ -11,6 +11,9 @@
 #include "types/map.hpp"
 
 namespace cpprl {
+
+typedef std::optional<std::reference_wrapper<Entity>> OptEntityRef;
+
 class EntityManager {
  public:
   EntityManager() {
@@ -21,8 +24,7 @@ class EntityManager {
   EntityManager(
       std::unique_ptr<AbstractEntityFactory> orc_factory,
       std::unique_ptr<AbstractEntityFactory> troll_factory)
-      : entities_{},
-        orc_factory_(std::move(orc_factory)),
+      : orc_factory_(std::move(orc_factory)),
         troll_factory_(std::move(troll_factory)){};
   void clear();
   void clear_except_player();

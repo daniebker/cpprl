@@ -143,6 +143,7 @@ void MainMenuWindow::render(tcod::Console& parent_console) {
     if (y_offset == 2 && !std::filesystem::exists("saves/game.sav")) {
       continue;
     }
+
     tcod::print_rect(
         *console_,
         {2, y_offset, console_->getWidth() - 1, 1},
@@ -152,6 +153,61 @@ void MainMenuWindow::render(tcod::Console& parent_console) {
         TCOD_LEFT);
     ++y_offset;
   }
+
+  tcod::blit(
+      parent_console,
+      *console_,
+      {3, 3},
+      {position_.x, position_.y, console_->getWidth(), console_->getHeight()},
+      1.0f,
+      1.0f);
+}
+
+void CharacterMenuWindow::render(tcod::Console& parent_console) {
+  console_->clear();
+  UiWindow::add_frame();
+
+  tcod::print(*console_, {1, cursor_}, ">", WHITE, std::nullopt, TCOD_LEFT);
+
+  int entity_damage_ = entity_->get_attack_component().get_damage();
+  int entity_defense_ = entity_->get_defense_component().get_defense();
+  auto stats = entity_->get_stats_component().value().get();
+
+  tcod::print_rect(
+      *console_,
+      {2, 1, console_->getWidth() - 1, 1},
+      fmt::format("Level: {}", stats.get_level()),
+      // "Damage: " + entity_damage_,
+      WHITE,
+      std::nullopt,
+      TCOD_LEFT);
+
+  tcod::print_rect(
+      *console_,
+      {2, 2, console_->getWidth() - 1, 1},
+      fmt::format("Stat Points: {}", stats.get_stats_points()),
+      // "Damage: " + entity_damage_,
+      WHITE,
+      std::nullopt,
+      TCOD_LEFT);
+
+  tcod::print_rect(
+      *console_,
+      {2, 3, console_->getWidth() - 1, 1},
+      fmt::format("Damage: {}", entity_damage_),
+      // "Damage: " + entity_damage_,
+      WHITE,
+      std::nullopt,
+      TCOD_LEFT);
+
+  tcod::print_rect(
+      *console_,
+      {2, 4, console_->getWidth() - 1, 1},
+      fmt::format("Defense: {}", entity_defense_),
+      // "Defense: " + entity_defense_,
+      WHITE,
+      std::nullopt,
+      TCOD_LEFT);
 
   tcod::blit(
       parent_console,

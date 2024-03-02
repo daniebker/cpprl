@@ -30,14 +30,14 @@ void EntityManager::place_entities(
   int number_of_items = random->getInt(0, max_items_per_room);
 
   for (int i = 0; i < number_of_monsters; i++) {
-    Vector2D bottom_left, top_right;
+    Vector2D bottom_left;
+    Vector2D top_right;
     std::tie(bottom_left, top_right) = room.innerBounds();
     int x = random->getInt(bottom_left.x + 1, top_right.x - 1);
     int y = random->getInt(bottom_left.y + 1, top_right.y - 1);
 
-    auto iterator = util::find_entity_at(entities_, x, y);
-
-    if (iterator != entities_.end()) {
+    if (auto iterator = util::find_entity_at(entities_, x, y);
+        iterator != entities_.end()) {
       continue;
     }
 

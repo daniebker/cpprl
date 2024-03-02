@@ -100,6 +100,24 @@ class InventoryWindow final : public UiWindow {
   virtual void render(tcod::Console& parent_console) override;
 };
 
+class CharacterMenuWindow final : public UiWindow {
+ private:
+  Entity* entity_;
+
+ public:
+  CharacterMenuWindow(
+      std::size_t width,
+      std::size_t height,
+      Vector2D position,
+      Entity* entity,
+      std::string title = "")
+      : UiWindow(width, height, position, title), entity_(entity) {
+    UiWindow::set_cursor(1);
+  };
+
+  virtual void render(tcod::Console& parent_console) override;
+};
+
 class GameOverWindow final : public UiWindow {
  private:
   std::string message_;

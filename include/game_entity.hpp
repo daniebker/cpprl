@@ -15,6 +15,7 @@ class ASCIIComponent;
 class AttackComponent;
 class DefenseComponent;
 class ConsumableComponent;
+class StatsComponent;
 class Container;
 
 class Entity {
@@ -28,6 +29,7 @@ class Entity {
   std::unique_ptr<ConsumableComponent> consumableComponent_;
   std::unique_ptr<AIComponent> aiComponent_;
   std::unique_ptr<Container> container_;
+  std::unique_ptr<StatsComponent> statsComponent_;
 
  public:
   Entity(
@@ -54,6 +56,15 @@ class Entity {
       return std::nullopt;
     }
   };
+
+  std::optional<std::reference_wrapper<StatsComponent>> get_stats_component() {
+    if (statsComponent_) {
+      return std::ref(*statsComponent_);
+    } else {
+      return std::nullopt;
+    }
+  };
+
   std::unique_ptr<AIComponent> transfer_ai_component();
   Container& get_container() { return *container_; };
   float get_distance_to(Entity* other) const;
@@ -72,6 +83,7 @@ class Entity {
       std::unique_ptr<ConsumableComponent> consumableComponent);
   void set_ai_component(std::unique_ptr<AIComponent> aiComponent);
   void set_container(std::unique_ptr<Container> container);
+  void set_stats_component(std::unique_ptr<StatsComponent> aiComponent);
 
   template <class Archive>
   void pack(Archive& archive) {
@@ -83,6 +95,7 @@ class Entity {
     archive(asciiComponent_ != nullptr);
     archive(aiComponent_ != nullptr);
     archive(container_ != nullptr);
+    archive(statsComponent_ != nullptr);
     if (transformComponent_) archive(transformComponent_);
 
     if (asciiComponent_) archive(asciiComponent_);
@@ -91,6 +104,7 @@ class Entity {
     if (consumableComponent_) archive(consumableComponent_);
     if (aiComponent_) archive(aiComponent_);
     if (container_) archive(container_);
+    if (statsComponent_) archive(statsComponent_);
   }
 
   template <class Archive>
@@ -102,6 +116,7 @@ class Entity {
     bool hasAsciiComponent;
     bool hasAIComponent;
     bool hasContainer;
+    bool hasStatsComponent;
 
     archive(name_, blocker_);
     archive(hasTransformComponent);
@@ -111,6 +126,7 @@ class Entity {
     archive(hasAsciiComponent);
     archive(hasAIComponent);
     archive(hasContainer);
+    archive(hasStatsComponent);
 
     if (hasTransformComponent) {
       archive(transformComponent_);
@@ -132,6 +148,9 @@ class Entity {
     }
     if (hasContainer) {
       archive(container_);
+    }
+    if (hasStatsComponent) {
+      archive(statsComponent_);
     }
   }
 };

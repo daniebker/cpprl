@@ -107,7 +107,14 @@ class MainMenuState final : public GuiViewState {
   MainMenuState(World& world, UiWindow* window) : GuiViewState(world, window) {}
   ~MainMenuState() { delete window_; }
   void on_enter() override;
-};  // namespace cpprl
+};
+
+class CharacterMenuState final : public GuiViewState {
+ public:
+  CharacterMenuState(World& world, UiWindow* window)
+      : GuiViewState(world, window) {}
+  void on_enter() override;
+};
 
 }  // namespace cpprl
 

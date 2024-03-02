@@ -14,7 +14,7 @@ class AbstractEntityFactory {
 
  protected:
   Entity* create_base(
-      std::string name, tcod::ColorRGB color, std::string_view symbol);
+      const std::string& name, tcod::ColorRGB color, std::string_view symbol);
 };
 
 class OrcFactory : public AbstractEntityFactory {

@@ -1,5 +1,7 @@
 #include "events/command.hpp"
 
+#include <assert.h>
+
 #include "combat_system.hpp"
 #include "entity_manager.hpp"
 #include "exceptions.hpp"
@@ -112,6 +114,20 @@ StateResult DieEvent::execute() {
   world_.get_message_log().add_message(
       fmt::format("{} has died!", util::capitalize(entity_->get_name())));
   entity_->get_defense_component().die(*entity_);
+
+  if (entity_->get_name() != "player") {
+    const std::optional<std::reference_wrapper<StatsComponent>>
+        stats_component = world_.get_player()->get_stats_component();
+    assert(stats_component.has_value());
+    world_.get_message_log().add_message(
+        fmt::format(
+            "You gain {} experience points.",
+            entity_->get_stats_component().value().get().get_xp()),
+        GREEN);
+    stats_component.value().get().add_xp(
+        entity_->get_stats_component().value().get().get_xp());
+  }
+
   return {};
 }
 
@@ -238,5 +254,28 @@ StateResult SelectMenuItemCommand::execute() {
 StateResult MainMenuCommand::execute() {
   return Change{std::make_unique<MainMenuState>(
       world_, new MainMenuWindow(60, 35, {0, 0}))};
+}
+
+StateResult CharacterMenuCommand::execute() {
+  return Change{std::make_unique<CharacterMenuState>(
+      world_, new CharacterMenuWindow(60, 35, {0, 0}, entity_))};
+}
+
+StateResult BoostStatCommand::execute() {
+  int cursor = ui_window_.get_cursor();
+  Entity* player = world_.get_player();
+  auto& stats = player->get_stats_component().value().get();
+
+  if (stats.get_stats_points() <= 0) {
+    return NoOp{"You don't have any stat points."};
+  }
+
+  if (cursor == 3) {
+    player->get_attack_component().boost_damage(1);
+  } else if (cursor == 4) {
+    player->get_defense_component().boost_defense(1);
+  }
+  stats.reduce_stats_points(1);
+  return EndTurn{};
 }
 }  // namespace cpprl

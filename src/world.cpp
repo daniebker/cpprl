@@ -105,7 +105,7 @@ void World::spawn_player(Entity* player) {
       player_->get_transform_component().get_position(), 4);
   DefenseComponent& player_defense = player_->get_defense_component();
   ui_->set_health_bar(player_defense);
-  // health_bar_ = new HealthBar(20, 1, {2, 36}, player_defense);
+  ui_->set_xp_bar(player_->get_stats_component().value().get());
   entities_->shrink_to_fit();
 }
 
