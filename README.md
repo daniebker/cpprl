@@ -11,9 +11,9 @@
   - The command to do this is: `git submodule update --init`
 - `mkdir build`
 - `cd build`
-- Init the project from the terminal using ~cmake ../~
+- Init the project from the terminal using `cmake ../`
 - `cd ../`
-- from the terminal run `cmake --build . --config Debug --target all -j 12~ to build the project`
+- from the terminal run `cmake --build . --config Debug --target all -j 12 # to build the project`
 - Load this project in VS Code and install any recommended plugins.
   Most importantly: _C/C++_, _C++ Intellisense_, and _CMake Tools_.
 - Using the CMake Tools plugin you can now build and run this project. Dependencies will automatically be installed via Vcpkg.
