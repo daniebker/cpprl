@@ -1,7 +1,6 @@
 #include "game_entity.hpp"
 
 #include <libtcod.hpp>
-#include <string_view>
 
 #include "basic_ai_component.hpp"
 #include "components.hpp"
@@ -64,4 +63,4 @@ namespace cpprl {
     return std::move(aiComponent_);
   };
 
-}  // namespace cpprl
+}
