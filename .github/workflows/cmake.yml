@@ -103,7 +103,7 @@ jobs:
       - name: "Upload Artifact"
         uses: actions/upload-artifact@v4
         with:
-          name: automated-builds
+          name: ${{ matrix-os }}-automated-builds
           path: ${{ env.archive-name }}.*
           retention-days: 7
           if-no-files-found: error
