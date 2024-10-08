@@ -6,6 +6,7 @@
 
 #include "basic_ai_component.hpp"
 #include "types/world_fwd.hpp"
+#include <../../lib/include/core/types.hpp>
 
 namespace cpprl {
 
@@ -19,6 +20,8 @@ namespace cpprl {
 
   class Entity {
     private:
+      SupaRL::Entity id_;
+
       std::string name_;
       bool blocker_;
       std::unique_ptr<TransformComponent> transformComponent_;
