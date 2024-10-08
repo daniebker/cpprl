@@ -142,7 +142,8 @@ jobs:
         uses: actions/cache@v2
         with:
           path: ${{env.EM_CACHE_FOLDER}}
-          key: ${{env.EM_VERSION}}-${{ runner.os }}-${{ hashFiles('emsdk/emsdk-version.txt') }}
+          # key: ${{env.EM_VERSION}}-${{ runner.os }}-${{ hashFiles('emsdk/emsdk-version.txt') }}
+          key: ${{env.EM_VERSION}}-${{ runner.os }}-${{ hashFiles('emsdk/emsdk-version.txt','.git/modules/HEAD') }}
       - uses: mymindstorm/setup-emsdk@v11
         with:
           version: ${{env.EM_VERSION}}
