@@ -1,5 +1,5 @@
 #include "gtest/gtest.h"
-#include "components.hpp"
+#include "../../lib/include/components/components.hpp"
 
 /**
  * @file status_condition_systems_tests.cpp
@@ -15,11 +15,11 @@
 TEST(StatusConditionSystem, TakeDamage) {
   // Setup
   auto entity = 1;
-  SupaRL::StatusConditionComponent statusConditionComponent {
-damege_per_turn_: 1,
-turns_remaining_: 1,
-turns_until_update_: 1,
-name_: "Bleed"
+  SupaRL::StatusConditionComponent statusConditionComponent = {
+    .damege_per_turn_= 1,
+    .turns_remaining_= 1,
+    .turns_until_update_= 1,
+    .name_= "Bleed"
   };
   // Add the StatusConditionComponent to the entity
   // AddEntityComponent(entity, statusConditionComponent);
