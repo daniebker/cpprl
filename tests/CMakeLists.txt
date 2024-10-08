@@ -22,6 +22,7 @@ add_executable(roguelike_tests ${cpprl_tests_SOURCE_FILES})
 target_link_libraries(roguelike_tests
  PRIVATE
   GTest::gtest_main
+  roguelike
   cpprl)
 
 include(GoogleTest)
