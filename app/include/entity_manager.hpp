@@ -3,6 +3,7 @@
 #include <memory>
 #include <optional>
 #include <vector>
+#include "../../lib/include/core/entity_manager.hpp"
 
 #include "colours.hpp"
 #include "entity_factory.hpp"
@@ -19,6 +20,7 @@ class EntityManager {
   EntityManager() {
     orc_factory_ = std::make_unique<OrcFactory>();
     troll_factory_ = std::make_unique<TrollFactory>();
+    entity_manager_ = SupaRL::EntityManager();
   };
 
   EntityManager(
@@ -82,6 +84,7 @@ class EntityManager {
 
  private:
   std::vector<Entity*> entities_;
+  SupaRL::EntityManager entity_manager_;
   std::unique_ptr<AbstractEntityFactory> orc_factory_;
   std::unique_ptr<AbstractEntityFactory> troll_factory_;
 };

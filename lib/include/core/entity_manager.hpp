@@ -4,6 +4,7 @@
 #include <array>
 #include <cassert>
 #include <queue>
+#include <iostream>
 
 
 namespace SupaRL {
@@ -14,48 +15,51 @@ namespace SupaRL {
       {
         for (Entity entity = 0; entity < MAX_ENTITIES; ++entity)
         {
-          mAvailableEntities.push(entity);
+          available_entities_.push(entity);
         }
       }
 
-      Entity CreateEntity()
+      Entity create_entity()
       {
-        assert(mLivingEntityCount < MAX_ENTITIES && "Too many entities in existence.");
+        assert(living_entity_count_ < MAX_ENTITIES && "Too many entities in existence.");
 
-        Entity id = mAvailableEntities.front();
-        mAvailableEntities.pop();
-        ++mLivingEntityCount;
+        Entity id = available_entities_.front();
+        available_entities_.pop();
+        ++living_entity_count_;
 
         return id;
       }
 
-      void DestroyEntity(Entity entity)
+      void destroy_entity(Entity entity)
       {
         assert(entity < MAX_ENTITIES && "Entity out of range.");
 
-        mSignatures[entity].reset();
-        mAvailableEntities.push(entity);
-        --mLivingEntityCount;
+        signatures_[entity].reset();
+        available_entities_.push(entity);
+        --living_entity_count_;
       }
 
-      void SetSignature(Entity entity, Signature signature)
+      void set_signature(Entity entity, Signature signature)
       {
+        std::cout << "Setting signature for entity " << entity << std::endl;
+        std::cout << "Num Signatures: " << signatures_.size() << std::endl;
+        std::cout << "Signature: " << signatures_[entity] << std::endl;
         assert(entity < MAX_ENTITIES && "Entity out of range.");
 
-        mSignatures[entity] = signature;
+        signatures_[entity] = signature;
       }
 
-      Signature GetSignature(Entity entity)
+      Signature get_signature(Entity entity)
       {
         assert(entity < MAX_ENTITIES && "Entity out of range.");
 
-        return mSignatures[entity];
+        return signatures_[entity];
       }
 
     private:
-      std::queue<Entity> mAvailableEntities{};
-      std::array<Signature, MAX_ENTITIES> mSignatures{};
-      uint32_t mLivingEntityCount{};
+      std::queue<Entity> available_entities_{};
+      std::array<Signature, MAX_ENTITIES> signatures_{};
+      uint32_t living_entity_count_{};
   };
 
 }

@@ -4,13 +4,15 @@
 
 #include "combat_system.hpp"
 #include "entity_manager.hpp"
-#include "exceptions.hpp"
 #include "game_entity.hpp"
 #include "gui.hpp"
 #include "input_handler.hpp"
 #include "state.hpp"
 #include "world.hpp"
+#include "core/coordinator.hpp"
+#include "components/velocity.hpp"
 
+extern SupaRL::Coordinator g_coordinator;
 namespace cpprl {
 
   StateResult PickupCommand::execute() {
@@ -213,7 +215,12 @@ namespace cpprl {
     }
 
     if (map.is_walkable(new_position)) {
+
       entity_->get_transform_component().move(new_position);
+
+      g_coordinator.get_component<SupaRL::VelocityComponent>(
+          entity_->get_id()).velocity_ = {move_vector_.x, move_vector_.y};
+
     } else {
       return NoOp{"You can't walk on that."};
     }

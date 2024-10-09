@@ -11,7 +11,11 @@
 #include "consumable_factory.hpp"
 #include "util.hpp"
 
+#include "../../lib/include/core/coordinator.hpp"
+
+
 namespace cpprl {
+extern SupaRL::Coordinator g_coordinator;
 
 void EntityManager::clear() { entities_.clear(); }
 

@@ -11,32 +11,32 @@ namespace SupaRL
   class EventManager
   {
     public:
-      void AddListener(EventId eventId, std::function<void(Event&)> const& listener)
+      void add_listener(EventId eventId, std::function<void(Event&)> const& listener)
       {
-        listeners[eventId].push_back(listener);
+        listeners_[eventId].push_back(listener);
       }
 
-      void SendEvent(Event& event)
+      void send_event(Event& event)
       {
-        uint32_t type = event.GetType();
+        uint32_t type = event.get_type();
 
-        for (auto const& listener : listeners[type])
+        for (auto const& listener : listeners_[type])
         {
           listener(event);
         }
       }
 
-      void SendEvent(EventId eventId)
+      void send_event(EventId eventId)
       {
         Event event(eventId);
 
-        for (auto const& listener : listeners[eventId])
+        for (auto const& listener : listeners_[eventId])
         {
           listener(event);
         }
       }
 
     private:
-      std::unordered_map<EventId, std::list<std::function<void(Event&)>>> listeners;
+      std::unordered_map<EventId, std::list<std::function<void(Event&)>>> listeners_;
   };
 }

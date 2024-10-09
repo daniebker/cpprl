@@ -12,28 +12,28 @@ namespace SupaRL {
       Event() = delete;
 
       explicit Event(EventId type)
-        : mType(type)
+        : type_(type)
       {}
 
       template<typename T>
-        void SetParam(EventId id, T value)
+        void set_param(EventId id, T value)
         {
-          mData[id] = value;
+          data_[id] = value;
         }
 
       template<typename T>
-        T GetParam(EventId id)
+        T get_param(EventId id)
         {
-          return std::any_cast<T>(mData[id]);
+          return std::any_cast<T>(data_[id]);
         }
 
-      EventId GetType() const
+      EventId get_type() const
       {
-        return mType;
+        return type_;
       }
 
     private:
-      EventId mType{};
-      std::unordered_map<EventId, std::any> mData{};
+      EventId type_{};
+      std::unordered_map<EventId, std::any> data_{};
   };
 }

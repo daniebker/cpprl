@@ -12,6 +12,7 @@
 #include "gui.hpp"
 #include "message_log.hpp"
 #include "rendering.hpp"
+#include "systems/physics_system.hpp"
 
 namespace cpprl {
 
@@ -21,13 +22,14 @@ class GameActor;
 class Map;
 class State;
 
-// singleton engine
 class Engine {
  private:
   std::unique_ptr<Renderer> renderer_;
   tcod::Context context_;
   std::unique_ptr<World> world_;
   std::unique_ptr<State> engine_state_;
+  std::shared_ptr<SupaRL::PhysicsSystem> physics_system_;
+
   int argc_;
   char** argv_;
 

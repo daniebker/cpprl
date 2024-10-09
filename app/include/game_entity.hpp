@@ -42,6 +42,9 @@ namespace cpprl {
 
       ~Entity() = default;
 
+      void set_id(SupaRL::Entity id) { id_ = id; };
+      SupaRL::Entity get_id() { return id_; };
+
       TransformComponent& get_transform_component() {
         return *transformComponent_;
       };

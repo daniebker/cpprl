@@ -2,7 +2,7 @@
 
 #include "component_array.hpp"
 #include "types.hpp"
-#include <any>
+#include <iostream>
 #include <memory>
 #include <unordered_map>
 
@@ -13,70 +13,70 @@ namespace SupaRL
   {
     public:
       template<typename T>
-        void RegisterComponent()
+        void register_component()
         {
           const char* typeName = typeid(T).name();
 
-          assert(mComponentTypes.find(typeName) == mComponentTypes.end() && "Registering component type more than once.");
+          assert(component_types_.find(typeName) == component_types_.end() && "Registering component type more than once.");
 
-          mComponentTypes.insert({typeName, mNextComponentType});
-          mComponentArrays.insert({typeName, std::make_shared<ComponentArray<T>>()});
+          component_types_.insert({typeName, next_component_type});
+          component_arrays_.insert({typeName, std::make_shared<ComponentArray<T>>()});
 
-          ++mNextComponentType;
+          ++next_component_type;
         }
 
       template<typename T>
-        ComponentType GetComponentType()
+        ComponentType get_component_type()
         {
           const char* typeName = typeid(T).name();
 
-          assert(mComponentTypes.find(typeName) != mComponentTypes.end() && "Component not registered before use.");
+          assert(component_types_.find(typeName) != component_types_.end() && "Component not registered before use.");
 
-          return mComponentTypes[typeName];
+          return component_types_[typeName];
         }
 
       template<typename T>
-        void AddComponent(Entity entity, T component)
+        void add_component(Entity entity, T component)
         {
-          GetComponentArray<T>()->InsertData(entity, component);
+          get_component_array<T>()->insert_data(entity, component);
         }
 
       template<typename T>
-        void RemoveComponent(Entity entity)
+        void remove_component(Entity entity)
         {
-          GetComponentArray<T>()->RemoveData(entity);
+          get_component_array<T>()->remove_data(entity);
         }
 
       template<typename T>
-        T& GetComponent(Entity entity)
+        T& get_component(Entity entity)
         {
-          return GetComponentArray<T>()->GetData(entity);
+          return get_component_array<T>()->get_data(entity);
         }
 
-      void EntityDestroyed(Entity entity)
+      void entity_destroyed(Entity entity)
       {
-        for (auto const& pair : mComponentArrays)
+        for (auto const& pair : component_arrays_)
         {
           auto const& component = pair.second;
 
-          component->EntityDestroyed(entity);
+          component->entity_destroyed(entity);
         }
       }
 
     private:
-      std::unordered_map<const char*, ComponentType> mComponentTypes{};
-      std::unordered_map<const char*, std::shared_ptr<IComponentArray>> mComponentArrays{};
-      ComponentType mNextComponentType{};
+      std::unordered_map<const char*, ComponentType> component_types_{};
+      std::unordered_map<const char*, std::shared_ptr<IComponentArray>> component_arrays_{};
+      ComponentType next_component_type{};
 
 
       template<typename T>
-        std::shared_ptr<ComponentArray<T>> GetComponentArray()
+        std::shared_ptr<ComponentArray<T>> get_component_array()
         {
           const char* typeName = typeid(T).name();
 
-          assert(mComponentTypes.find(typeName) != mComponentTypes.end() && "Component not registered before use.");
+          assert(component_types_.find(typeName) != component_types_.end() && "Component not registered before use.");
 
-          return std::static_pointer_cast<ComponentArray<T>>(mComponentArrays[typeName]);
+          return std::static_pointer_cast<ComponentArray<T>>(component_arrays_[typeName]);
         }
   };
 }

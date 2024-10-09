@@ -10,7 +10,7 @@ namespace SupaRL {
   {
     public:
       virtual ~IComponentArray() = default;
-      virtual void EntityDestroyed(Entity entity) = 0;
+      virtual void entity_destroyed(Entity entity) = 0;
   };
 
 
@@ -18,58 +18,58 @@ namespace SupaRL {
     class ComponentArray : public IComponentArray
   {
     public:
-      void InsertData(Entity entity, T component)
+      void insert_data(Entity entity, T component)
       {
-        assert(mEntityToIndexMap.find(entity) == mEntityToIndexMap.end() && "Component added to same entity more than once.");
+        assert(entity_to_index_map_.find(entity) == entity_to_index_map_.end() && "Component added to same entity more than once.");
 
         // Put new entry at end
-        size_t newIndex = mSize;
-        mEntityToIndexMap[entity] = newIndex;
-        mIndexToEntityMap[newIndex] = entity;
-        mComponentArray[newIndex] = component;
-        ++mSize;
+        size_t newIndex = size_;
+        entity_to_index_map_[entity] = newIndex;
+        index_to_entity_map_[newIndex] = entity;
+        component_array_[newIndex] = component;
+        ++size_;
       }
 
-      void RemoveData(Entity entity)
+      void remove_data(Entity entity)
       {
-        assert(mEntityToIndexMap.find(entity) != mEntityToIndexMap.end() && "Removing non-existent component.");
+        assert(entity_to_index_map_.find(entity) != entity_to_index_map_.end() && "Removing non-existent component.");
 
         // Copy element at end into deleted element's place to maintain density
-        size_t indexOfRemovedEntity = mEntityToIndexMap[entity];
-        size_t indexOfLastElement = mSize - 1;
-        mComponentArray[indexOfRemovedEntity] = mComponentArray[indexOfLastElement];
+        size_t indexOfRemovedEntity = entity_to_index_map_[entity];
+        size_t indexOfLastElement = size_ - 1;
+        component_array_[indexOfRemovedEntity] = component_array_[indexOfLastElement];
 
         // Update map to point to moved spot
-        Entity entityOfLastElement = mIndexToEntityMap[indexOfLastElement];
-        mEntityToIndexMap[entityOfLastElement] = indexOfRemovedEntity;
-        mIndexToEntityMap[indexOfRemovedEntity] = entityOfLastElement;
+        Entity entityOfLastElement = index_to_entity_map_[indexOfLastElement];
+        entity_to_index_map_[entityOfLastElement] = indexOfRemovedEntity;
+        index_to_entity_map_[indexOfRemovedEntity] = entityOfLastElement;
 
-        mEntityToIndexMap.erase(entity);
-        mIndexToEntityMap.erase(indexOfLastElement);
+        entity_to_index_map_.erase(entity);
+        index_to_entity_map_.erase(indexOfLastElement);
 
-        --mSize;
+        --size_;
       }
 
-      T& GetData(Entity entity)
+      T& get_data(Entity entity)
       {
-        assert(mEntityToIndexMap.find(entity) != mEntityToIndexMap.end() && "Retrieving non-existent component.");
+        assert(entity_to_index_map_.find(entity) != entity_to_index_map_.end() && "Retrieving non-existent component.");
 
-        return mComponentArray[mEntityToIndexMap[entity]];
+        return component_array_[entity_to_index_map_[entity]];
       }
 
-      void EntityDestroyed(Entity entity) override
+      void entity_destroyed(Entity entity) override
       {
-        if (mEntityToIndexMap.find(entity) != mEntityToIndexMap.end())
+        if (entity_to_index_map_.find(entity) != entity_to_index_map_.end())
         {
-          RemoveData(entity);
+          remove_data(entity);
         }
       }
 
     private:
-      std::array<T, MAX_ENTITIES> mComponentArray{};
-      std::unordered_map<Entity, size_t> mEntityToIndexMap{};
-      std::unordered_map<size_t, Entity> mIndexToEntityMap{};
-      size_t mSize{};
+      std::array<T, MAX_ENTITIES> component_array_{};
+      std::unordered_map<Entity, size_t> entity_to_index_map_{};
+      std::unordered_map<size_t, Entity> index_to_entity_map_{};
+      size_t size_{};
   };
 
 }

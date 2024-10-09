@@ -7,115 +7,113 @@
 #include "types.hpp"
 #include <memory>
 
+#include <iostream>
 
 namespace SupaRL
 {
-class Coordinator
-{
-public:
-	void Init()
-	{
-		mComponentManager = std::make_unique<ComponentManager>();
-		mEntityManager = std::make_unique<EntityManager>();
-		mEventManager = std::make_unique<EventManager>();
-		mSystemManager = std::make_unique<SystemManager>();
-	}
+  class Coordinator
+  {
+    public:
+      void init()
+      {
+        component_manager_ = std::make_unique<ComponentManager>();
+        entity_manager_ = std::make_unique<EntityManager>();
+        event_manager_ = std::make_unique<EventManager>();
+        system_manager_ = std::make_unique<SystemManager>();
+      }
+
+      // Entity methods
+      Entity create_entity()
+      {
+        return entity_manager_->create_entity();
+      }
+
+      void destroy_entity(Entity entity)
+      {
+        entity_manager_->destroy_entity(entity);
+
+        component_manager_->entity_destroyed(entity);
+
+        system_manager_->entity_destroyed(entity);
+      }
+
+      // Component methods
+      template<typename T>
+        void register_component()
+        {
+          component_manager_->register_component<T>();
+        }
+
+      template<typename T>
+        void add_component(Entity entity, T component)
+        {
+          component_manager_->add_component<T>(entity, component);
+
+          auto signature = entity_manager_->get_signature(entity);
+          signature.set(component_manager_->get_component_type<T>(), true);
+          entity_manager_->set_signature(entity, signature);
+
+          system_manager_->entity_signature_changed(entity, signature);
+        }
+
+      template<typename T>
+        void remove_component(Entity entity)
+        {
+          component_manager_->remove_component<T>(entity);
+
+          auto signature = entity_manager_->get_signature(entity);
+          signature.set(component_manager_->get_component_type<T>(), false);
+          entity_manager_->set_signature(entity, signature);
+
+          system_manager_->entity_signature_changed(entity, signature);
+        }
+
+      template<typename T>
+        T& get_component(Entity entity)
+        {
+          return component_manager_->get_component<T>(entity);
+        }
+
+      template<typename T>
+        ComponentType get_component_type()
+        {
+          return component_manager_->get_component_type<T>();
+        }
 
 
-	// Entity methods
-	Entity CreateEntity()
-	{
-		return mEntityManager->CreateEntity();
-	}
+      // System methods
+      template<typename T>
+        std::shared_ptr<T> register_system()
+        {
+          return system_manager_->register_system<T>();
+        }
 
-	void DestroyEntity(Entity entity)
-	{
-		mEntityManager->DestroyEntity(entity);
+      template<typename T>
+        void set_system_signature(Signature signature)
+        {
+          system_manager_->set_signature<T>(signature);
+        }
 
-		mComponentManager->EntityDestroyed(entity);
+      // Event methods
+      void add_event_listener(EventId eventId, std::function<void(Event&)> const& listener)
+      {
+        event_manager_->add_listener(eventId, listener);
+      }
 
-		mSystemManager->EntityDestroyed(entity);
-	}
+      void send_event(Event& event)
+      {
+        event_manager_->send_event(event);
+      }
 
+      void send_event(EventId eventId)
+      {
+        event_manager_->send_event(eventId);
+      }
 
-	// Component methods
-	template<typename T>
-	void RegisterComponent()
-	{
-		mComponentManager->RegisterComponent<T>();
-	}
-
-	template<typename T>
-	void AddComponent(Entity entity, T component)
-	{
-		mComponentManager->AddComponent<T>(entity, component);
-
-		auto signature = mEntityManager->GetSignature(entity);
-		signature.set(mComponentManager->GetComponentType<T>(), true);
-		mEntityManager->SetSignature(entity, signature);
-
-		mSystemManager->EntitySignatureChanged(entity, signature);
-	}
-
-	template<typename T>
-	void RemoveComponent(Entity entity)
-	{
-		mComponentManager->RemoveComponent<T>(entity);
-
-		auto signature = mEntityManager->GetSignature(entity);
-		signature.set(mComponentManager->GetComponentType<T>(), false);
-		mEntityManager->SetSignature(entity, signature);
-
-		mSystemManager->EntitySignatureChanged(entity, signature);
-	}
-
-	template<typename T>
-	T& GetComponent(Entity entity)
-	{
-		return mComponentManager->GetComponent<T>(entity);
-	}
-
-	template<typename T>
-	ComponentType GetComponentType()
-	{
-		return mComponentManager->GetComponentType<T>();
-	}
-
-
-	// System methods
-	template<typename T>
-	std::shared_ptr<T> RegisterSystem()
-	{
-		return mSystemManager->RegisterSystem<T>();
-	}
-
-	template<typename T>
-	void SetSystemSignature(Signature signature)
-	{
-		mSystemManager->SetSignature<T>(signature);
-	}
-
-
-	// Event methods
-	void AddEventListener(EventId eventId, std::function<void(Event&)> const& listener)
-	{
-		mEventManager->AddListener(eventId, listener);
-	}
-
-	void SendEvent(Event& event)
-	{
-		mEventManager->SendEvent(event);
-	}
-
-	void SendEvent(EventId eventId)
-	{
-		mEventManager->SendEvent(eventId);
-	}
-
-private:
-	std::unique_ptr<ComponentManager> mComponentManager;
-	std::unique_ptr<EntityManager> mEntityManager;
-	std::unique_ptr<EventManager> mEventManager;
-	std::unique_ptr<SystemManager> mSystemManager;
-};
+    private:
+      std::unique_ptr<ComponentManager> component_manager_;
+      std::unique_ptr<EntityManager> entity_manager_;
+      std::unique_ptr<EventManager> event_manager_;
+      std::unique_ptr<SystemManager> system_manager_;
+  };
 }
