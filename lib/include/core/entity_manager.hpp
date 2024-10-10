@@ -4,8 +4,6 @@
 #include <array>
 #include <cassert>
 #include <queue>
-#include <iostream>
-
 
 namespace SupaRL {
   class EntityManager

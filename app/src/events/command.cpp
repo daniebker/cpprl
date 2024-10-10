@@ -216,8 +216,6 @@ namespace cpprl {
 
     if (map.is_walkable(new_position)) {
 
-      entity_->get_transform_component().position_ = new_position;
-
       g_coordinator.get_component<SupaRL::VelocityComponent>(
           entity_->get_id()).velocity_ = {move_vector_.x, move_vector_.y};
 

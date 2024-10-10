@@ -20,6 +20,5 @@ namespace SupaRL
         std::cout << message << value << std::endl;
 #endif
       }
-
   };
 }

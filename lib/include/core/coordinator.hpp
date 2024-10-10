@@ -7,8 +7,6 @@
 #include "types.hpp"
 #include <memory>
 
-#include <iostream>
-
 namespace SupaRL
 {
   class Coordinator

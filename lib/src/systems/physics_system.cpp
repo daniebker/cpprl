@@ -3,7 +3,6 @@
 #include "core/coordinator.hpp"
 #include "components/transform.hpp"
 #include "components/velocity.hpp"
-#include <iostream>
 
 extern SupaRL::Coordinator g_coordinator;
 
@@ -14,7 +13,6 @@ namespace SupaRL {
   void PhysicsSystem::update() {
     auto entities_to_remove = std::vector<Entity>();
     for (auto const& entity : entities_) {
-      std::cout << "Updating physics for entity " << entity << std::endl;
       auto& transform = g_coordinator.get_component<TransformComponent>(entity);
       auto& velocity = g_coordinator.get_component<VelocityComponent>(entity);
 

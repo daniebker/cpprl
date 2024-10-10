@@ -2,7 +2,6 @@
 
 #include "component_array.hpp"
 #include "types.hpp"
-#include <iostream>
 #include <memory>
 #include <unordered_map>
 
