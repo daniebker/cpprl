@@ -49,12 +49,12 @@ namespace cpprl {
 
   void World::render(Renderer& renderer) {
     dungeon_.get_map().compute_fov(
-        player_->get_transform_component().get_position(), 10);
+        player_->get_transform_component().position_, 10);
     dungeon_.get_map().render(g_console);
 
     for (const auto& entity : *entities_) {
       if (dungeon_.get_map().is_in_fov(
-            entity->get_transform_component().get_position())) {
+            entity->get_transform_component().position_)) {
         renderer.render(
             entity->get_sprite_component(), entity->get_transform_component());
       }
@@ -103,15 +103,15 @@ namespace cpprl {
       .x = dungeon_.get_map().get_rooms().at(0).get_center().x,
       .y = dungeon_.get_map().get_rooms().at(0).get_center().y
     };
-    player->get_transform_component().move(
-        dungeon_.get_map().get_rooms().at(0).get_center());
+    player->get_transform_component().position_ =
+        dungeon_.get_map().get_rooms().at(0).get_center();
     World::spawn_player(player);
   }
 
   void World::spawn_player(Entity* player) {
     player_ = entities_->spawn(player);
     dungeon_.get_map().compute_fov(
-        player_->get_transform_component().get_position(), 4);
+        player_->get_transform_component().position_, 4);
     DefenseComponent& player_defense = player_->get_defense_component();
     ui_->set_health_bar(player_defense);
     ui_->set_xp_bar(player_->get_stats_component().value().get());

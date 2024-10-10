@@ -1,5 +1,4 @@
-#ifndef INCLUDE_COMPONENTS_HPP_
-#define INCLUDE_COMPONENTS_HPP_
+#pragma once
 
 #include <cereal/types/polymorphic.hpp>
 #include <libtcod.hpp>
@@ -7,7 +6,7 @@
 
 #include "game_entity.hpp"
 #include "types/action_result.hpp"
-#include "types/math.hpp"
+#include <core/math.hpp>
 #include "types/world_fwd.hpp"
 
 namespace cpprl {
@@ -63,8 +62,8 @@ namespace cpprl {
       TransformComponent() = default;
       TransformComponent(int x, int y) : position_({x, y}) {}
       virtual ~TransformComponent() = default;
-      Vector2D get_position() const { return position_; }
-      void move(Vector2D new_position) { position_ = new_position; }
+      SupaRL::Vector2D get_position() const { return position_; }
+      void move(SupaRL::Vector2D new_position) { position_ = new_position; }
 
       template <class Archive>
         void serialize(Archive& archive) {
@@ -72,7 +71,7 @@ namespace cpprl {
         }
 
     private:
-      Vector2D position_;
+      SupaRL::Vector2D position_;
   };
 
   class ASCIIComponent {
@@ -289,4 +288,3 @@ CEREAL_REGISTER_TYPE(cpprl::FireSpell);
 CEREAL_REGISTER_TYPE(cpprl::ConfusionSpell);
 CEREAL_REGISTER_TYPE(cpprl::StatsComponent);
 CEREAL_REGISTER_TYPE(cpprl::AttackComponent);
-#endif

@@ -6,7 +6,11 @@
 
 #include "basic_ai_component.hpp"
 #include "types/world_fwd.hpp"
-#include <../../lib/include/core/types.hpp>
+#include <core/types.hpp>
+#include <core/coordinator.hpp>
+#include <components/transform.hpp>
+
+extern SupaRL::Coordinator g_coordinator;
 
 namespace cpprl {
 
@@ -45,9 +49,11 @@ namespace cpprl {
       void set_id(SupaRL::Entity id) { id_ = id; };
       SupaRL::Entity get_id() { return id_; };
 
-      TransformComponent& get_transform_component() {
-        return *transformComponent_;
+      SupaRL::TransformComponent& get_transform_component() {
+        auto& transform = g_coordinator.get_component<SupaRL::TransformComponent>(id_);
+        return transform;
       };
+
       ASCIIComponent& get_sprite_component() { return *asciiComponent_; };
       AttackComponent& get_attack_component() { return *attackComponent_; };
       DefenseComponent& get_defense_component() { return *defenseComponent_; };

@@ -9,9 +9,7 @@
 #include "combat_system.hpp"
 #include "entity_manager.hpp"
 #include "events/command.hpp"
-#include "exceptions.hpp"
 #include "game_entity.hpp"
-#include "globals.hpp"
 #include "state.hpp"
 #include "world.hpp"
 
@@ -73,8 +71,9 @@ namespace cpprl {
   ActionResult ConsumableComponent::drop(Entity* owner, Entity* wearer) {
     if (auto* container = &wearer->get_container(); container) {
       container->remove(owner);
-      owner->get_transform_component().move(
-          wearer->get_transform_component().get_position());
+      // TODO: This would then use the global coordinator to
+      // get the transform of each entity and set the positions.
+      owner->get_transform_component().position_ = wearer->get_transform_component().position_;
       return Success{};
     }
     return Failure{};
@@ -112,7 +111,7 @@ namespace cpprl {
   ActionResult LightningBolt::use(Entity* owner, Entity* wearer, World& world) {
     std::optional<std::reference_wrapper<Entity>> optional_closest_monster_ref =
       world.get_entities().get_closest_living_monster(
-          wearer->get_transform_component().get_position(), range_);
+          wearer->get_transform_component().position_, range_);
     if (!optional_closest_monster_ref.has_value()) {
       return Failure{"No enemy is close enough to strike."};
     }
@@ -148,7 +147,7 @@ namespace cpprl {
       for (Entity* entity : world.get_entities()) {
         if (const auto* defense_component = &entity->get_defense_component();
             defense_component && defense_component->is_not_dead() &&
-            entity->get_transform_component().get_position().distance_to(
+            entity->get_transform_component().position_.distance_to(
               world.get_map().get_highlight_tile()) <= aoe_) {
           world.get_message_log().add_message(
               fmt::format(

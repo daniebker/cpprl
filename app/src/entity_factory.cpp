@@ -101,4 +101,4 @@ namespace cpprl {
 
     return entity;
   }
-}  // namespace cpprl
+}

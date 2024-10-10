@@ -1,5 +1,4 @@
-#ifndef ACTION_RESULT_HPP
-#define ACTION_RESULT_HPP
+#pragma once
 
 #include <memory>
 #include <string>
@@ -8,17 +7,16 @@
 #include "state.hpp"
 
 namespace cpprl {
-class State;
-struct Success {};
+  class State;
+  struct Success {};
 
-struct Failure {
-  std::string message;
-};
+  struct Failure {
+    std::string message;
+  };
 
-struct Poll {
-  std::unique_ptr<State> new_state;
-};
+  struct Poll {
+    std::unique_ptr<State> new_state;
+  };
 
-using ActionResult = std::variant<Success, Failure, Poll>;
-}  // namespace cpprl
-#endif
+  using ActionResult = std::variant<Success, Failure, Poll>;
+}

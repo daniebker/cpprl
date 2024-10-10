@@ -1,19 +1,16 @@
-#ifndef INCLUDE_XP_BAR_HPP_
-#define INCLUDE_XP_BAR_HPP_
-
+#pragma once
 #include "components.hpp"
 #include "gui.hpp"
+#include <core/math.hpp>
 
 namespace cpprl {
+  class XPBar : public UiWindow {
+    private:
+      StatsComponent& stats_;
 
-class XPBar : public UiWindow {
- private:
-  StatsComponent& stats_;
+    public:
+      XPBar(int width, int height, SupaRL::Vector2D position, StatsComponent& stats);
+      void render(tcod::Console& console) override;
+  };
 
- public:
-  XPBar(int width, int height, Vector2D position, StatsComponent& stats);
-  void render(tcod::Console& console) override;
-};
-
-}  // namespace cpprl
-#endif  // INCLUDE_XP_BAR_HPP_
+}

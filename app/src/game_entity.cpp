@@ -20,12 +20,6 @@ namespace cpprl {
 
   void Entity::update(World& world) { aiComponent_->update(world, this); }
 
-  // TODO: not sure this belongs here
-  float Entity::get_distance_to(Entity* other) const {
-    return transformComponent_->get_position().distance_to(
-        other->get_transform_component().get_position());
-  };
-
   void Entity::set_ascii_component(
       std::unique_ptr<ASCIIComponent> asciiComponent) {
     asciiComponent_ = std::move(asciiComponent);
