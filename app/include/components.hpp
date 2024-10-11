@@ -124,7 +124,7 @@ namespace cpprl {
           int nb_items;
           archive(nb_items);
           for (int i = 0; i < nb_items; i++) {
-            Entity* entity = new Entity("", false, nullptr, nullptr);
+            Entity* entity = new Entity("", false, nullptr);
             entity->unpack(archive);
             inventory_.emplace_back(entity);
           }

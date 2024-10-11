@@ -4,11 +4,14 @@
 #include "components.hpp"
 #include "types/math.hpp"
 
+extern SupaRL::Coordinator g_coordinator;
 namespace cpprl::util {
   template <typename T>
     inline auto find_entity_at(std::vector<T>& vec, int x, int y) {
       auto iterator = std::find_if(vec.begin(), vec.end(), [x, y](T& entity) {
-          return entity->get_transform_component().position_ == SupaRL::Vector2D{x, y};
+          auto entity_position = g_coordinator.get_component<SupaRL::TransformComponent>(
+              entity->get_id()).position_;
+          return entity_position == SupaRL::Vector2D{x, y};
           });
       return iterator;
     }

@@ -153,7 +153,6 @@ namespace cpprl {
               engine_state_->on_enter();
             }
             physics_system_->update();
-            std::cout << "End turn" << std::endl;
           } else if (std::holds_alternative<Quit>(result)) {
             // TODO: there's a bug here. We should only save
             // when exiting the game, not when quitting to the main menu.

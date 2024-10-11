@@ -48,15 +48,19 @@ namespace cpprl {
   }
 
   void World::render(Renderer& renderer) {
+    auto player_position = g_coordinator.get_component<SupaRL::TransformComponent>(
+        player_->get_id()).position_;
     dungeon_.get_map().compute_fov(
-        player_->get_transform_component().position_, 10);
+        player_position, 10);
     dungeon_.get_map().render(g_console);
 
     for (const auto& entity : *entities_) {
+      auto entity_transform = g_coordinator.get_component<SupaRL::TransformComponent>(
+          entity->get_id());
       if (dungeon_.get_map().is_in_fov(
-            entity->get_transform_component().position_)) {
+            entity_transform.position_)) {
         renderer.render(
-            entity->get_sprite_component(), entity->get_transform_component());
+            entity->get_sprite_component(), entity_transform);
       }
     }
     ui_->render(g_console);
@@ -94,24 +98,17 @@ namespace cpprl {
 
   void World::spawn_player() {
     auto player_factory_ = std::make_unique<PlayerFactory>();
-    Entity* player = player_factory_->create();
-
-    auto transform = g_coordinator.get_component<SupaRL::TransformComponent>(
-        player->get_id());
-
-    transform.position_ = SupaRL::Vector2D{
-      .x = dungeon_.get_map().get_rooms().at(0).get_center().x,
-      .y = dungeon_.get_map().get_rooms().at(0).get_center().y
-    };
-    player->get_transform_component().position_ =
-        dungeon_.get_map().get_rooms().at(0).get_center();
+    auto spawn_position = dungeon_.get_map().get_rooms().at(0).get_center();
+    Entity* player = player_factory_->create(spawn_position);
     World::spawn_player(player);
   }
 
   void World::spawn_player(Entity* player) {
     player_ = entities_->spawn(player);
+    SupaRL::Vector2D player_position= g_coordinator.get_component<SupaRL::TransformComponent>(
+        player_->get_id()).position_;
     dungeon_.get_map().compute_fov(
-        player_->get_transform_component().position_, 4);
+        player_position, 4);
     DefenseComponent& player_defense = player_->get_defense_component();
     ui_->set_health_bar(player_defense);
     ui_->set_xp_bar(player_->get_stats_component().value().get());
@@ -125,5 +122,4 @@ namespace cpprl {
       current_window_->set_cursor(current_window_->get_cursor() + scroll_amount);
     }
   }
-
 }

@@ -46,15 +46,11 @@ namespace SupaRL
 
       void entity_signature_changed(Entity entity, Signature entitySignature)
       {
-        std::cout << "Entity signature changed " << entity << std::endl;
         for (auto const& pair : systems_)
         {
           auto const& type = pair.first;
           auto const& system = pair.second;
-          std::cout << "System: " << type << std::endl;
-          std::cout << "System: " << system << std::endl;
           auto const& systemSignature = signatures_[type];
-          std::cout << "Entities: " << system->entities_.size() << std::endl;
 
           if ((entitySignature & systemSignature) == systemSignature)
           {
@@ -62,9 +58,7 @@ namespace SupaRL
           }
           else
           {
-            std::cout << "Erasing entity" << std::endl;
             system->entities_.erase(entity);
-            std::cout << "Entities: " << system->entities_.size() << std::endl;
           }
         }
       }

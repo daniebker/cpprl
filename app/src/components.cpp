@@ -73,7 +73,11 @@ namespace cpprl {
       container->remove(owner);
       // TODO: This would then use the global coordinator to
       // get the transform of each entity and set the positions.
-      owner->get_transform_component().position_ = wearer->get_transform_component().position_;
+      auto owner_transform = g_coordinator.get_component<SupaRL::TransformComponent>(
+          owner->get_id());
+      auto wearer_position = g_coordinator.get_component<SupaRL::TransformComponent>(
+          wearer->get_id()).position_;
+      owner_transform.position_ = wearer_position;
       return Success{};
     }
     return Failure{};
@@ -109,9 +113,11 @@ namespace cpprl {
   }
 
   ActionResult LightningBolt::use(Entity* owner, Entity* wearer, World& world) {
+    auto wearer_position = g_coordinator.get_component<SupaRL::TransformComponent>(
+        wearer->get_id()).position_;
     std::optional<std::reference_wrapper<Entity>> optional_closest_monster_ref =
       world.get_entities().get_closest_living_monster(
-          wearer->get_transform_component().position_, range_);
+          wearer_position, range_);
     if (!optional_closest_monster_ref.has_value()) {
       return Failure{"No enemy is close enough to strike."};
     }
@@ -145,9 +151,11 @@ namespace cpprl {
     auto on_pick = [&, owner, wearer]() {
       ConsumableComponent::use(owner, wearer, world);
       for (Entity* entity : world.get_entities()) {
+        auto entity_position = g_coordinator.get_component<SupaRL::TransformComponent>(
+            entity->get_id()).position_;
         if (const auto* defense_component = &entity->get_defense_component();
             defense_component && defense_component->is_not_dead() &&
-            entity->get_transform_component().position_.distance_to(
+            entity_position.distance_to(
               world.get_map().get_highlight_tile()) <= aoe_) {
           world.get_message_log().add_message(
               fmt::format(

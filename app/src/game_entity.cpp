@@ -11,11 +11,9 @@ namespace cpprl {
   Entity::Entity(
       std::string const& name,
       bool blocker,
-      std::unique_ptr<TransformComponent> transformComponent,
       std::unique_ptr<ASCIIComponent> asciiComponent)
     : name_(name),
     blocker_(blocker),
-    transformComponent_(std::move(transformComponent)),
     asciiComponent_(std::move(asciiComponent)) {}
 
   void Entity::update(World& world) { aiComponent_->update(world, this); }

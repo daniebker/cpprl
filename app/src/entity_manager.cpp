@@ -13,9 +13,8 @@
 
 #include "core/coordinator.hpp"
 
+extern SupaRL::Coordinator g_coordinator;
 namespace cpprl {
-  extern SupaRL::Coordinator g_coordinator;
-
   void EntityManager::clear() { entities_.clear(); }
 
   void EntityManager::clear_except_player() {
@@ -45,12 +44,11 @@ namespace cpprl {
       }
 
       if (random->getFloat(0.0f, 1.0f) < 0.8f) {
-        Entity* entity = orc_factory_->create();
-        entity->get_transform_component().position_ = {x, y};
+        Entity* entity = orc_factory_->create({x,y});
         spawn(std::move(entity));
       } else {
-        Entity* entity = troll_factory_->create();
-        spawn(std::move(entity), {x, y});
+        Entity* entity = troll_factory_->create({x,y});
+        spawn(std::move(entity));
       }
     }
 
@@ -69,37 +67,27 @@ namespace cpprl {
       float dice = random->getFloat(.0f, 1.0f);
       if (dice <= 0.7f) {
         auto health_potion_factory = std::make_unique<HealthPotionFactory>();
-        Entity* entity = health_potion_factory->create();
-        spawn(std::move(entity), {x, y});
+        Entity* entity = health_potion_factory->create({x,y});
+        spawn(std::move(entity));
       } else if (dice <= .8f) {
         auto lighting_scroll_factory = std::make_unique<LightningScrollFactory>();
-        Entity* entity = lighting_scroll_factory->create();
-        spawn(std::move(entity), {x, y});
+        Entity* entity = lighting_scroll_factory->create({x,y});
+        spawn(std::move(entity));
       } else if (dice <= .9f) {
         auto fireball_scroll_factory = std::make_unique<FireballScrollFactory>();
-        Entity* entity = fireball_scroll_factory->create();
-        spawn(std::move(entity), {x, y});
+        Entity* entity = fireball_scroll_factory->create({x,y});
+        spawn(std::move(entity));
       } else if (dice <= 1.0f) {
         auto confusion_scroll_factory =
           std::make_unique<ConfusionScrollFactory>();
-        Entity* entity = confusion_scroll_factory->create();
-        spawn(std::move(entity), {x, y});
+        Entity* entity = confusion_scroll_factory->create({x,y});
+        spawn(std::move(entity));
       }
     }
   }
 
   Entity* EntityManager::spawn(Entity* src) {
     return entities_.emplace_back(src);
-  }
-
-  Entity* EntityManager::spawn(Entity* src, SupaRL::Vector2D position) {
-    Entity* entity = spawn(src);
-
-    if (position != entity->get_transform_component().position_) {
-      entity->get_transform_component().position_ = position;
-    }
-
-    return entity;
   }
 
   std::vector<std::reference_wrapper<Entity>> EntityManager::get_entities_at(
@@ -109,7 +97,9 @@ namespace cpprl {
     // Corpse, Item, Actor...
     entities_at_position.reserve(3);
     for (auto& entity : entities_) {
-      if (entity->get_transform_component().position_ == position) {
+      auto entity_position = g_coordinator.get_component<SupaRL::TransformComponent>(
+          entity->get_id()).position_;
+      if (entity_position == position) {
         entities_at_position.push_back(*entity);
       }
     }
@@ -120,8 +110,10 @@ namespace cpprl {
   std::optional<std::reference_wrapper<Entity>>
     EntityManager::get_blocking_entity_at(SupaRL::Vector2D position) {
       for (const auto& entity : entities_) {
+      auto entity_position = g_coordinator.get_component<SupaRL::TransformComponent>(
+          entity->get_id()).position_;
         if (entity->is_blocking() &&
-            entity->get_transform_component().position_ == position) {
+            entity_position == position) {
           return std::reference_wrapper<Entity>(*entity);
         }
       }
@@ -131,8 +123,10 @@ namespace cpprl {
   std::optional<std::reference_wrapper<Entity>>
     EntityManager::get_non_blocking_entity_at(SupaRL::Vector2D position) {
       for (const auto& entity : entities_) {
+        auto entity_position = g_coordinator.get_component<SupaRL::TransformComponent>(
+            entity->get_id()).position_;
         if (!entity->is_blocking() &&
-            entity->get_transform_component().position_ == position) {
+            entity_position == position) {
           return std::reference_wrapper<Entity>(*entity);
         }
       }
@@ -157,8 +151,10 @@ namespace cpprl {
           entity->get_ai_component();
 
         if (ai_component.has_value() && defense_component) {
+          auto entity_position = g_coordinator.get_component<SupaRL::TransformComponent>(
+              entity->get_id()).position_;
           float distance = position.distance_to(
-              entity->get_transform_component().position_);
+              entity_position);
           if (distance < best_distance && (distance <= range || range == 0.0f)) {
             best_distance = distance;
             closest = *entity;

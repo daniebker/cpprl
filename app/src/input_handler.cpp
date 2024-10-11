@@ -8,6 +8,8 @@
 #include "gui.hpp"
 #include "world.hpp"
 
+extern SupaRL::Coordinator g_coordinator;
+
 namespace cpprl {
 EngineEvent& EventHandler::handle_sdl_event(SDL_Event event) noexcept {
   SDL_Keycode key = event.key.keysym.sym;
@@ -118,8 +120,10 @@ EngineEvent& GameInputHandler::handle_sdl_event(SDL_Event event) noexcept {
   } else if (key == SDLK_PERIOD) {
     return *character_menu_command_;
   } else if (key == SDLK_LEFTBRACKET) {
+    auto entity_position = g_coordinator.get_component<SupaRL::TransformComponent>(
+        controllable_entity_->get_id()).position_;
     use_command_ = std::make_unique<UseCommand>(
-        world_, controllable_entity_->get_transform_component().position_);
+        world_, entity_position);
     return *use_command_;
   } else {
     return EventHandler::handle_sdl_event(event);

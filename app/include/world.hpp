@@ -75,7 +75,7 @@ namespace cpprl {
             }
           }
           archive(entities_);
-          player_ = new Entity("", false, nullptr, nullptr);
+          player_ = new Entity("", false, nullptr);
           // TODO: If player is confused, quitting and reopening the game removes the
           // confused state
           player_->unpack(archive);

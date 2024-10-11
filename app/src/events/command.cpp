@@ -16,9 +16,11 @@ extern SupaRL::Coordinator g_coordinator;
 namespace cpprl {
 
   StateResult PickupCommand::execute() {
+    auto entity_position = g_coordinator.get_component<SupaRL::TransformComponent>(
+        entity_->get_id()).position_;
     std::optional<std::reference_wrapper<Entity>> optional_item_ref =
       world_.get_entities().get_non_blocking_entity_at(
-          entity_->get_transform_component().position_);
+          entity_position);
     if(!optional_item_ref.has_value()) {
       return NoOp{"There is nothing here to pick up."};
     }
@@ -138,8 +140,10 @@ namespace cpprl {
   }
 
   StateResult DirectionalCommand::execute() {
+    auto entity_position = g_coordinator.get_component<SupaRL::TransformComponent>(
+        entity_->get_id()).position_;
     auto targetPos =
-      entity_->get_transform_component().position_ + move_vector_;
+      entity_position + move_vector_;
 
     if (world_.get_entities().get_blocking_entity_at(targetPos)) {
       auto action = MeleeCommand(world_, entity_, move_vector_);
@@ -164,8 +168,10 @@ namespace cpprl {
   }
 
   StateResult MeleeCommand::execute() {
+    auto entity_position = g_coordinator.get_component<SupaRL::TransformComponent>(
+        entity_->get_id()).position_;
     auto targetPos =
-      entity_->get_transform_component().position_ + move_vector_;
+      entity_position + move_vector_;
     std::optional<std::reference_wrapper<Entity>> target =
       world_.get_entities().get_blocking_entity_at(targetPos);
 
@@ -202,8 +208,10 @@ namespace cpprl {
   };
 
   StateResult MovementCommand::execute() {
+    auto entity_position = g_coordinator.get_component<SupaRL::TransformComponent>(
+        entity_->get_id()).position_;
     SupaRL::Vector2D new_position =
-      entity_->get_transform_component().position_ + move_vector_;
+      entity_position + move_vector_;
     auto& map = world_.get_map();
 
     if (map.is_not_in_bounds(new_position)) {

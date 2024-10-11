@@ -9,6 +9,7 @@
 #include "world.hpp"
 #include <core/math.hpp>
 
+extern SupaRL::Coordinator g_coordinator;
 namespace cpprl {
 
 bool can_path_to_target(tcod::BresenhamLine& path, World& world) {
@@ -22,10 +23,10 @@ bool can_path_to_target(tcod::BresenhamLine& path, World& world) {
 }
 
 void HostileAI::update(World& world, Entity* entity) {
-  SupaRL::Vector2D position = entity->get_transform_component().position_;
+  auto position = g_coordinator.get_component<SupaRL::TransformComponent>(entity->get_id()).position_;
   if (world.get_map().is_in_fov(position)) {
     Entity* player = world.get_player();
-    SupaRL::Vector2D player_position = player->get_transform_component().position_;
+    auto player_position = g_coordinator.get_component<SupaRL::TransformComponent>(player->get_id()).position_;
     SupaRL::Vector2D delta = player_position - position;
 
     int distance = std::max(std::abs(delta.x), std::abs(delta.y));

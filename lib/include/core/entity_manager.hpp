@@ -39,9 +39,6 @@ namespace SupaRL {
 
       void set_signature(Entity entity, Signature signature)
       {
-        std::cout << "Setting signature for entity " << entity << std::endl;
-        std::cout << "Num Signatures: " << signatures_.size() << std::endl;
-        std::cout << "Signature: " << signatures_[entity] << std::endl;
         assert(entity < MAX_ENTITIES && "Entity out of range.");
 
         signatures_[entity] = signature;

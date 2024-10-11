@@ -28,7 +28,6 @@ namespace cpprl {
 
       std::string name_;
       bool blocker_;
-      std::unique_ptr<TransformComponent> transformComponent_;
       std::unique_ptr<ASCIIComponent> asciiComponent_;
       std::unique_ptr<AttackComponent> attackComponent_;
       std::unique_ptr<DefenseComponent> defenseComponent_;
@@ -41,18 +40,12 @@ namespace cpprl {
       Entity(
           std::string const& name,
           bool blocker,
-          std::unique_ptr<TransformComponent> transformComponent,
           std::unique_ptr<ASCIIComponent> asciiComponent);
 
       ~Entity() = default;
 
       void set_id(SupaRL::Entity id) { id_ = id; };
       SupaRL::Entity get_id() { return id_; };
-
-      SupaRL::TransformComponent& get_transform_component() {
-        auto& transform = g_coordinator.get_component<SupaRL::TransformComponent>(id_);
-        return transform;
-      };
 
       ASCIIComponent& get_sprite_component() { return *asciiComponent_; };
       AttackComponent& get_attack_component() { return *attackComponent_; };
@@ -99,7 +92,6 @@ namespace cpprl {
       template <class Archive>
         void pack(Archive& archive) {
           archive(name_, blocker_);
-          archive(transformComponent_ != nullptr);
           archive(defenseComponent_ != nullptr);
           archive(attackComponent_ != nullptr);
           archive(consumableComponent_ != nullptr);
@@ -107,7 +99,6 @@ namespace cpprl {
           archive(aiComponent_ != nullptr);
           archive(container_ != nullptr);
           archive(statsComponent_ != nullptr);
-          if (transformComponent_) archive(transformComponent_);
 
           if (asciiComponent_) archive(asciiComponent_);
           if (attackComponent_) archive(attackComponent_);
@@ -120,7 +111,6 @@ namespace cpprl {
 
       template <class Archive>
         void unpack(Archive& archive) {
-          bool hasTransformComponent;
           bool hasDefenseComponent;
           bool hasAttackComponent;
           bool hasConsumableComponent;
@@ -130,7 +120,6 @@ namespace cpprl {
           bool hasStatsComponent;
 
           archive(name_, blocker_);
-          archive(hasTransformComponent);
           archive(hasDefenseComponent);
           archive(hasAttackComponent);
           archive(hasConsumableComponent);
@@ -139,9 +128,6 @@ namespace cpprl {
           archive(hasContainer);
           archive(hasStatsComponent);
 
-          if (hasTransformComponent) {
-            archive(transformComponent_);
-          }
           if (hasAsciiComponent) {
             archive(asciiComponent_);
           }

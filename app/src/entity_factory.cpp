@@ -17,11 +17,10 @@ namespace cpprl {
     return new Entity(
         name,
         true,
-        std::make_unique<TransformComponent>(0, 0),
         std::make_unique<ASCIIComponent>(symbol, color, 1));
   }
 
-  Entity* OrcFactory::create() {
+  Entity* OrcFactory::create(SupaRL::Vector2D at_position) {
     Entity* entity = create_base("Orc", DARK_GREEN, "o");
 
     entity->set_attack_component(std::make_unique<AttackComponent>(3));
@@ -40,7 +39,7 @@ namespace cpprl {
     g_coordinator.add_component(entity_id, SupaRL::AttackComponent{
         .damage_ = 3});
     g_coordinator.add_component(entity_id, SupaRL::TransformComponent{
-        .position_ = {0, 0}});
+        .position_ = at_position});
     g_coordinator.add_component(
         entity_id, SupaRL::VelocityComponent{
         .velocity_ = {0,0}});
@@ -48,7 +47,7 @@ namespace cpprl {
     return entity;
   }
 
-  Entity* TrollFactory::create() {
+  Entity* TrollFactory::create(SupaRL::Vector2D at_position) {
     Entity* entity = create_base("Troll", DARK_GREEN, "T");
 
     entity->set_attack_component(std::make_unique<AttackComponent>(4));
@@ -67,7 +66,7 @@ namespace cpprl {
     g_coordinator.add_component(entity_id, SupaRL::AttackComponent{
         .damage_ = 4});
     g_coordinator.add_component(entity_id, SupaRL::TransformComponent{
-        .position_ = {0, 0}});
+        .position_ = at_position});
     g_coordinator.add_component(
         entity_id, SupaRL::VelocityComponent{
         .velocity_ = {0,0}});
@@ -75,7 +74,7 @@ namespace cpprl {
     return entity;
   }
 
-  Entity* PlayerFactory::create() {
+  Entity* PlayerFactory::create(SupaRL::Vector2D at_position) {
     Entity* entity = create_base("Player", TEAL, "@");
 
     entity->set_attack_component(std::make_unique<AttackComponent>(5));
@@ -94,7 +93,7 @@ namespace cpprl {
     g_coordinator.add_component(entity_id, SupaRL::AttackComponent{
         .damage_ = 5});
     g_coordinator.add_component(entity_id, SupaRL::TransformComponent{
-        .position_ = {0, 0}});
+        .position_ = at_position});
     g_coordinator.add_component(
         entity_id, SupaRL::VelocityComponent{
         .velocity_ = {0,0}});
