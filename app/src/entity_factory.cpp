@@ -9,6 +9,8 @@
 #include "components/transform.hpp"
 #include "components/velocity.hpp"
 #include "components/ascii.hpp"
+#include <components/physique.hpp>
+#include <components/identity.hpp>
 
 extern SupaRL::Coordinator g_coordinator;
 
@@ -16,9 +18,7 @@ namespace cpprl {
   Entity* AbstractEntityFactory::create_base(
       const std::string& name, tcod::ColorRGB color, std::string symbol) {
 
-    auto entity = new Entity(
-        name,
-        true);
+    auto entity = new Entity();
     SupaRL::Entity entity_id = g_coordinator.create_entity();
     entity->set_id(entity_id);
     g_coordinator.add_component(entity_id, SupaRL::AsciiComponent{
@@ -26,6 +26,10 @@ namespace cpprl {
         .colour_ = SupaRL::ColorRGB{.r = color.r, .g = color.g, .b = color.b},
         .layer_ = 1});
 
+    g_coordinator.add_component(entity_id, SupaRL::IdentityComponent{
+        .name_ = name});
+    g_coordinator.add_component(entity_id, SupaRL::PhysiqueComponent{
+        .is_blocking_ = true});
     return entity;
   }
 

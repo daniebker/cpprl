@@ -5,14 +5,14 @@
 #include "components.hpp"
 #include <components/ascii.hpp>
 #include <components/transform.hpp>
+#include <components/physique.hpp>
+#include <components/identity.hpp>
 
 extern SupaRL::Coordinator g_coordinator;
 namespace cpprl {
   Entity* AbstractConsumableFactory::create_base(
       std::string name, tcod::ColorRGB color, std::string symbol,SupaRL::Vector2D at_position) {
-    Entity* new_entity = new Entity(
-        name,
-        false);
+    Entity* new_entity = new Entity();
     auto entity_id = g_coordinator.create_entity();
     new_entity->set_id(entity_id);
     g_coordinator.add_component(entity_id, SupaRL::TransformComponent{
@@ -21,6 +21,10 @@ namespace cpprl {
         .symbol_ = symbol,
         .colour_ = SupaRL::ColorRGB{.r = color.r, .g = color.g, .b = color.b},
         .layer_ = 1});
+    g_coordinator.add_component(entity_id, SupaRL::IdentityComponent{
+        .name_ = name});
+    g_coordinator.add_component(entity_id, SupaRL::PhysiqueComponent{
+        .is_blocking_ = false});
     return new_entity;
 
   }

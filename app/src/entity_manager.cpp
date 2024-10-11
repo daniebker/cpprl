@@ -6,12 +6,12 @@
 #include <optional>
 
 #include "basic_ai_component.hpp"
-#include "colours.hpp"
-#include "components.hpp"
 #include "consumable_factory.hpp"
 #include "util.hpp"
 
-#include "core/coordinator.hpp"
+#include <components/identity.hpp>
+#include <components/physique.hpp>
+#include <core/coordinator.hpp>
 
 extern SupaRL::Coordinator g_coordinator;
 namespace cpprl {
@@ -21,7 +21,10 @@ namespace cpprl {
     entities_.erase(
         std::begin(std::ranges::remove_if(
             entities_,
-            [](const Entity* entity) { return entity->get_name() != "Player"; })),
+            [](const Entity* entity) {
+            auto& entity_name = g_coordinator.get_component<SupaRL::IdentityComponent>(
+                entity->get_id()).name_;
+            return entity_name != "Player"; })),
         entities_.end());
   }
 
@@ -110,9 +113,11 @@ namespace cpprl {
   std::optional<std::reference_wrapper<Entity>>
     EntityManager::get_blocking_entity_at(SupaRL::Vector2D position) {
       for (const auto& entity : entities_) {
-      auto entity_position = g_coordinator.get_component<SupaRL::TransformComponent>(
+      auto& entity_position = g_coordinator.get_component<SupaRL::TransformComponent>(
           entity->get_id()).position_;
-        if (entity->is_blocking() &&
+      auto entity_is_blocking = g_coordinator.get_component<SupaRL::PhysiqueComponent>(
+          entity->get_id()).is_blocking_;
+        if (entity_is_blocking &&
             entity_position == position) {
           return std::reference_wrapper<Entity>(*entity);
         }
@@ -123,9 +128,11 @@ namespace cpprl {
   std::optional<std::reference_wrapper<Entity>>
     EntityManager::get_non_blocking_entity_at(SupaRL::Vector2D position) {
       for (const auto& entity : entities_) {
-        auto entity_position = g_coordinator.get_component<SupaRL::TransformComponent>(
+        auto& entity_position = g_coordinator.get_component<SupaRL::TransformComponent>(
             entity->get_id()).position_;
-        if (!entity->is_blocking() &&
+      auto entity_is_not_blocking = !g_coordinator.get_component<SupaRL::PhysiqueComponent>(
+          entity->get_id()).is_blocking_;
+        if (entity_is_not_blocking &&
             entity_position == position) {
           return std::reference_wrapper<Entity>(*entity);
         }

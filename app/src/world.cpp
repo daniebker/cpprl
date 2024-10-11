@@ -8,7 +8,8 @@
 #include "entity_manager.hpp"
 #include "game_entity.hpp"
 #include "core/coordinator.hpp"
-#include "components/transform.hpp"
+#include <components/transform.hpp>
+#include <components/identity.hpp>
 
 extern SupaRL::Coordinator g_coordinator;
 
@@ -75,7 +76,9 @@ namespace cpprl {
       for (std::reference_wrapper<Entity> entity_reference_wrapper :
           entities_at) {
         const Entity& entity = entity_reference_wrapper.get();
-        names += entity.get_name() + ", ";
+        auto& entity_name = g_coordinator.get_component<SupaRL::IdentityComponent>(
+            entity.get_id()).name_;
+        names += entity_name + ", ";
         tcod::print_rect(
             g_console,
             {controller_->cursor.x, controller_->cursor.y - 1, 20, 1},

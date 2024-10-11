@@ -11,6 +11,7 @@
 #include "world.hpp"
 #include "core/coordinator.hpp"
 #include "components/velocity.hpp"
+#include <components/identity.hpp>
 
 extern SupaRL::Coordinator g_coordinator;
 namespace cpprl {
@@ -26,9 +27,11 @@ namespace cpprl {
     }
 
     Entity& item = optional_item_ref.value().get();
+    auto& item_name = g_coordinator.get_component<SupaRL::IdentityComponent>(
+        item.get_id()).name_;
 
     world_.get_message_log().add_message(
-        "You pick up the " + item.get_name() + ".", WHITE);
+        "You pick up the " + item_name + ".", WHITE);
     entity_->get_container().add(&item);
     world_.get_entities().remove(&item);
 
@@ -116,11 +119,13 @@ namespace cpprl {
   }
 
   StateResult DieEvent::execute() {
+    auto& entity_name = g_coordinator.get_component<SupaRL::IdentityComponent>(
+        entity_->get_id()).name_;
     world_.get_message_log().add_message(
-        fmt::format("{} has died!", util::capitalize(entity_->get_name())));
+        fmt::format("{} has died!", util::capitalize(entity_name)));
     entity_->get_defense_component().die(*entity_);
 
-    if (entity_->get_name() != "player") {
+    if (entity_name != "player") {
       const std::optional<std::reference_wrapper<StatsComponent>>
         stats_component = world_.get_player()->get_stats_component();
       assert(stats_component.has_value());
@@ -167,23 +172,27 @@ namespace cpprl {
   StateResult MeleeCommand::execute() {
     auto entity_position = g_coordinator.get_component<SupaRL::TransformComponent>(
         entity_->get_id()).position_;
+    auto entity_name = g_coordinator.get_component<SupaRL::IdentityComponent>(
+        entity_->get_id()).name_;
     auto targetPos =
       entity_position + move_vector_;
     std::optional<std::reference_wrapper<Entity>> target =
       world_.get_entities().get_blocking_entity_at(targetPos);
 
     tcod::ColorRGB attack_colour = WHITE;
-    if (entity_->get_name() != "player") {
+    if (entity_name != "player") {
       attack_colour = RED;
     }
 
     if (target.has_value()) {
       int damage = combat_system::handle_attack(*entity_, target.value().get());
+      auto& target_name = g_coordinator.get_component<SupaRL::IdentityComponent>(
+          target.value().get().get_id()).name_;
       if (damage > 0) {
         std::string message = fmt::format(
             "{} attacks {} for {} hit points.",
-            util::capitalize(entity_->get_name()),
-            util::capitalize(target.value().get().get_name()),
+            util::capitalize(entity_name),
+            util::capitalize(target_name),
             damage);
 
         world_.get_message_log().add_message(message, attack_colour, true);
@@ -195,8 +204,8 @@ namespace cpprl {
       } else {
         std::string message = fmt::format(
             "{} attacks {} but does no damage.",
-            util::capitalize(entity_->get_name()),
-            util::capitalize(target.value().get().get_name()));
+            util::capitalize(entity_name),
+            util::capitalize(target_name));
 
         world_.get_message_log().add_message(message, attack_colour, true);
       }

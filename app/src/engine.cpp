@@ -24,6 +24,8 @@
 #include "components/status_condition.hpp"
 #include "components/velocity.hpp"
 #include "components/ascii.hpp"
+#include "components/physique.hpp"
+#include "components/identity.hpp"
 #include "systems/status_condition_system.hpp"
 #include "systems/combat_system.hpp"
 #include "core/types.hpp"
@@ -57,6 +59,8 @@ namespace cpprl {
     g_coordinator.register_component<SupaRL::TransformComponent>();
     g_coordinator.register_component<SupaRL::VelocityComponent>();
     g_coordinator.register_component<SupaRL::AsciiComponent>();
+    g_coordinator.register_component<SupaRL::PhysiqueComponent>();
+    g_coordinator.register_component<SupaRL::IdentityComponent>();
 
     /*g_coordinator.register_system<SupaRL::StatusConditionSystem>();*/
     /*{*/

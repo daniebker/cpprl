@@ -25,8 +25,6 @@ namespace cpprl {
     private:
       SupaRL::Entity id_;
 
-      std::string name_;
-      bool blocker_;
       std::unique_ptr<AttackComponent> attackComponent_;
       std::unique_ptr<DefenseComponent> defenseComponent_;
       std::unique_ptr<ConsumableComponent> consumableComponent_;
@@ -35,14 +33,11 @@ namespace cpprl {
       std::unique_ptr<StatsComponent> statsComponent_;
 
     public:
-      Entity(
-          std::string const& name,
-          bool blocker);
-
+      Entity() = default;
       ~Entity() = default;
 
       void set_id(SupaRL::Entity id) { id_ = id; };
-      SupaRL::Entity get_id() { return id_; };
+       SupaRL::Entity get_id() const { return id_; };
 
       AttackComponent& get_attack_component() { return *attackComponent_; };
       DefenseComponent& get_defense_component() { return *defenseComponent_; };
@@ -69,12 +64,8 @@ namespace cpprl {
       Container& get_container() { return *container_; };
       float get_distance_to(Entity* other) const;
 
-      bool is_blocking() const { return blocker_; };
-      std::string get_name() const { return name_; };
 
       void update(World& world);
-      void set_blocking(bool blocker) { blocker_ = blocker; };
-      void set_name(std::string_view name) { name_ = name; };
       void set_defense_component(
           std::unique_ptr<DefenseComponent> defenseComponent);
       void set_attack_component(std::unique_ptr<AttackComponent> attackComponent);
@@ -86,7 +77,6 @@ namespace cpprl {
 
       template <class Archive>
         void pack(Archive& archive) {
-          archive(name_, blocker_);
           archive(defenseComponent_ != nullptr);
           archive(attackComponent_ != nullptr);
           archive(consumableComponent_ != nullptr);
@@ -111,7 +101,6 @@ namespace cpprl {
           bool hasContainer;
           bool hasStatsComponent;
 
-          archive(name_, blocker_);
           archive(hasDefenseComponent);
           archive(hasAttackComponent);
           archive(hasConsumableComponent);

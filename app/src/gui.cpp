@@ -5,6 +5,7 @@
 #include "colours.hpp"
 #include "components.hpp"
 #include "game_entity.hpp"
+#include <components/identity.hpp>
 
 namespace cpprl {
 
@@ -92,10 +93,12 @@ void InventoryWindow::render(tcod::Console& parent_console) {
   } else {
     tcod::print(*console_, {1, cursor_}, ">", WHITE, std::nullopt, TCOD_LEFT);
     for (auto it = items.begin(); it != items.end(); ++it) {
+      auto& entity_name = g_coordinator.get_component<SupaRL::IdentityComponent>(
+          (*it)->get_id()).name_;
       tcod::print_rect(
           *console_,
           {2, y_offset, console_->getWidth() - 1, 1},
-          (*it)->get_name(),
+          entity_name,
           WHITE,
           std::nullopt,
           TCOD_LEFT);

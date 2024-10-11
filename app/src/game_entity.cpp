@@ -8,11 +8,6 @@
 
 namespace cpprl {
 
-  Entity::Entity(
-      std::string const& name,
-      bool blocker)
-    : name_(name),
-    blocker_(blocker) {}
 
   void Entity::update(World& world) { aiComponent_->update(world, this); }
 

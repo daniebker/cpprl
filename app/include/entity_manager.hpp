@@ -62,9 +62,6 @@ namespace cpprl {
         void save(Archive& archive) const {
           archive(entities_.size() - 1);
           for (auto& entity : entities_) {
-            if (entity->get_name() == "Player") {
-              continue;
-            }
             entity->pack(archive);
           }
         }
@@ -75,7 +72,7 @@ namespace cpprl {
           archive(size);
           entities_.reserve(size);
           for (size_t i = 0; i < size; i++) {
-            auto entity = new Entity("", false);
+            auto entity = new Entity();
             entity->unpack(archive);
             entities_.emplace_back(entity);
           }

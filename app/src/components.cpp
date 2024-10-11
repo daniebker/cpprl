@@ -12,6 +12,8 @@
 #include "game_entity.hpp"
 #include "state.hpp"
 #include "world.hpp"
+#include <components/identity.hpp>
+#include <components/physique.hpp>
 
 extern SupaRL::Coordinator g_coordinator;
 
@@ -33,16 +35,20 @@ namespace cpprl {
   }
 
   void DefenseComponent::die(Entity& the_deceased) const {
-    the_deceased.set_name("Corpse of " + the_deceased.get_name());
+    auto& identity_comp = g_coordinator.get_component<SupaRL::IdentityComponent>(
+        the_deceased.get_id());
+    identity_comp.name_ = "Corpse of " + identity_comp.name_;
 
     auto& ascii_comp = g_coordinator.get_component<SupaRL::AsciiComponent>(
         the_deceased.get_id());
-
     ascii_comp.symbol_ = "%";
     ascii_comp.colour_ = SupaRL::ColorRGB{RED.r, RED.g, RED.b};
     ascii_comp.layer_ = -1;
 
-    the_deceased.set_blocking(false);
+    auto& physique_component = g_coordinator.get_component<SupaRL::PhysiqueComponent>(
+        the_deceased.get_id());
+
+    physique_component.is_blocking_ = false;
     the_deceased.set_ai_component(nullptr);
   }
 
@@ -135,12 +141,14 @@ namespace cpprl {
 
     int inflicted = combat_system::handle_spell(damage_, closest_living_monster);
     ConsumableComponent::use(owner, wearer, world);
+      auto& entity_name = g_coordinator.get_component<SupaRL::IdentityComponent>(
+          closest_living_monster.get_id()).name_;
     if (inflicted > 0) {
       world.get_message_log().add_message(
           fmt::format(
             "A lightning bolt strikes the {} with a loud "
             "thunder! The damage is {} hit points.",
-            closest_living_monster.get_name(),
+            entity_name,
             damage_),
           GREEN);
 
@@ -152,7 +160,7 @@ namespace cpprl {
     } else {
       return Failure{fmt::format(
           "The lightning bolt hits the {} but does no damage.",
-          closest_living_monster.get_name())};
+          entity_name)};
     }
   }
 
@@ -162,6 +170,8 @@ namespace cpprl {
       for (Entity* entity : world.get_entities()) {
         auto entity_position = g_coordinator.get_component<SupaRL::TransformComponent>(
             entity->get_id()).position_;
+        auto entity_name = g_coordinator.get_component<SupaRL::IdentityComponent>(
+            entity->get_id()).name_;
         if (const auto* defense_component = &entity->get_defense_component();
             defense_component && defense_component->is_not_dead() &&
             entity_position.distance_to(
@@ -169,7 +179,7 @@ namespace cpprl {
           world.get_message_log().add_message(
               fmt::format(
                 "The {} gets burned for {} hit points.",
-                entity->get_name(),
+                entity_name,
                 damage_),
               RED);
           int inflicted = combat_system::handle_spell(damage_, *entity);
@@ -194,6 +204,8 @@ namespace cpprl {
             world.get_map().get_highlight_tile());
       if (optional_ref_target.has_value()) {
         auto& target = optional_ref_target.value().get();
+        auto& entity_name = g_coordinator.get_component<SupaRL::IdentityComponent>(
+            target.get_id()).name_;
         std::unique_ptr<AIComponent> old_ai = target.transfer_ai_component();
 
         std::unique_ptr<AIComponent> confusion_ai =
@@ -203,7 +215,7 @@ namespace cpprl {
             fmt::format(
               "The eyes of the {} look vacant, as it starts to "
               "stumble around!",
-              target.get_name()),
+              entity_name),
             GREEN);
         ConsumableComponent::use(owner, wearer, world);
         return {};
