@@ -130,7 +130,7 @@ namespace cpprl {
       for (const auto& entity : entities_) {
         auto& entity_position = g_coordinator.get_component<SupaRL::TransformComponent>(
             entity->get_id()).position_;
-      auto entity_is_not_blocking = !g_coordinator.get_component<SupaRL::PhysiqueComponent>(
+        auto entity_is_not_blocking = !g_coordinator.get_component<SupaRL::PhysiqueComponent>(
           entity->get_id()).is_blocking_;
         if (entity_is_not_blocking &&
             entity_position == position) {
