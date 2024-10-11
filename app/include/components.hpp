@@ -57,23 +57,6 @@ namespace cpprl {
       int max_hp_;
   };
 
-  class TransformComponent {
-    public:
-      TransformComponent() = default;
-      TransformComponent(int x, int y) : position_({x, y}) {}
-      virtual ~TransformComponent() = default;
-      SupaRL::Vector2D get_position() const { return position_; }
-      void move(SupaRL::Vector2D new_position) { position_ = new_position; }
-
-      template <class Archive>
-        void serialize(Archive& archive) {
-          archive(position_);
-        }
-
-    private:
-      SupaRL::Vector2D position_;
-  };
-
   class ASCIIComponent {
     public:
       ASCIIComponent() = default;
