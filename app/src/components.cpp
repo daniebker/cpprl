@@ -13,6 +13,8 @@
 #include "state.hpp"
 #include "world.hpp"
 
+extern SupaRL::Coordinator g_coordinator;
+
 namespace cpprl {
   int DefenseComponent::heal(int amount) {
     if (hp_ == max_hp_) {
@@ -31,8 +33,15 @@ namespace cpprl {
   }
 
   void DefenseComponent::die(Entity& the_deceased) const {
-    the_deceased.set_name("corpse of " + the_deceased.get_name());
-    the_deceased.set_ascii_component(std::make_unique<ASCIIComponent>("%", RED, -1));
+    the_deceased.set_name("Corpse of " + the_deceased.get_name());
+
+    auto& ascii_comp = g_coordinator.get_component<SupaRL::AsciiComponent>(
+        the_deceased.get_id());
+
+    ascii_comp.symbol_ = "%";
+    ascii_comp.colour_ = SupaRL::ColorRGB{RED.r, RED.g, RED.b};
+    ascii_comp.layer_ = -1;
+
     the_deceased.set_blocking(false);
     the_deceased.set_ai_component(nullptr);
   }

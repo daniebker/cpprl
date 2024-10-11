@@ -13,7 +13,7 @@ namespace cpprl {
 
     protected:
       Entity* create_base(
-          const std::string& name, tcod::ColorRGB color, std::string_view symbol);
+          const std::string& name, tcod::ColorRGB color, std::string symbol);
   };
 
   class OrcFactory : public AbstractEntityFactory {

@@ -10,18 +10,11 @@ namespace cpprl {
 
   Entity::Entity(
       std::string const& name,
-      bool blocker,
-      std::unique_ptr<ASCIIComponent> asciiComponent)
+      bool blocker)
     : name_(name),
-    blocker_(blocker),
-    asciiComponent_(std::move(asciiComponent)) {}
+    blocker_(blocker) {}
 
   void Entity::update(World& world) { aiComponent_->update(world, this); }
-
-  void Entity::set_ascii_component(
-      std::unique_ptr<ASCIIComponent> asciiComponent) {
-    asciiComponent_ = std::move(asciiComponent);
-  };
 
   void Entity::set_attack_component(
       std::unique_ptr<AttackComponent> attackComponent) {

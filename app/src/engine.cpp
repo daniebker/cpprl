@@ -23,10 +23,12 @@
 #include "components/transform.hpp"
 #include "components/status_condition.hpp"
 #include "components/velocity.hpp"
+#include "components/ascii.hpp"
 #include "systems/status_condition_system.hpp"
 #include "systems/combat_system.hpp"
 #include "core/types.hpp"
 
+// TODO: Service Locator pattern?
 SupaRL::Coordinator g_coordinator;
 
 namespace cpprl {
@@ -54,6 +56,7 @@ namespace cpprl {
     g_coordinator.register_component<SupaRL::AttackComponent>();
     g_coordinator.register_component<SupaRL::TransformComponent>();
     g_coordinator.register_component<SupaRL::VelocityComponent>();
+    g_coordinator.register_component<SupaRL::AsciiComponent>();
 
     /*g_coordinator.register_system<SupaRL::StatusConditionSystem>();*/
     /*{*/

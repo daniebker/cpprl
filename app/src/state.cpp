@@ -50,7 +50,7 @@ namespace cpprl {
     world_.get_dungeon().increase_level();
     world_.generate_map(80, 35, true);
     // Add the player back to the entities.
-    auto player_transform = g_coordinator.get_component<SupaRL::TransformComponent>(
+    auto& player_transform = g_coordinator.get_component<SupaRL::TransformComponent>(
         world_.get_player()->get_id());
     player_transform.position_ = world_.get_map().get_rooms().at(0).get_center();
     world_.get_entities().spawn(world_.get_player());

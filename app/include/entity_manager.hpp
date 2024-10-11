@@ -75,7 +75,7 @@ namespace cpprl {
           archive(size);
           entities_.reserve(size);
           for (size_t i = 0; i < size; i++) {
-            auto entity = new Entity("", false, nullptr);
+            auto entity = new Entity("", false);
             entity->unpack(archive);
             entities_.emplace_back(entity);
           }

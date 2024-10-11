@@ -26,9 +26,6 @@ namespace cpprl {
     }
 
     Entity& item = optional_item_ref.value().get();
-    if (item.get_name().find("corpse") != std::string::npos) {
-      return NoOp{"There is nothing here to pick up."};
-    }
 
     world_.get_message_log().add_message(
         "You pick up the " + item.get_name() + ".", WHITE);

@@ -3,19 +3,24 @@
 #include <memory>
 
 #include "components.hpp"
+#include <components/ascii.hpp>
+#include <components/transform.hpp>
 
 extern SupaRL::Coordinator g_coordinator;
 namespace cpprl {
   Entity* AbstractConsumableFactory::create_base(
-      std::string name, tcod::ColorRGB color, std::string_view symbol,SupaRL::Vector2D at_position) {
+      std::string name, tcod::ColorRGB color, std::string symbol,SupaRL::Vector2D at_position) {
     Entity* new_entity = new Entity(
         name,
-        false,
-        std::make_unique<ASCIIComponent>(symbol, color, 1));
+        false);
     auto entity_id = g_coordinator.create_entity();
     new_entity->set_id(entity_id);
     g_coordinator.add_component(entity_id, SupaRL::TransformComponent{
         .position_ = at_position});
+    g_coordinator.add_component(entity_id, SupaRL::AsciiComponent{
+        .symbol_ = symbol,
+        .colour_ = SupaRL::ColorRGB{.r = color.r, .g = color.g, .b = color.b},
+        .layer_ = 1});
     return new_entity;
 
   }

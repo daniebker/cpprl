@@ -2,7 +2,6 @@
 
 #include <cereal/types/polymorphic.hpp>
 #include <libtcod.hpp>
-#include <string_view>
 
 #include "game_entity.hpp"
 #include "types/action_result.hpp"
@@ -57,28 +56,6 @@ namespace cpprl {
       int max_hp_;
   };
 
-  class ASCIIComponent {
-    public:
-      ASCIIComponent() = default;
-      ASCIIComponent(std::string_view symbol, tcod::ColorRGB colour, int layer)
-        : symbol_(symbol), colour_(colour), layer_(layer) {}
-      virtual ~ASCIIComponent() = default;
-
-      std::string_view get_symbol() const { return symbol_; }
-      tcod::ColorRGB get_colour() const { return colour_; }
-      int get_layer() const { return layer_; }
-
-      template <class Archive>
-        void serialize(Archive& archive) {
-          archive(symbol_, colour_, layer_);
-        }
-
-    private:
-      std::string symbol_;
-      tcod::ColorRGB colour_;
-      int layer_;
-  };
-
   class Container {
     private:
       size_t size_;
@@ -107,7 +84,7 @@ namespace cpprl {
           int nb_items;
           archive(nb_items);
           for (int i = 0; i < nb_items; i++) {
-            Entity* entity = new Entity("", false, nullptr);
+            Entity* entity = new Entity("", false);
             entity->unpack(archive);
             inventory_.emplace_back(entity);
           }

@@ -15,7 +15,6 @@ extern SupaRL::Coordinator g_coordinator;
 namespace cpprl {
 
   class TransformComponent;
-  class ASCIIComponent;
   class AttackComponent;
   class DefenseComponent;
   class ConsumableComponent;
@@ -28,7 +27,6 @@ namespace cpprl {
 
       std::string name_;
       bool blocker_;
-      std::unique_ptr<ASCIIComponent> asciiComponent_;
       std::unique_ptr<AttackComponent> attackComponent_;
       std::unique_ptr<DefenseComponent> defenseComponent_;
       std::unique_ptr<ConsumableComponent> consumableComponent_;
@@ -39,15 +37,13 @@ namespace cpprl {
     public:
       Entity(
           std::string const& name,
-          bool blocker,
-          std::unique_ptr<ASCIIComponent> asciiComponent);
+          bool blocker);
 
       ~Entity() = default;
 
       void set_id(SupaRL::Entity id) { id_ = id; };
       SupaRL::Entity get_id() { return id_; };
 
-      ASCIIComponent& get_sprite_component() { return *asciiComponent_; };
       AttackComponent& get_attack_component() { return *attackComponent_; };
       DefenseComponent& get_defense_component() { return *defenseComponent_; };
       ConsumableComponent& get_consumable_component() {
@@ -79,7 +75,6 @@ namespace cpprl {
       void update(World& world);
       void set_blocking(bool blocker) { blocker_ = blocker; };
       void set_name(std::string_view name) { name_ = name; };
-      void set_ascii_component(std::unique_ptr<ASCIIComponent> asciiComponent);
       void set_defense_component(
           std::unique_ptr<DefenseComponent> defenseComponent);
       void set_attack_component(std::unique_ptr<AttackComponent> attackComponent);
@@ -95,12 +90,10 @@ namespace cpprl {
           archive(defenseComponent_ != nullptr);
           archive(attackComponent_ != nullptr);
           archive(consumableComponent_ != nullptr);
-          archive(asciiComponent_ != nullptr);
           archive(aiComponent_ != nullptr);
           archive(container_ != nullptr);
           archive(statsComponent_ != nullptr);
 
-          if (asciiComponent_) archive(asciiComponent_);
           if (attackComponent_) archive(attackComponent_);
           if (defenseComponent_) archive(defenseComponent_);
           if (consumableComponent_) archive(consumableComponent_);
@@ -114,7 +107,6 @@ namespace cpprl {
           bool hasDefenseComponent;
           bool hasAttackComponent;
           bool hasConsumableComponent;
-          bool hasAsciiComponent;
           bool hasAIComponent;
           bool hasContainer;
           bool hasStatsComponent;
@@ -123,14 +115,10 @@ namespace cpprl {
           archive(hasDefenseComponent);
           archive(hasAttackComponent);
           archive(hasConsumableComponent);
-          archive(hasAsciiComponent);
           archive(hasAIComponent);
           archive(hasContainer);
           archive(hasStatsComponent);
 
-          if (hasAsciiComponent) {
-            archive(asciiComponent_);
-          }
           if (hasAttackComponent) {
             archive(attackComponent_);
           }

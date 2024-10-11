@@ -59,8 +59,10 @@ namespace cpprl {
           entity->get_id());
       if (dungeon_.get_map().is_in_fov(
             entity_transform.position_)) {
+        auto entity_sprite = g_coordinator.get_component<SupaRL::AsciiComponent>(
+            entity->get_id());
         renderer.render(
-            entity->get_sprite_component(), entity_transform);
+            entity_sprite, entity_transform);
       }
     }
     ui_->render(g_console);

@@ -7,17 +7,16 @@
 #include "globals.hpp"
 #include "util.hpp"
 #include <components/transform.hpp>
+#include <components/ascii.hpp>
 
 namespace cpprl {
-  class ASCIIComponent;
-  class TransformComponent;
   class Renderer {
     public:
       Renderer() {}
       virtual ~Renderer() {}
 
       virtual void render(
-          ASCIIComponent& sprite, SupaRL::TransformComponent& transform) = 0;
+          SupaRL::AsciiComponent& sprite, SupaRL::TransformComponent& transform) = 0;
   };
 
   class TCODRenderer : public Renderer {
@@ -42,6 +41,6 @@ namespace cpprl {
       };
       ~TCODRenderer() = default;
 
-      virtual void render(ASCIIComponent& sprite, SupaRL::TransformComponent& transform);
+      virtual void render(SupaRL::AsciiComponent& sprite, SupaRL::TransformComponent& transform);
   };
 }

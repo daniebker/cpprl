@@ -14,7 +14,7 @@ namespace cpprl {
 
     protected:
       Entity* create_base(
-          std::string name, tcod::ColorRGB color, std::string_view symbol,SupaRL::Vector2D at_position);
+          std::string name, tcod::ColorRGB color, std::string symbol,SupaRL::Vector2D at_position);
   };
 
   class HealthPotionFactory : public AbstractConsumableFactory {
