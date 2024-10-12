@@ -8,6 +8,7 @@
 #include "gui.hpp"
 #include "input_handler.hpp"
 #include "state.hpp"
+#include "controller.hpp"
 #include "world.hpp"
 #include "core/coordinator.hpp"
 #include "components/velocity.hpp"
@@ -158,6 +159,8 @@ namespace cpprl {
 
   StateResult MouseInputEvent::execute() {
     world_.get_map().set_highlight_tile(position_);
+    std::cout << "position_: " << position_.x << ", " << position_.y << std::endl;
+    world_.get_controller().cursor = position_;
     return {};
   }
 

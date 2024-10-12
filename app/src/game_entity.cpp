@@ -7,8 +7,6 @@
 #include "world.hpp"
 
 namespace cpprl {
-
-
   void Entity::update(World& world) { aiComponent_->update(world, this); }
 
   void Entity::set_attack_component(
@@ -42,5 +40,4 @@ namespace cpprl {
   std::unique_ptr<AIComponent> Entity::transfer_ai_component() {
     return std::move(aiComponent_);
   };
-
 }

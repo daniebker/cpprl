@@ -45,6 +45,7 @@ namespace cpprl {
       Entity* get_player() const { return player_; }
       void spawn_player();
       void spawn_player(Entity* player);
+      Controller& get_controller() { return *controller_; }
 
       template <class Archive>
         void save(Archive& archive) const {

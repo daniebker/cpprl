@@ -82,13 +82,12 @@ GameInputHandler::GameInputHandler(World& world, Entity* controllable_entity)
       controllable_entity_(controllable_entity){};
 
 EngineEvent& GameInputHandler::handle_sdl_event(SDL_Event event) noexcept {
-  // TODO: Move this to its own handler.
-  //  probably want an event handler which has
-  //  input handler for keyboard and another for mouse
   if (event.type == SDL_MOUSEMOTION) {
     g_context.convert_event_coordinates(event);
-    world_.get_map().set_highlight_tile({event.motion.x, event.motion.y});
-    return *noop_;
+    mouse_input_event_ = std::make_unique<MouseInputEvent>(
+        world_, SupaRL::Vector2D{event.motion.x, event.motion.y});
+    /*world_.get_map().set_highlight_tile({event.motion.x, event.motion.y});*/
+    return *mouse_input_event_;
   }
 
   SDL_Keycode key = event.key.keysym.sym;

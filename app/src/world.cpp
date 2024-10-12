@@ -32,6 +32,7 @@ namespace cpprl {
     message_log_.add_message("Press 'v' to view your adventure log", WHITE);
     message_log_.add_message("Now, fly you fool!", WHITE);
   }
+
   void World::generate_map(int width, int height, bool with_entities) {
     // TODO: will need to pass the seed here
     dungeon_.generate(DungeonConfig{30, 6, 10, width, height, 2});
@@ -70,6 +71,7 @@ namespace cpprl {
 
     message_log_.render(g_console, 23, 35, 45, 5);
     // TODO: this is not working since cursor is not being set
+    std::cout << "cursor: " << controller_->cursor.x << ", " << controller_->cursor.y << std::endl;
     auto entities_at = entities_->get_entities_at(controller_->cursor);
     if (!entities_at.empty()) {
       std::string names;

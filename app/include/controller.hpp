@@ -6,6 +6,5 @@ namespace cpprl {
   struct Controller {
     SupaRL::Vector2D cursor = {0, 0};
   };
-
 }
 

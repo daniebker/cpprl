@@ -59,6 +59,7 @@ namespace cpprl {
       std::unique_ptr<MainMenuCommand> main_menu_command_;
       std::unique_ptr<UseCommand> use_command_;
       std::unique_ptr<CharacterMenuCommand> character_menu_command_;
+      std::unique_ptr<MouseInputEvent> mouse_input_event_;
       Entity* controllable_entity_;
 
     public:
