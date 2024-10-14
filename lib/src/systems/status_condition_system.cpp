@@ -20,13 +20,9 @@ namespace SupaRL
       auto& defence = g_coordinator.get_component<DefenceComponent>(entity);
 
       status_condition.ticks_++;
-      if (status_condition.ticks_ % 10 == 0)
+      if (status_condition.ticks_ == status_condition.max_ticks_)
       {
         defence.hp_ -= status_condition.damage_per_tick_;
-        if (defence.hp_ <= 0)
-        {
-          // DIE.
-        }
       }
     }
   }

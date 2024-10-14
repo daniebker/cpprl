@@ -62,13 +62,13 @@ namespace cpprl {
     g_coordinator.register_component<SupaRL::PhysiqueComponent>();
     g_coordinator.register_component<SupaRL::IdentityComponent>();
 
-    /*g_coordinator.register_system<SupaRL::StatusConditionSystem>();*/
-    /*{*/
-    /*  SupaRL::Signature signature;*/
-    /*  signature.set(g_coordinator.get_component_type<SupaRL::StatusConditionComponent>());*/
-    /*  signature.set(g_coordinator.get_component_type<SupaRL::DefenceComponent>());*/
-    /*  g_coordinator.set_system_signature<SupaRL::StatusConditionSystem>(signature);*/
-    /*}*/
+    status_condition_system_ = g_coordinator.register_system<SupaRL::StatusConditionSystem>();
+    {
+      SupaRL::Signature signature;
+      signature.set(g_coordinator.get_component_type<SupaRL::StatusConditionComponent>());
+      signature.set(g_coordinator.get_component_type<SupaRL::DefenceComponent>());
+      g_coordinator.set_system_signature<SupaRL::StatusConditionSystem>(signature);
+    }
     /**/
     /*g_coordinator.register_system<SupaRL::CombatSystem>();*/
     /*{*/
@@ -153,6 +153,7 @@ namespace cpprl {
           } else if (std::holds_alternative<LoadGame>(result)) {
             load();
           } else if (std::holds_alternative<EndTurn>(result)) {
+            status_condition_system_->update();
             world_->handle_enemy_turns();
             if (world_->get_player()->get_defense_component().is_dead()) {
               engine_state_->on_exit();
