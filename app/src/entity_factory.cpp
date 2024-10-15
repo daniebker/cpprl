@@ -11,6 +11,7 @@
 #include "components/ascii.hpp"
 #include <components/physique.hpp>
 #include <components/identity.hpp>
+#include <components/status_condition.hpp>
 
 extern SupaRL::Coordinator g_coordinator;
 
@@ -30,6 +31,11 @@ namespace cpprl {
         .name_ = name});
     g_coordinator.add_component(entity_id, SupaRL::PhysiqueComponent{
         .is_blocking_ = true});
+    g_coordinator.add_component(entity_id, SupaRL::StatusConditionComponent{
+        .damage_per_tick_ = 0,
+        .max_ticks_ = 0,
+        .ticks_ = 0,
+        .name_ = "none"});
     return entity;
   }
 
