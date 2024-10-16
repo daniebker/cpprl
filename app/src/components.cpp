@@ -9,11 +9,13 @@
 #include "combat_system.hpp"
 #include "entity_manager.hpp"
 #include "events/command.hpp"
-#include "exceptions.hpp"
 #include "game_entity.hpp"
-#include "globals.hpp"
 #include "state.hpp"
 #include "world.hpp"
+#include <components/identity.hpp>
+#include <components/physique.hpp>
+
+extern SupaRL::Coordinator g_coordinator;
 
 namespace cpprl {
   int DefenseComponent::heal(int amount) {
@@ -32,12 +34,6 @@ namespace cpprl {
     return healed;
   }
 
-  void DefenseComponent::die(Entity& the_deceased) const {
-    the_deceased.set_name("corpse of " + the_deceased.get_name());
-    the_deceased.set_ascii_component(std::make_unique<ASCIIComponent>("%", RED, -1));
-    the_deceased.set_blocking(false);
-    the_deceased.set_ai_component(nullptr);
-  }
 
   Container::Container(int size) : size_(size), inventory_({}) {
     inventory_.reserve(size);
@@ -73,8 +69,13 @@ namespace cpprl {
   ActionResult ConsumableComponent::drop(Entity* owner, Entity* wearer) {
     if (auto* container = &wearer->get_container(); container) {
       container->remove(owner);
-      owner->get_transform_component().move(
-          wearer->get_transform_component().get_position());
+      // TODO: This would then use the global coordinator to
+      // get the transform of each entity and set the positions.
+      auto owner_transform = g_coordinator.get_component<SupaRL::TransformComponent>(
+          owner->get_id());
+      auto wearer_position = g_coordinator.get_component<SupaRL::TransformComponent>(
+          wearer->get_id()).position_;
+      owner_transform.position_ = wearer_position;
       return Success{};
     }
     return Failure{};
@@ -110,9 +111,11 @@ namespace cpprl {
   }
 
   ActionResult LightningBolt::use(Entity* owner, Entity* wearer, World& world) {
+    auto wearer_position = g_coordinator.get_component<SupaRL::TransformComponent>(
+        wearer->get_id()).position_;
     std::optional<std::reference_wrapper<Entity>> optional_closest_monster_ref =
       world.get_entities().get_closest_living_monster(
-          wearer->get_transform_component().get_position(), range_);
+          wearer_position, range_);
     if (!optional_closest_monster_ref.has_value()) {
       return Failure{"No enemy is close enough to strike."};
     }
@@ -121,12 +124,14 @@ namespace cpprl {
 
     int inflicted = combat_system::handle_spell(damage_, closest_living_monster);
     ConsumableComponent::use(owner, wearer, world);
+      auto& entity_name = g_coordinator.get_component<SupaRL::IdentityComponent>(
+          closest_living_monster.get_id()).name_;
     if (inflicted > 0) {
       world.get_message_log().add_message(
           fmt::format(
             "A lightning bolt strikes the {} with a loud "
             "thunder! The damage is {} hit points.",
-            closest_living_monster.get_name(),
+            entity_name,
             damage_),
           GREEN);
 
@@ -138,7 +143,7 @@ namespace cpprl {
     } else {
       return Failure{fmt::format(
           "The lightning bolt hits the {} but does no damage.",
-          closest_living_monster.get_name())};
+          entity_name)};
     }
   }
 
@@ -146,14 +151,18 @@ namespace cpprl {
     auto on_pick = [&, owner, wearer]() {
       ConsumableComponent::use(owner, wearer, world);
       for (Entity* entity : world.get_entities()) {
+        auto entity_position = g_coordinator.get_component<SupaRL::TransformComponent>(
+            entity->get_id()).position_;
+        auto entity_name = g_coordinator.get_component<SupaRL::IdentityComponent>(
+            entity->get_id()).name_;
         if (const auto* defense_component = &entity->get_defense_component();
             defense_component && defense_component->is_not_dead() &&
-            entity->get_transform_component().get_position().distance_to(
+            entity_position.distance_to(
               world.get_map().get_highlight_tile()) <= aoe_) {
           world.get_message_log().add_message(
               fmt::format(
                 "The {} gets burned for {} hit points.",
-                entity->get_name(),
+                entity_name,
                 damage_),
               RED);
           int inflicted = combat_system::handle_spell(damage_, *entity);
@@ -178,6 +187,8 @@ namespace cpprl {
             world.get_map().get_highlight_tile());
       if (optional_ref_target.has_value()) {
         auto& target = optional_ref_target.value().get();
+        auto& entity_name = g_coordinator.get_component<SupaRL::IdentityComponent>(
+            target.get_id()).name_;
         std::unique_ptr<AIComponent> old_ai = target.transfer_ai_component();
 
         std::unique_ptr<AIComponent> confusion_ai =
@@ -187,7 +198,7 @@ namespace cpprl {
             fmt::format(
               "The eyes of the {} look vacant, as it starts to "
               "stumble around!",
-              target.get_name()),
+              entity_name),
             GREEN);
         ConsumableComponent::use(owner, wearer, world);
         return {};

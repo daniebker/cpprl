@@ -1,68 +1,42 @@
-#ifndef TYPES_MATH_HPP
-#define TYPES_MATH_HPP
+#pragma once
 
 #include <array>
+
 #include <cmath>
+#include <core/math.hpp>
 
 namespace cpprl {
 
-struct Vector2D {
-  operator const std::array<int, 2>() const noexcept { return {x, y}; }
+  struct Quadrilateral {
+    operator const std::array<int, 4>() const noexcept {
+      return {position.x, position.y, width, height};
+    }
 
-  Vector2D operator+(const Vector2D& other) const noexcept { return {x + other.x, y + other.y}; }
-  Vector2D operator+=(const Vector2D& other) noexcept {
-    x += other.x;
-    y += other.y;
-    return *this;
-  }
-  Vector2D operator-(const Vector2D& other) const noexcept { return {x - other.x, y - other.y}; }
-  Vector2D operator/(int scalar) const noexcept { return {x / scalar, y / scalar}; }
-  bool operator==(const Vector2D& other) const noexcept { return x == other.x && y == other.y; }
-  bool operator!=(const Vector2D& other) const noexcept { return !(*this == other); }
-  float distance_to(const Vector2D& other) const noexcept {
-    return std::sqrt(std::pow(x - other.x, 2) + std::pow(y - other.y, 2));
-  }
+    bool operator==(const Quadrilateral& other) const noexcept {
+      return position == other.position && width == other.width &&
+        height == other.height;
+    }
+    bool operator!=(const Quadrilateral& other) const noexcept {
+      return !(*this == other);
+    }
 
-  int x;
-  int y;
+    SupaRL::Vector2D position;
+    int width;
+    int height;
 
-  template <class Archive>
-  void serialize(Archive& archive) {
-    archive(x, y);
-  }
-};
+    template <class Archive>
+      void serialize(Archive& archive) {
+        archive(position, width, height);
+      }
+  };
 
-struct Quadrilateral {
-  operator const std::array<int, 4>() const noexcept {
-    return {position.x, position.y, width, height};
-  }
-
-  bool operator==(const Quadrilateral& other) const noexcept {
-    return position == other.position && width == other.width &&
-           height == other.height;
-  }
-  bool operator!=(const Quadrilateral& other) const noexcept {
-    return !(*this == other);
+  template <typename T>
+    inline T euclidean_squared(T x, T y) {
+      return x * x + y * y;
+    }
+  inline int euclidean_squared(SupaRL::Vector2D vec) {
+    return euclidean_squared(vec.x, vec.y);
   }
 
-  Vector2D position;
-  int width;
-  int height;
-
-  template <class Archive>
-  void serialize(Archive& archive) {
-    archive(position, width, height);
-  }
-};
-
-template <typename T>
-inline T euclidean_squared(T x, T y) {
-  return x * x + y * y;
-}
-inline int euclidean_squared(Vector2D vec) {
-  return euclidean_squared(vec.x, vec.y);
 }
 
-}  // namespace cpprl
-
-#endif  // TYPES_MATH_HPP

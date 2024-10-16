@@ -6,6 +6,7 @@ file(
     "./include/*.hpp"
     "./include/*.h"
 )
+set(CMAKE_EXPORT_COMPILE_COMMANDS 1)
 
 add_library(cpprl ${cpprl_SOURCE_FILES})
 

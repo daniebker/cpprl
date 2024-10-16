@@ -125,3 +125,6 @@ saves/
 game.sav
 build_web/
 docs/
+
+# clang
+.cache/
