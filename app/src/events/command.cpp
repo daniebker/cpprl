@@ -11,8 +11,9 @@
 #include "controller.hpp"
 #include "world.hpp"
 #include "core/coordinator.hpp"
-#include "components/velocity.hpp"
+#include <components/velocity.hpp>
 #include <components/identity.hpp>
+#include <components/defence.hpp>
 
 extern SupaRL::Coordinator g_coordinator;
 namespace cpprl {
@@ -124,7 +125,7 @@ namespace cpprl {
         entity_->get_id()).name_;
     world_.get_message_log().add_message(
         fmt::format("{} has died!", util::capitalize(entity_name)));
-    entity_->get_defense_component().die(*entity_);
+    /*entity_->get_defense_component().die(*entity_);*/
 
     if (entity_name != "player") {
       const std::optional<std::reference_wrapper<StatsComponent>>
@@ -299,7 +300,9 @@ namespace cpprl {
     if (cursor == 3) {
       player->get_attack_component().boost_damage(1);
     } else if (cursor == 4) {
-      player->get_defense_component().boost_defense(1);
+      auto& defence_component = g_coordiator.get_component<SupaRL::DefenseComponent>(
+          player->get_id());
+      defence_component.defense_ += 1;
     }
     stats.reduce_stats_points(1);
     return EndTurn{};

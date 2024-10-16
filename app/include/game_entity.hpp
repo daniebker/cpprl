@@ -16,7 +16,6 @@ namespace cpprl {
 
   class TransformComponent;
   class AttackComponent;
-  class DefenseComponent;
   class ConsumableComponent;
   class StatsComponent;
   class Container;
@@ -26,7 +25,6 @@ namespace cpprl {
       SupaRL::Entity id_;
 
       std::unique_ptr<AttackComponent> attackComponent_;
-      std::unique_ptr<DefenseComponent> defenseComponent_;
       std::unique_ptr<ConsumableComponent> consumableComponent_;
       std::unique_ptr<AIComponent> aiComponent_;
       std::unique_ptr<Container> container_;
@@ -40,7 +38,6 @@ namespace cpprl {
        SupaRL::Entity get_id() const { return id_; };
 
       AttackComponent& get_attack_component() { return *attackComponent_; };
-      DefenseComponent& get_defense_component() { return *defenseComponent_; };
       ConsumableComponent& get_consumable_component() {
         return *consumableComponent_;
       };
@@ -66,8 +63,6 @@ namespace cpprl {
 
 
       void update(World& world);
-      void set_defense_component(
-          std::unique_ptr<DefenseComponent> defenseComponent);
       void set_attack_component(std::unique_ptr<AttackComponent> attackComponent);
       void set_consumable_component(
           std::unique_ptr<ConsumableComponent> consumableComponent);
@@ -77,7 +72,6 @@ namespace cpprl {
 
       template <class Archive>
         void pack(Archive& archive) {
-          archive(defenseComponent_ != nullptr);
           archive(attackComponent_ != nullptr);
           archive(consumableComponent_ != nullptr);
           archive(aiComponent_ != nullptr);
@@ -85,7 +79,6 @@ namespace cpprl {
           archive(statsComponent_ != nullptr);
 
           if (attackComponent_) archive(attackComponent_);
-          if (defenseComponent_) archive(defenseComponent_);
           if (consumableComponent_) archive(consumableComponent_);
           if (aiComponent_) archive(aiComponent_);
           if (container_) archive(container_);
@@ -110,9 +103,6 @@ namespace cpprl {
 
           if (hasAttackComponent) {
             archive(attackComponent_);
-          }
-          if (hasDefenseComponent) {
-            archive(defenseComponent_);
           }
           if (hasConsumableComponent) {
             archive(consumableComponent_);

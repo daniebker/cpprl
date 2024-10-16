@@ -34,23 +34,6 @@ namespace cpprl {
     return healed;
   }
 
-  void DefenseComponent::die(Entity& the_deceased) const {
-    auto& identity_comp = g_coordinator.get_component<SupaRL::IdentityComponent>(
-        the_deceased.get_id());
-    identity_comp.name_ = "Corpse of " + identity_comp.name_;
-
-    auto& ascii_comp = g_coordinator.get_component<SupaRL::AsciiComponent>(
-        the_deceased.get_id());
-    ascii_comp.symbol_ = "%";
-    ascii_comp.colour_ = SupaRL::ColorRGB{RED.r, RED.g, RED.b};
-    ascii_comp.layer_ = -1;
-
-    auto& physique_component = g_coordinator.get_component<SupaRL::PhysiqueComponent>(
-        the_deceased.get_id());
-
-    physique_component.is_blocking_ = false;
-    the_deceased.set_ai_component(nullptr);
-  }
 
   Container::Container(int size) : size_(size), inventory_({}) {
     inventory_.reserve(size);

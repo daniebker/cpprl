@@ -32,6 +32,7 @@ namespace cpprl {
     g_coordinator.add_component(entity_id, SupaRL::PhysiqueComponent{
         .is_blocking_ = true});
     g_coordinator.add_component(entity_id, SupaRL::StatusConditionComponent{
+        // Should this be an array of status conditions?
         .damage_per_tick_ = 0,
         .max_ticks_ = 0,
         .ticks_ = 0,
