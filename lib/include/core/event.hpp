@@ -16,13 +16,13 @@ namespace SupaRL {
       {}
 
       template<typename T>
-        void set_param(EventId id, T value)
+        void set_param(ParamId id, T value)
         {
           data_[id] = value;
         }
 
       template<typename T>
-        T get_param(EventId id)
+        T get_param(ParamId id)
         {
           return std::any_cast<T>(data_[id]);
         }
