@@ -35,9 +35,8 @@ namespace cpprl {
       ~Entity() = default;
 
       void set_id(SupaRL::Entity id) { id_ = id; };
-       SupaRL::Entity get_id() const { return id_; };
+      SupaRL::Entity get_id() const { return id_; };
 
-      AttackComponent& get_attack_component() { return *attackComponent_; };
       ConsumableComponent& get_consumable_component() {
         return *consumableComponent_;
       };

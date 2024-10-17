@@ -23,15 +23,6 @@ namespace cpprl::combat_system {
     spell_event.set_param<>(SupaRL::Events::Combat::Spell::TARGET, target.get_id());
     spell_event.set_param<>(SupaRL::Events::Combat::Spell::POWER, power);
     g_coordinator.send_event(spell_event);
-
-    int damage = power - target.get_defense_component().get_defense();
-    if (damage > 0) {
-
-      target.get_defense_component().take_damage(damage);
-
-      return damage;
-    }
-    return 0;
   };
 }
 

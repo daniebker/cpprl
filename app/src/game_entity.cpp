@@ -9,16 +9,6 @@
 namespace cpprl {
   void Entity::update(World& world) { aiComponent_->update(world, this); }
 
-  void Entity::set_attack_component(
-      std::unique_ptr<AttackComponent> attackComponent) {
-    attackComponent_ = std::move(attackComponent);
-  };
-
-  void Entity::set_defense_component(
-      std::unique_ptr<DefenseComponent> defenseComponent) {
-    defenseComponent_ = std::move(defenseComponent);
-  };
-
   void Entity::set_consumable_component(
       std::unique_ptr<ConsumableComponent> consumableComponent) {
     consumableComponent_ = std::move(consumableComponent);

@@ -34,20 +34,39 @@ namespace SupaRL {
 
   // TODO: Make these easier to define and use (macro?)
   // TODO: Add some kind of enforcement/automation that a SetParam type and a GetParam type match
-
   namespace Events::Combat {
     const EventId ATTACK = "Events::Combat::ATTACK"_hash;
-    const EventID SPELL = "Events::Combat::SPELL"_hash;
-  }
-
-  namespace Events::Combat::Attack{
+    const EventId SPELL = "Events::Combat::SPELL"_hash;
     const ParamId ATTACKER = "Events::Combat::Attack::Attacker"_hash;
     const ParamId DEFENDER = "Events::Combat::Attack::Defender"_hash;
+  }
+
+  namespace Events::Combat::Damage{
+    const EventId DEALT = "Events::Combat::Damage::DEALT"_hash;
+    const ParamId DAMAGE = "Events::Combat::Damage::Damage"_hash;
+    const ParamId ATTACKER = "Events::Combat::Damage::Attacker"_hash;
+    const ParamId DEFENDER = "Events::Combat::Damage::Defender"_hash;
+  }
+
+  namespace Events::Combat::Die{
+    const EventId DIE = "Events::Combat::Die::DIE"_hash;
+    const ParamId ENTITY = "Events::Combat::Die::Entity"_hash;
   }
 
   namespace Events::Combat::Spell{
     const ParamId TARGET = "Events::Combat::Spell::Target"_hash;
     const ParamId POWER = "Events::Combat::Spell::Power"_hash;
+  }
+
+  namespace Events::StatusCondition {
+    const EventId APPLY = "Events::StatusCondition::APPLY"_hash;
+    const EventId REMOVE = "Events::StatusCondition::REMOVE"_hash;
+  }
+
+  namespace Events::StatusCondition {
+    const ParamId NAME = "Events::StatusCondition::Name"_hash;
+    const ParamId DAMAGE_PER_TICK = "Events::StatusCondition::DamagePerTick"_hash;
+    const ParamId CONDITION = "Events::StatusCondition::Condition"_hash;
   }
 
 }

@@ -1,10 +1,12 @@
 #pragma once
 
+#include <cstdint>
+
 namespace SupaRL {
   struct ColourRGB {
-    int r;
-    int g;
-    int b;
+    uint8_t r;
+    uint8_t g;
+    uint8_t b;
   };
 
   static constexpr ColourRGB WHITE = {255, 255, 255};
