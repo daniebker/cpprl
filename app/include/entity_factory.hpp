@@ -1,36 +1,34 @@
-#ifndef ENTITY_FACTORY_HPP
-#define ENTITY_FACTORY_HPP
+#pragma once
 
 #include <libtcod.hpp>
-#include <memory>
+#include <core/math.hpp>
 
 namespace cpprl {
-class Entity;
-class AbstractEntityFactory {
- public:
-  virtual ~AbstractEntityFactory() = default;
+  class Entity;
+  class AbstractEntityFactory {
+    public:
+      virtual ~AbstractEntityFactory() = default;
 
-  virtual Entity* create() = 0;
+      virtual Entity* create(SupaRL::Vector2D at_position) = 0;
 
- protected:
-  Entity* create_base(
-      const std::string& name, tcod::ColorRGB color, std::string_view symbol);
-};
+    protected:
+      Entity* create_base(
+          const std::string& name, tcod::ColorRGB color, std::string symbol);
+  };
 
-class OrcFactory : public AbstractEntityFactory {
- public:
-  Entity* create() override;
-};
+  class OrcFactory : public AbstractEntityFactory {
+    public:
+      Entity* create(SupaRL::Vector2D at_position) override;
+  };
 
-class TrollFactory : public AbstractEntityFactory {
- public:
-  Entity* create() override;
-};
+  class TrollFactory : public AbstractEntityFactory {
+    public:
+      Entity* create(SupaRL::Vector2D at_position) override;
+  };
 
-class PlayerFactory : public AbstractEntityFactory {
- public:
-  Entity* create() override;
-};
-}  // namespace cpprl
+  class PlayerFactory : public AbstractEntityFactory {
+    public:
+      Entity* create(SupaRL::Vector2D at_position) override;
+  };
+}
 
-#endif

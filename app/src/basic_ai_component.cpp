@@ -1,15 +1,15 @@
 #include "basic_ai_component.hpp"
 
 #include <algorithm>
-#include <iostream>
 #include <libtcod.hpp>
 
-#include "entity_manager.hpp"
 #include "events/command.hpp"
 #include "game_entity.hpp"
-#include "types/map.hpp"
+#include "entity_manager.hpp"
 #include "world.hpp"
+#include <core/math.hpp>
 
+extern SupaRL::Coordinator g_coordinator;
 namespace cpprl {
 
 bool can_path_to_target(tcod::BresenhamLine& path, World& world) {
@@ -23,11 +23,11 @@ bool can_path_to_target(tcod::BresenhamLine& path, World& world) {
 }
 
 void HostileAI::update(World& world, Entity* entity) {
-  Vector2D position = entity->get_transform_component().get_position();
+  auto position = g_coordinator.get_component<SupaRL::TransformComponent>(entity->get_id()).position_;
   if (world.get_map().is_in_fov(position)) {
     Entity* player = world.get_player();
-    Vector2D player_position = player->get_transform_component().get_position();
-    Vector2D delta = player_position - position;
+    auto player_position = g_coordinator.get_component<SupaRL::TransformComponent>(player->get_id()).position_;
+    SupaRL::Vector2D delta = player_position - position;
 
     int distance = std::max(std::abs(delta.x), std::abs(delta.y));
     if (distance <= 1) {
@@ -40,7 +40,7 @@ void HostileAI::update(World& world, Entity* entity) {
 
     if (can_path_to_target(path, world)) {
       auto dest = path[0];
-      auto destination = Vector2D{dest[0], dest[1]} - position;
+      auto destination = SupaRL::Vector2D{dest[0], dest[1]} - position;
 
       auto action = MovementCommand(world, entity, destination);
       action.execute();
