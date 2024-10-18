@@ -5,6 +5,9 @@
 #include "gui.hpp"
 #include "rendering.hpp"
 #include "world.hpp"
+#include <components/defence.hpp>
+
+extern SupaRL::Coordinator g_coordinator;
 
 namespace cpprl {
 
@@ -38,8 +41,11 @@ namespace cpprl {
     // gen a new dungeon?
     world_.get_message_log().add_message(
         "You take a moment to rest to recover your strength.", WHITE);
-    world_.get_player()->get_defense_component().heal(
-        world_.get_player()->get_defense_component().get_max_hp() / 2);
+    auto player_id = world_.get_player()->get_id();
+    auto& player_defence = g_coordinator.get_component<SupaRL::DefenceComponent>(player_id);
+
+    player_defence.heal(player_defence.max_hp_ / 2);
+
     world_.get_message_log().add_message(
         "After a rare moment of peace, you descend deeper into the heart of the "
         "dungeon...",

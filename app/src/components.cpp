@@ -8,32 +8,17 @@
 #include "basic_ai_component.hpp"
 #include "combat_system.hpp"
 #include "entity_manager.hpp"
-#include "events/command.hpp"
 #include "game_entity.hpp"
 #include "state.hpp"
 #include "world.hpp"
+#include <core/types.hpp>
 #include <components/identity.hpp>
 #include <components/physique.hpp>
+#include <components/defence.hpp>
 
 extern SupaRL::Coordinator g_coordinator;
 
 namespace cpprl {
-  int DefenseComponent::heal(int amount) {
-    if (hp_ == max_hp_) {
-      return 0;
-    };
-    int new_hp = hp_ + amount;
-    if (new_hp > max_hp_) {
-      new_hp = max_hp_;
-    }
-
-    int healed = new_hp - hp_;
-
-    hp_ = new_hp;
-
-    return healed;
-  }
-
 
   Container::Container(int size) : size_(size), inventory_({}) {
     inventory_.reserve(size);
@@ -93,21 +78,37 @@ namespace cpprl {
 
   ActionResult HealingConsumable::use(
       Entity* owner, Entity* wearer, World& world) {
-    if (const DefenseComponent* defense_component =
-        &wearer->get_defense_component();
-        defense_component == nullptr) {
-      return Failure{"There's nothing to heal."};
-    }
+    auto& wearer_defence = g_coordinator.get_component<SupaRL::DefenceComponent>(
+        wearer->get_id());
 
-    if (const int amount_healed = wearer->get_defense_component().heal(amount_);
+    // Shouldn't hit this any more
+    /*if (const DefenseComponent* defense_component =*/
+    /*    &wearer->get_defense_component();*/
+    /*    defense_component == nullptr) {*/
+    /*  return Failure{"There's nothing to heal."};*/
+    /*}*/
+
+   ;
+
+    if (const int amount_healed = wearer_defence.heal(amount_);
         amount_healed > 0) {
       ConsumableComponent::use(owner, wearer, world);
-      std::string message = fmt::format("You healed for {} HP.", amount_healed);
-      world.get_message_log().add_message(message, GREEN);
+      auto healed_event = SupaRL::Event(SupaRL::Events::Heal::HEALED);
+      healed_event.set_param(SupaRL::Events::Heal::AMOUNT, amount_healed);
+      healed_event.set_param(SupaRL::Events::Heal::ENTITY, wearer->get_id());
+      g_coordinator.send_event(healed_event);
+      /*std::string message = fmt::format("You healed for {} HP.", amount_healed);*/
+      /*world.get_message_log().add_message(message, GREEN);*/
       return Success{};
     }
 
-    return Failure{"You are already at full health."};
+    auto healed_event = SupaRL::Event(SupaRL::Events::Heal::HEALED);
+    healed_event.set_param(SupaRL::Events::Heal::AMOUNT, 0);
+    healed_event.set_param(SupaRL::Events::Heal::ENTITY, wearer->get_id());
+    g_coordinator.send_event(healed_event);
+
+    /*return Failure{"You are already at full health."};*/
+    return Failure{};
   }
 
   ActionResult LightningBolt::use(Entity* owner, Entity* wearer, World& world) {
@@ -122,57 +123,66 @@ namespace cpprl {
 
     Entity& closest_living_monster = optional_closest_monster_ref.value().get();
 
-    int inflicted = combat_system::handle_spell(damage_, closest_living_monster);
+    /*int inflicted = combat_system::handle_spell(damage_, closest_living_monster);*/
+    combat_system::handle_spell(damage_, closest_living_monster);
     ConsumableComponent::use(owner, wearer, world);
-      auto& entity_name = g_coordinator.get_component<SupaRL::IdentityComponent>(
-          closest_living_monster.get_id()).name_;
-    if (inflicted > 0) {
-      world.get_message_log().add_message(
-          fmt::format(
-            "A lightning bolt strikes the {} with a loud "
-            "thunder! The damage is {} hit points.",
-            entity_name,
-            damage_),
-          GREEN);
-
-      if (closest_living_monster.get_defense_component().is_dead()) {
-        auto action = DieEvent(world, &closest_living_monster);
-        action.execute();
-      }
+      /*auto& entity_name = g_coordinator.get_component<SupaRL::IdentityComponent>(*/
+      /*    closest_living_monster.get_id()).name_;*/
       return Success{};
-    } else {
-      return Failure{fmt::format(
-          "The lightning bolt hits the {} but does no damage.",
-          entity_name)};
-    }
+    /*if (inflicted > 0) {*/
+    /*  world.get_message_log().add_message(*/
+    /*      fmt::format(*/
+    /*        "A lightning bolt strikes the {} with a loud "*/
+    /*        "thunder! The damage is {} hit points.",*/
+    /*        entity_name,*/
+    /*        damage_),*/
+    /*      GREEN);*/
+    /**/
+    /*  // TODO: this should be handled by spell cast*/
+    /*  if (closest_living_monster.get_defense_component().is_dead()) {*/
+    /*    auto action = DieEvent(world, &closest_living_monster);*/
+    /*    action.execute();*/
+    /*  }*/
+    /*  return Success{};*/
+    /*} else {*/
+    /*  return Failure{fmt::format(*/
+    /*      "The lightning bolt hits the {} but does no damage.",*/
+    /*      entity_name)};*/
+    /*}*/
   }
 
   ActionResult FireSpell::use(Entity* owner, Entity* wearer, World& world) {
     auto on_pick = [&, owner, wearer]() {
       ConsumableComponent::use(owner, wearer, world);
       for (Entity* entity : world.get_entities()) {
-        auto entity_position = g_coordinator.get_component<SupaRL::TransformComponent>(
+
+        const auto entity_position = g_coordinator.get_component<SupaRL::TransformComponent>(
             entity->get_id()).position_;
-        auto entity_name = g_coordinator.get_component<SupaRL::IdentityComponent>(
+        const auto entity_name = g_coordinator.get_component<SupaRL::IdentityComponent>(
             entity->get_id()).name_;
-        if (const auto* defense_component = &entity->get_defense_component();
-            defense_component && defense_component->is_not_dead() &&
+        auto& defence_component = g_coordinator.get_component<SupaRL::DefenceComponent>(
+            entity->get_id());
+
+        if (defence_component.is_not_dead() &&
             entity_position.distance_to(
               world.get_map().get_highlight_tile()) <= aoe_) {
-          world.get_message_log().add_message(
-              fmt::format(
-                "The {} gets burned for {} hit points.",
-                entity_name,
-                damage_),
-              RED);
-          int inflicted = combat_system::handle_spell(damage_, *entity);
-          if (inflicted > 0) {
-            // TODO: this is repeated everywhere. Put it in take_damage
-            if (entity->get_defense_component().is_dead()) {
-              auto action = DieEvent(world, entity);
-              action.execute();
-            }
-          }
+          // TODO: Send this as a message
+          /*world.get_message_log().add_message(*/
+          /*    fmt::format(*/
+          /*      "The {} gets burned for {} hit points.",*/
+          /*      entity_name,*/
+          /*      damage_),*/
+          /*    RED);*/
+          /*int inflicted = combat_system::handle_spell(damage_, *entity);*/
+          combat_system::handle_spell(damage_, *entity);
+          // Combat system should handle firing the die event on spell damage.
+          /*if (inflicted > 0) {*/
+          /*  // TODO: this is repeated everywhere. Put it in take_damage*/
+          /*  if (entity->get_defense_component().is_dead()) {*/
+          /*    auto action = DieEvent(world, entity);*/
+          /*    action.execute();*/
+          /*  }*/
+          /*}*/
         }
       }
     };

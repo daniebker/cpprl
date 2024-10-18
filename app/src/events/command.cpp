@@ -13,6 +13,7 @@
 #include "core/coordinator.hpp"
 #include <components/velocity.hpp>
 #include <components/identity.hpp>
+#include <components/attack.hpp>
 #include <components/defence.hpp>
 
 extern SupaRL::Coordinator g_coordinator;
@@ -298,7 +299,9 @@ namespace cpprl {
     }
 
     if (cursor == 3) {
-      player->get_attack_component().boost_damage(1);
+      auto& attack_component = g_coordiator.get_component<SupaRL::AttackComponent>(
+          player->get_id());
+      attack_component.damage_ += 1;
     } else if (cursor == 4) {
       auto& defence_component = g_coordiator.get_component<SupaRL::DefenseComponent>(
           player->get_id());

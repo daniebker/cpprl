@@ -53,6 +53,12 @@ namespace SupaRL {
     const ParamId ENTITY = "Events::Combat::Die::Entity"_hash;
   }
 
+  namespace Events::Heal{
+    const EventId HEALED = "Events::Heal::HEALED"_hash;
+    const ParamId AMOUNT = "Events::Heal::Amount"_hash;
+    const ParamId ENTITY = "Events::Heal::Entity"_hash;
+  }
+
   namespace Events::Combat::Spell{
     const ParamId TARGET = "Events::Combat::Spell::Target"_hash;
     const ParamId POWER = "Events::Combat::Spell::Power"_hash;
