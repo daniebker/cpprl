@@ -9,7 +9,7 @@ namespace cpprl {
 
 class HealthBar : public UiWindow {
  private:
-   SupaRL::DefenseComponent& health_;
+   SupaRL::DefenceComponent& health_;
 
  public:
   HealthBar(
