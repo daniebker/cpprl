@@ -10,6 +10,7 @@
 #include "core/coordinator.hpp"
 #include <components/transform.hpp>
 #include <components/identity.hpp>
+#include <components/defence.hpp>
 
 extern SupaRL::Coordinator g_coordinator;
 
@@ -95,8 +96,10 @@ namespace cpprl {
     for (const auto& entity : *entities_) {
       const std::optional<std::reference_wrapper<AIComponent>> ai_component =
         entity->get_ai_component();
+      iconst auto& defence_component = g_coordinator.get_component<SupaRL::DefenceComponent>(
+          entity->get_id());
       if (ai_component.has_value() &&
-          entity->get_defense_component().is_not_dead()) {
+          defence_component.is_not_dead()) {
         entity->update(*this);
       }
     }
@@ -115,7 +118,8 @@ namespace cpprl {
         player_->get_id()).position_;
     dungeon_.get_map().compute_fov(
         player_position, 4);
-    DefenseComponent& player_defense = player_->get_defense_component();
+    const auto& player_defense = g_coordinator.get_component<SupaRL::DefenceComponent>(
+        player_->get_id());
     ui_->set_health_bar(player_defense);
     ui_->set_xp_bar(player_->get_stats_component().value().get());
     entities_->shrink_to_fit();

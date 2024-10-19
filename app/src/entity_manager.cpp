@@ -11,6 +11,7 @@
 
 #include <components/identity.hpp>
 #include <components/physique.hpp>
+#include <components/defence.hpp>
 #include <core/coordinator.hpp>
 
 extern SupaRL::Coordinator g_coordinator;
@@ -153,11 +154,12 @@ namespace cpprl {
       std::optional<std::reference_wrapper<Entity>> closest = std::nullopt;
       float best_distance = 1E6f;
       for (const auto& entity : entities_) {
-        const auto* defense_component = &entity->get_defense_component();
+        const auto& defense_component = g_coordinator.get_component<SupaRL::DefenceComponent>(
+            entity->get_id());
         const std::optional<std::reference_wrapper<AIComponent>> ai_component =
           entity->get_ai_component();
 
-        if (ai_component.has_value() && defense_component) {
+        if (ai_component.has_value() && defence_component.is_not_dead()) {
           auto entity_position = g_coordinator.get_component<SupaRL::TransformComponent>(
               entity->get_id()).position_;
           float distance = position.distance_to(

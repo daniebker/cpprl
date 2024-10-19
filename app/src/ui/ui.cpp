@@ -9,9 +9,9 @@ namespace cpprl {
       std::make_unique<DungeonLevel>(20, 1, SupaRL::Vector2D{2, 35}, dungeon);
   }
 
-  void UI::set_health_bar(DefenseComponent& defense_component) {
+  void UI::set_health_bar(SupaRL::DefenceComponent& defence_component) {
     health_bar_ =
-      std::make_unique<HealthBar>(20, 1, SupaRL::Vector2D{2, 36}, defense_component);
+      std::make_unique<HealthBar>(20, 1, SupaRL::Vector2D{2, 36}, defence_component);
   }
 
   void UI::set_xp_bar(StatsComponent& stats_component) {

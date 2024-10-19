@@ -27,36 +27,7 @@ namespace cpprl {
       int damage_;
   };
 
-  class DefenseComponent {
-    public:
-      DefenseComponent() = default;
-      DefenseComponent(int defense, int maxHp)
-        : defense_(defense), hp_(maxHp), max_hp_(maxHp) {}
-      virtual ~DefenseComponent() = default;
-
-      int get_hp() const { return hp_; }
-      int get_max_hp() const { return max_hp_; }
-      int get_defense() const { return defense_; }
-      void boost_defense(int amount) { defense_ += amount; }
-
-      void take_damage(int damage) { hp_ -= damage; }
-      int heal(int amount);
-      bool is_dead() const { return hp_ <= 0; }
-      bool is_not_dead() const { return !is_dead(); }
-      void die(Entity& owner) const;
-
-      template <class Archive>
-        void serialize(Archive& archive) {
-          archive(defense_, hp_, max_hp_);
-        }
-
-    private:
-      int defense_;
-      int hp_;
-      int max_hp_;
-  };
-
-  class Container {
+ class Container {
     private:
       size_t size_;
       std::vector<Entity*> inventory_;
