@@ -1,16 +1,13 @@
-#ifndef TILE_HPP
-#define TILE_HPP
+#pragma once
 
-#include <iostream>
 #include <libtcod.hpp>
 
 namespace cpprl {
 
-struct Tile {
-  std::string_view name;
-  int character;
-  tcod::ColorRGB foreground;
-}
+  struct Tile {
+    std::string_view name;
+    int character;
+    tcod::ColorRGB foreground;
+  };
 
-}  // namespace cpprl
-#endif
+}

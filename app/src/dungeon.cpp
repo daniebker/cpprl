@@ -2,6 +2,7 @@
 
 #include <memory>
 #include <tuple>
+#include <core/math.hpp>
 
 #include "rectangular_room.hpp"
 #include "types/map.hpp"
@@ -15,7 +16,7 @@ void Dungeon::generate(DungeonConfig dungeon_config) {
       dungeon_config.map_width, dungeon_config.map_height);
   auto rooms = std::vector<RectangularRoom>{};
 
-  Vector2D last_room_center = {0, 0};
+  SupaRL::Vector2D last_room_center = {0, 0};
   for (int i = 0; i < dungeon_config.max_rooms; i++) {
     int room_width =
         rng_.getInt(dungeon_config.room_min_size, dungeon_config.room_max_size);
@@ -37,11 +38,11 @@ void Dungeon::generate(DungeonConfig dungeon_config) {
 
     last_room_center = new_room.get_center();
     if (!rooms.empty()) {
-      Vector2D previous_room_center = rooms.back().get_center();
-      std::vector<Vector2D> tunnel =
+      SupaRL::Vector2D previous_room_center = rooms.back().get_center();
+      std::vector<SupaRL::Vector2D> tunnel =
           l_tunnel_between(previous_room_center, new_room.get_center());
 
-      for (const Vector2D position : tunnel) {
+      for (const SupaRL::Vector2D position : tunnel) {
         current_map_->set_tiles_at(position, FLOOR_TILE);
       }
     }
@@ -53,8 +54,8 @@ void Dungeon::generate(DungeonConfig dungeon_config) {
 }
 
 constexpr float half_chance = 0.5F;
-std::vector<Vector2D> Dungeon::l_tunnel_between(Vector2D start, Vector2D end) {
-  Vector2D corner{0, 0};
+std::vector<SupaRL::Vector2D> Dungeon::l_tunnel_between(SupaRL::Vector2D start, SupaRL::Vector2D end) {
+  SupaRL::Vector2D corner{0, 0};
 
   if (rng_.get(0.0f, 1.0f) < half_chance) {
     corner = {end.x, start.y};
@@ -62,7 +63,7 @@ std::vector<Vector2D> Dungeon::l_tunnel_between(Vector2D start, Vector2D end) {
     corner = {start.x, end.y};
   }
 
-  std::vector<Vector2D> tunnel{};
+  std::vector<SupaRL::Vector2D> tunnel{};
 
   for (const auto&& [x, y] :
        tcod::BresenhamLine({start.x, start.y}, {corner.x, corner.y})) {

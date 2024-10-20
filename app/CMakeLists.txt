@@ -5,6 +5,7 @@ target_include_directories(${PROJECT_NAME}
 
 # Ensure the C++20 standard is available.
 target_compile_features(${PROJECT_NAME} PRIVATE cxx_std_20)
+set(CMAKE_EXPORT_COMPILE_COMMANDS 1)
 
 # Enforce UTF-8 encoding on MSVC.
 if (MSVC)
