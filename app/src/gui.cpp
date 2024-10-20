@@ -6,6 +6,10 @@
 #include "components.hpp"
 #include "game_entity.hpp"
 #include <components/identity.hpp>
+#include <components/defence.hpp>
+#include <components/attack.hpp>
+
+extern SupaRL::Coordinator gcoordinator;
 
 namespace cpprl {
 
@@ -172,8 +176,10 @@ void CharacterMenuWindow::render(tcod::Console& parent_console) {
 
   tcod::print(*console_, {1, cursor_}, ">", WHITE, std::nullopt, TCOD_LEFT);
 
-  int entity_damage_ = entity_->get_attack_component().get_damage();
-  int entity_defense_ = entity_->get_defense_component().get_defense();
+  auto& entity_defence = gcoordinator.get_component<SupaRL::DefenceComponent>(
+      entity_->get_id());
+  auto& entity_attack = gcoordinator.get_component<SupaRL::AttackComponent>(
+      entity_->get_id());
   auto stats = entity_->get_stats_component().value().get();
 
   tcod::print_rect(
@@ -197,7 +203,7 @@ void CharacterMenuWindow::render(tcod::Console& parent_console) {
   tcod::print_rect(
       *console_,
       {2, 3, console_->getWidth() - 1, 1},
-      fmt::format("Damage: {}", entity_damage_),
+      fmt::format("Damage: {}", entity_attack.damage_),
       // "Damage: " + entity_damage_,
       WHITE,
       std::nullopt,
@@ -206,7 +212,7 @@ void CharacterMenuWindow::render(tcod::Console& parent_console) {
   tcod::print_rect(
       *console_,
       {2, 4, console_->getWidth() - 1, 1},
-      fmt::format("Defense: {}", entity_defense_),
+      fmt::format("Defense: {}", entity_defence.defence_),
       // "Defense: " + entity_defense_,
       WHITE,
       std::nullopt,
