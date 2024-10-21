@@ -126,7 +126,6 @@ namespace cpprl {
         entity_->get_id()).name_;
     world_.get_message_log().add_message(
         fmt::format("{} has died!", util::capitalize(entity_name)));
-    /*entity_->get_defense_component().die(*entity_);*/
 
     if (entity_name != "player") {
       const std::optional<std::reference_wrapper<StatsComponent>>
@@ -190,31 +189,33 @@ namespace cpprl {
     }
 
     if (target.has_value()) {
-      int damage = combat_system::handle_attack(*entity_, target.value().get());
-      auto& target_name = g_coordinator.get_component<SupaRL::IdentityComponent>(
-          target.value().get().get_id()).name_;
-      if (damage > 0) {
-        std::string message = fmt::format(
-            "{} attacks {} for {} hit points.",
-            util::capitalize(entity_name),
-            util::capitalize(target_name),
-            damage);
-
-        world_.get_message_log().add_message(message, attack_colour, true);
-
-        if (target.value().get().get_defense_component().is_dead()) {
-          auto action = DieEvent(world_, &target.value().get());
-          return action.execute();
-        }
-      } else {
-        std::string message = fmt::format(
-            "{} attacks {} but does no damage.",
-            util::capitalize(entity_name),
-            util::capitalize(target_name));
-
-        world_.get_message_log().add_message(message, attack_colour, true);
+      combat_system::handle_attack(*entity_, target.value().get());
+      /*if (damage > 0) {*/
+      /*  std::string message = fmt::format(*/
+      /*      "{} attacks {} for {} hit points.",*/
+      /*      util::capitalize(entity_name),*/
+      /*      util::capitalize(target_name),*/
+      /*      damage);*/
+      /**/
+      /*  world_.get_message_log().add_message(message, attack_colour, true);*/
+      /**/
+      /*  auto& target_defence = g_coordinator.get_component<SupaRL::DefenceComponent>(*/
+      /*      target.value().get().get_id());*/
+      /*  if (target_defence.is_dead()) {*/
+      /*    auto action = DieEvent(world_, &target.value().get());*/
+      /*    return action.execute();*/
+      /*  }*/
+      /*} else {*/
+      /*auto& target_name = g_coordinator.get_component<SupaRL::IdentityComponent>(*/
+      /*    target.value().get().get_id()).name_;*/
+      /*  std::string message = fmt::format(*/
+      /*      "{} attacks {} but does no damage.",*/
+      /*      util::capitalize(entity_name),*/
+      /*      util::capitalize(target_name));*/
+      /**/
+      /*  world_.get_message_log().add_message(message, attack_colour, true);*/
       }
-    }
+    /*}*/
     return EndTurn{};
   };
 
