@@ -71,7 +71,6 @@ namespace cpprl {
     ui_->render(g_console);
 
     message_log_.render(g_console, 23, 35, 45, 5);
-    // TODO: this is not working since cursor is not being set
     auto entities_at = entities_->get_entities_at(controller_->cursor);
     if (!entities_at.empty()) {
       std::string names;
