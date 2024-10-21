@@ -96,7 +96,7 @@ namespace cpprl {
     for (const auto& entity : *entities_) {
       const std::optional<std::reference_wrapper<AIComponent>> ai_component =
         entity->get_ai_component();
-      iconst auto& defence_component = g_coordinator.get_component<SupaRL::DefenceComponent>(
+      auto& defence_component = g_coordinator.get_component<SupaRL::DefenceComponent>(
           entity->get_id());
       if (ai_component.has_value() &&
           defence_component.is_not_dead()) {
@@ -118,9 +118,9 @@ namespace cpprl {
         player_->get_id()).position_;
     dungeon_.get_map().compute_fov(
         player_position, 4);
-    const auto& player_defense = g_coordinator.get_component<SupaRL::DefenceComponent>(
+    auto& player_defence = g_coordinator.get_component<SupaRL::DefenceComponent>(
         player_->get_id());
-    ui_->set_health_bar(player_defense);
+    ui_->set_health_bar(player_defence);
     ui_->set_xp_bar(player_->get_stats_component().value().get());
     entities_->shrink_to_fit();
   }
