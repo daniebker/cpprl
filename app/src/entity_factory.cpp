@@ -48,7 +48,7 @@ namespace cpprl {
     entity->set_stats_component(
         std::make_unique<StatsComponent>(10, 1, 10, 10, 2));
 
-    g_coordinator,add_component(entity_id, SupaRL::AttackComponent{
+    g_coordinator.add_component(entity_id, SupaRL::AttackComponent{
         .damage_ = 3});
     g_coordinator.add_component(entity_id, SupaRL::DefenceComponent{
         .defence_ = 0,
