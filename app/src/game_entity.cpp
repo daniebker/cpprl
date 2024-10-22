@@ -7,6 +7,7 @@
 #include "world.hpp"
 
 namespace cpprl {
+  // Cry. We need to move this to a component.
   void Entity::update(World& world) { aiComponent_->update(world, this); }
 
   void Entity::set_consumable_component(
