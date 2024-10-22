@@ -300,13 +300,13 @@ namespace cpprl {
     }
 
     if (cursor == 3) {
-      auto& attack_component = g_coordiator.get_component<SupaRL::AttackComponent>(
+      auto& attack_component = g_coordinator.get_component<SupaRL::AttackComponent>(
           player->get_id());
       attack_component.damage_ += 1;
     } else if (cursor == 4) {
-      auto& defence_component = g_coordiator.get_component<SupaRL::DefenseComponent>(
+      auto& defence_component = g_coordinator.get_component<SupaRL::DefenceComponent>(
           player->get_id());
-      defence_component.defense_ += 1;
+      defence_component.defence_ += 1;
     }
     stats.reduce_stats_points(1);
     return EndTurn{};

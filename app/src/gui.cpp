@@ -9,7 +9,7 @@
 #include <components/defence.hpp>
 #include <components/attack.hpp>
 
-extern SupaRL::Coordinator gcoordinator;
+extern SupaRL::Coordinator g_coordinator;
 
 namespace cpprl {
 
@@ -176,9 +176,9 @@ void CharacterMenuWindow::render(tcod::Console& parent_console) {
 
   tcod::print(*console_, {1, cursor_}, ">", WHITE, std::nullopt, TCOD_LEFT);
 
-  auto& entity_defence = gcoordinator.get_component<SupaRL::DefenceComponent>(
+  auto& entity_defence = g_coordinator.get_component<SupaRL::DefenceComponent>(
       entity_->get_id());
-  auto& entity_attack = gcoordinator.get_component<SupaRL::AttackComponent>(
+  auto& entity_attack = g_coordinator.get_component<SupaRL::AttackComponent>(
       entity_->get_id());
   auto stats = entity_->get_stats_component().value().get();
 

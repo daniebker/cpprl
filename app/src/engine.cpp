@@ -91,8 +91,8 @@ namespace cpprl {
   void Engine::save() {
     std::filesystem::create_directories(std::filesystem::path("saves"));
     auto player_id = world_->get_player()->get_id();
-    auto& player_defense = g_coordinator.get_component<SupaRL::DefenceComponent>(player_id);
-    if (player_defense.is_dead()) {
+    auto& player_defence = g_coordinator.get_component<SupaRL::DefenceComponent>(player_id);
+    if (player_defence.is_dead()) {
       std::filesystem::remove(std::filesystem::path("saves/game.sav"));
 
     } else {
@@ -158,8 +158,8 @@ namespace cpprl {
             status_condition_system_->update();
             world_->handle_enemy_turns();
             auto playerId = world_->get_player()->get_id();
-            auto& player_defense = g_coordinator.get_component<SupaRL::DefenceComponent>(playerId);
-            if (player_defense.is_dead()) {
+            auto& player_defence = g_coordinator.get_component<SupaRL::DefenceComponent>(playerId);
+            if (player_defence.is_dead()) {
               engine_state_->on_exit();
               engine_state_ = std::make_unique<GameOverState>(*world_);
               engine_state_->on_enter();

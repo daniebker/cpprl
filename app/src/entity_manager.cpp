@@ -154,7 +154,7 @@ namespace cpprl {
       std::optional<std::reference_wrapper<Entity>> closest = std::nullopt;
       float best_distance = 1E6f;
       for (const auto& entity : entities_) {
-        const auto& defense_component = g_coordinator.get_component<SupaRL::DefenceComponent>(
+        auto& defence_component = g_coordinator.get_component<SupaRL::DefenceComponent>(
             entity->get_id());
         const std::optional<std::reference_wrapper<AIComponent>> ai_component =
           entity->get_ai_component();

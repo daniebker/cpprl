@@ -19,7 +19,7 @@ namespace cpprl {
         .position_ = at_position});
     g_coordinator.add_component(entity_id, SupaRL::AsciiComponent{
         .symbol_ = symbol,
-        .colour_ = SupaRL::ColorRGB{.r = color.r, .g = color.g, .b = color.b},
+        .colour_ = SupaRL::ColourRGB{.r = color.r, .g = color.g, .b = color.b},
         .layer_ = 1});
     g_coordinator.add_component(entity_id, SupaRL::IdentityComponent{
         .name_ = name});

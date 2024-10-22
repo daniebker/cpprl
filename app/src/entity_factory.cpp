@@ -54,8 +54,6 @@ namespace cpprl {
         .defence_ = 0,
         .hp_ = 10,
         .max_hp_ = 10});
-    g_coordinator.add_component(entity_id, SupaRL::AttackComponent{
-        .damage_ = 3});
     g_coordinator.add_component(entity_id, SupaRL::TransformComponent{
         .position_ = at_position});
     g_coordinator.add_component(
@@ -68,7 +66,6 @@ namespace cpprl {
   Entity* TrollFactory::create(SupaRL::Vector2D at_position) {
     Entity* entity = create_base("Troll", DARK_GREEN, "T");
 
-    entity->set_attack_component(std::make_unique<AttackComponent>(4));
     entity->set_ai_component(std::make_unique<HostileAI>());
     entity->set_stats_component(
         std::make_unique<StatsComponent>(20, 1, 10, 20, 2));
@@ -81,8 +78,6 @@ namespace cpprl {
         .defence_ = 1,
         .hp_ = 16,
         .max_hp_ = 16});
-    g_coordinator.add_component(entity_id, SupaRL::AttackComponent{
-        .damage_ = 4});
     g_coordinator.add_component(entity_id, SupaRL::TransformComponent{
         .position_ = at_position});
     g_coordinator.add_component(
@@ -107,8 +102,6 @@ namespace cpprl {
         .defence_ = 2,
         .hp_ = 30,
         .max_hp_ = 30});
-    g_coordinator.add_component(entity_id, SupaRL::AttackComponent{
-        .damage_ = 5});
     g_coordinator.add_component(entity_id, SupaRL::TransformComponent{
         .position_ = at_position});
     g_coordinator.add_component(
