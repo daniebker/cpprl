@@ -5,7 +5,6 @@
 #include <algorithm>
 #include <optional>
 
-#include "basic_ai_component.hpp"
 #include "consumable_factory.hpp"
 #include "util.hpp"
 

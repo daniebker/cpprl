@@ -23,34 +23,6 @@ bool can_path_to_target(tcod::BresenhamLine& path, World& world) {
 }
 
 void HostileAI::update(World& world, Entity* entity) {
-  auto position = g_coordinator.get_component<SupaRL::TransformComponent>(entity->get_id()).position_;
-  if (world.get_map().is_in_fov(position)) {
-    Entity* player = world.get_player();
-    auto player_position = g_coordinator.get_component<SupaRL::TransformComponent>(player->get_id()).position_;
-    SupaRL::Vector2D delta = player_position - position;
-
-    int distance = std::max(std::abs(delta.x), std::abs(delta.y));
-    if (distance <= 1) {
-      auto melee_command = MeleeCommand(world, entity, delta);
-      melee_command.execute();
-    }
-
-    tcod::BresenhamLine path =
-        tcod::BresenhamLine({position.x, position.y}, {player_position.x, player_position.y}).without_endpoints();
-
-    if (can_path_to_target(path, world)) {
-      auto dest = path[0];
-      auto destination = SupaRL::Vector2D{dest[0], dest[1]} - position;
-
-      auto action = MovementCommand(world, entity, destination);
-      action.execute();
-
-      return;
-    }
-
-    auto action = NoOpEvent(world);
-    action.execute();
-  }
 }
 
 ConfusionAI::ConfusionAI(int num_turns, std::unique_ptr<AIComponent> old_ai)

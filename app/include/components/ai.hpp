@@ -1,6 +1,6 @@
 #pragma once
 
-namespace SupaRL {
+namespace cpprl {
   enum class AIType {
     HOSTILE,
     CONFUSION
