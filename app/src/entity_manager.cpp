@@ -111,6 +111,17 @@ namespace cpprl {
   }
 
   std::optional<std::reference_wrapper<Entity>>
+    EntityManager::get_entity(SupaRL::Entity entity_) {
+      for( const auto& entity : entities_) {
+        const auto& entity_id = entity->get_id();
+        if(entity_id == entity_) {
+          return std::reference_wrapper<Entity>(*entity);
+        }
+      }
+      return std::nullopt;
+    }
+
+  std::optional<std::reference_wrapper<Entity>>
     EntityManager::get_blocking_entity_at(SupaRL::Vector2D position) {
       for (const auto& entity : entities_) {
       auto& entity_position = g_coordinator.get_component<SupaRL::TransformComponent>(

@@ -4,6 +4,7 @@
 #include <core/math.hpp>
 #include "types/state_result.hpp"
 #include "types/world_fwd.hpp"
+#include <core/types.hpp>
 
 namespace cpprl {
   class UiWindow;
@@ -24,6 +25,7 @@ namespace cpprl {
 
     public:
       Command(World& world, Entity* entity) : EngineEvent(world), entity_(entity) {}
+      Command(World& world, SupaRL::Entity entity);
       virtual ~Command() {}
       virtual StateResult execute() = 0;
   };

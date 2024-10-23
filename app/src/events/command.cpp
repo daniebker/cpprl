@@ -18,6 +18,13 @@
 
 extern SupaRL::Coordinator g_coordinator;
 namespace cpprl {
+  Command::Command(World& world, SupaRL::Entity entity) : EngineEvent(world) {
+    auto& entity_manager = world.get_entities();
+    auto entity_obj = entity_manager.get_entity(entity);
+    if(entity_obj.has_value()) {
+      // TODO: Convert from SupaRL::Entity to Entity from cpprl
+    }
+  }
 
   StateResult PickupCommand::execute() {
     auto entity_position = g_coordinator.get_component<SupaRL::TransformComponent>(
