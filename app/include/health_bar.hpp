@@ -1,21 +1,21 @@
-#ifndef INCLUDE_HEALTH_BAR_HPP_
-#define INCLUDE_HEALTH_BAR_HPP_
+#pragma once
 
-#include "components.hpp"
 #include "gui.hpp"
+#include <core/math.hpp>
+
+#include <components/defence.hpp>
 
 namespace cpprl {
 
 class HealthBar : public UiWindow {
  private:
-  DefenseComponent& health_;
+   SupaRL::DefenceComponent& health_;
 
  public:
   HealthBar(
-      int width, int height, Vector2D position, DefenseComponent& defense);
+      int width, int height, SupaRL::Vector2D position, SupaRL::DefenceComponent& defense);
 
   void render(tcod::Console& console) override;
 };
 
-}  // namespace cpprl
-#endif
+}

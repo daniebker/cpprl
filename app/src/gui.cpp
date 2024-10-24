@@ -5,6 +5,11 @@
 #include "colours.hpp"
 #include "components.hpp"
 #include "game_entity.hpp"
+#include <components/identity.hpp>
+#include <components/defence.hpp>
+#include <components/attack.hpp>
+
+extern SupaRL::Coordinator g_coordinator;
 
 namespace cpprl {
 
@@ -92,10 +97,12 @@ void InventoryWindow::render(tcod::Console& parent_console) {
   } else {
     tcod::print(*console_, {1, cursor_}, ">", WHITE, std::nullopt, TCOD_LEFT);
     for (auto it = items.begin(); it != items.end(); ++it) {
+      auto& entity_name = g_coordinator.get_component<SupaRL::IdentityComponent>(
+          (*it)->get_id()).name_;
       tcod::print_rect(
           *console_,
           {2, y_offset, console_->getWidth() - 1, 1},
-          (*it)->get_name(),
+          entity_name,
           WHITE,
           std::nullopt,
           TCOD_LEFT);
@@ -169,8 +176,10 @@ void CharacterMenuWindow::render(tcod::Console& parent_console) {
 
   tcod::print(*console_, {1, cursor_}, ">", WHITE, std::nullopt, TCOD_LEFT);
 
-  int entity_damage_ = entity_->get_attack_component().get_damage();
-  int entity_defense_ = entity_->get_defense_component().get_defense();
+  auto& entity_defence = g_coordinator.get_component<SupaRL::DefenceComponent>(
+      entity_->get_id());
+  auto& entity_attack = g_coordinator.get_component<SupaRL::AttackComponent>(
+      entity_->get_id());
   auto stats = entity_->get_stats_component().value().get();
 
   tcod::print_rect(
@@ -194,7 +203,7 @@ void CharacterMenuWindow::render(tcod::Console& parent_console) {
   tcod::print_rect(
       *console_,
       {2, 3, console_->getWidth() - 1, 1},
-      fmt::format("Damage: {}", entity_damage_),
+      fmt::format("Damage: {}", entity_attack.damage_),
       // "Damage: " + entity_damage_,
       WHITE,
       std::nullopt,
@@ -203,7 +212,7 @@ void CharacterMenuWindow::render(tcod::Console& parent_console) {
   tcod::print_rect(
       *console_,
       {2, 4, console_->getWidth() - 1, 1},
-      fmt::format("Defense: {}", entity_defense_),
+      fmt::format("Defense: {}", entity_defence.defence_),
       // "Defense: " + entity_defense_,
       WHITE,
       std::nullopt,

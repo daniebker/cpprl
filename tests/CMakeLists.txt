@@ -5,6 +5,8 @@ FetchContent_Declare(
 )
 # For Windows: Prevent overriding the parent project's compiler/linker settings
 set(gtest_force_shared_crt ON CACHE BOOL "" FORCE)
+set(CMAKE_EXPORT_COMPILE_COMMANDS 1)
+
 FetchContent_MakeAvailable(googletest)
 
 enable_testing()

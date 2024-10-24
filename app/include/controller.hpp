@@ -1,13 +1,10 @@
-#ifndef INCLUDE_CONTROLLER_HPP_
-#define INCLUDE_CONTROLLER_HPP_
+#pragma once
 
-#include "types/math.hpp"
+#include "core/math.hpp"
 
 namespace cpprl {
-struct Controller {
-  Vector2D cursor = {0, 0};
-};
+  struct Controller {
+    SupaRL::Vector2D cursor = {0, 0};
+  };
+}
 
-}  // namespace cpprl
-
-#endif  // INCLUDE_CONTROLLER_HPP_

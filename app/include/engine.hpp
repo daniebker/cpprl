@@ -1,5 +1,4 @@
-#ifndef ENGINE_HPP
-#define ENGINE_HPP
+#pragma once
 #include <SDL2/SDL.h>
 
 #include <libtcod.hpp>
@@ -12,42 +11,45 @@
 #include "gui.hpp"
 #include "message_log.hpp"
 #include "rendering.hpp"
+#include "systems/physics_system.hpp"
+#include "systems/status_condition_system.hpp"
 
 namespace cpprl {
 
-class EventHandler;
-class GameInputHandler;
-class GameActor;
-class Map;
-class State;
+  class EventHandler;
+  class GameInputHandler;
+  class GameActor;
+  class Map;
+  class State;
 
-// singleton engine
-class Engine {
- private:
-  std::unique_ptr<Renderer> renderer_;
-  tcod::Context context_;
-  std::unique_ptr<World> world_;
-  std::unique_ptr<State> engine_state_;
-  int argc_;
-  char** argv_;
+  class Engine {
+    private:
+      std::unique_ptr<Renderer> renderer_;
+      tcod::Context context_;
+      std::unique_ptr<World> world_;
+      std::unique_ptr<State> engine_state_;
+      std::shared_ptr<SupaRL::PhysicsSystem> physics_system_;
+      std::shared_ptr<SupaRL::StatusConditionSystem> status_condition_system_;
 
-  void generate_map(int width, int height);
-  void handle_enemy_turns();
+      int argc_;
+      char** argv_;
 
- public:
-  Engine();
-  Engine(const Engine&) = delete;
-  Engine& operator=(const Engine&) = delete;
-  ~Engine();
+      void generate_map(int width, int height);
+      void handle_enemy_turns();
 
-  static Engine& get_instance();
-  void handle_events();
-  void render();
-  void handle_player_death();
-  void reset_game();
-  void load();
-  void save();
-  void init(int argc, char** argv);
-};
-}  // namespace cpprl
-#endif
+    public:
+      Engine();
+      Engine(const Engine&) = delete;
+      Engine& operator=(const Engine&) = delete;
+      ~Engine();
+
+      static Engine& get_instance();
+      void handle_events();
+      void render();
+      void handle_player_death();
+      void reset_game();
+      void load();
+      void save();
+      void init(int argc, char** argv);
+  };
+}

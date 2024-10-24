@@ -1,11 +1,14 @@
 #include "input_handler.hpp"
 
 #include <memory>
+#include <core/math.hpp>
 
 #include "engine.hpp"
 #include "events/command.hpp"
 #include "gui.hpp"
 #include "world.hpp"
+
+extern SupaRL::Coordinator g_coordinator;
 
 namespace cpprl {
 EngineEvent& EventHandler::handle_sdl_event(SDL_Event event) noexcept {
@@ -21,16 +24,16 @@ EngineEvent& TargetingInputHandler::handle_sdl_event(SDL_Event event) noexcept {
   if (event.type == SDL_MOUSEMOTION) {
     g_context.convert_event_coordinates(event);
     mouse_input_event_ = std::make_unique<MouseInputEvent>(
-        world_, Vector2D{event.motion.x, event.motion.y});
+        world_, SupaRL::Vector2D{event.motion.x, event.motion.y});
     return *mouse_input_event_;
   } else if (event.type == SDL_MOUSEBUTTONDOWN) {
     g_context.convert_event_coordinates(event);
     mouse_click_event_ = std::make_unique<MouseClickEvent>(
-        world_, Vector2D{event.motion.x, event.motion.y});
+        world_, SupaRL::Vector2D{event.motion.x, event.motion.y});
     return *mouse_click_event_;
   } else if (event.type == SDL_KEYDOWN) {
     mouse_click_event_ = std::make_unique<MouseClickEvent>(
-        world_, Vector2D{event.motion.x, event.motion.y});
+        world_, SupaRL::Vector2D{event.motion.x, event.motion.y});
 
     SDL_Keycode key = event.key.keysym.sym;
 
@@ -52,40 +55,39 @@ EngineEvent& TargetingInputHandler::handle_sdl_event(SDL_Event event) noexcept {
 GameInputHandler::GameInputHandler(World& world, Entity* controllable_entity)
     : EventHandler(world),
       button_right_(std::make_unique<DirectionalCommand>(
-          world_, controllable_entity, Vector2D{1, 0})),
+          world_, controllable_entity, SupaRL::Vector2D{1, 0})),
       button_up_(std::make_unique<DirectionalCommand>(
-          world_, controllable_entity, Vector2D{0, -1})),
+          world_, controllable_entity, SupaRL::Vector2D{0, -1})),
       button_down_(std::make_unique<DirectionalCommand>(
-          world_, controllable_entity, Vector2D{0, 1})),
+          world_, controllable_entity, SupaRL::Vector2D{0, 1})),
       button_up_right_(std::make_unique<DirectionalCommand>(
-          world_, controllable_entity, Vector2D{1, -1})),
+          world_, controllable_entity, SupaRL::Vector2D{1, -1})),
       button_up_left_(std::make_unique<DirectionalCommand>(
-          world_, controllable_entity, Vector2D{-1, -1})),
+          world_, controllable_entity, SupaRL::Vector2D{-1, -1})),
       button_left_(std::make_unique<DirectionalCommand>(
-          world_, controllable_entity, Vector2D{-1, 0})),
+          world_, controllable_entity, SupaRL::Vector2D{-1, 0})),
       button_down_right_(std::make_unique<DirectionalCommand>(
-          world_, controllable_entity, Vector2D{1, 1})),
+          world_, controllable_entity, SupaRL::Vector2D{1, 1})),
       button_down_left_(std::make_unique<DirectionalCommand>(
-          world_, controllable_entity, Vector2D{-1, 1})),
+          world_, controllable_entity, SupaRL::Vector2D{-1, 1})),
       view_history_command_(std::make_unique<ViewHistoryCommand>(world_)),
       pick_up_command_(
           std::make_unique<PickupCommand>(world, controllable_entity)),
       inventory_command_(
           std::make_unique<InventoryCommand>(world, controllable_entity)),
       main_menu_command_(std::make_unique<MainMenuCommand>(world)),
+      use_command_(nullptr),
       character_menu_command_(
           std::make_unique<CharacterMenuCommand>(world, controllable_entity)),
-      use_command_(nullptr),
       controllable_entity_(controllable_entity){};
 
 EngineEvent& GameInputHandler::handle_sdl_event(SDL_Event event) noexcept {
-  // TODO: Move this to its own handler.
-  //  probably want an event handler which has
-  //  input handler for keyboard and another for mouse
   if (event.type == SDL_MOUSEMOTION) {
     g_context.convert_event_coordinates(event);
-    world_.get_map().set_highlight_tile({event.motion.x, event.motion.y});
-    return *noop_;
+    mouse_input_event_ = std::make_unique<MouseInputEvent>(
+        world_, SupaRL::Vector2D{event.motion.x, event.motion.y});
+    /*world_.get_map().set_highlight_tile({event.motion.x, event.motion.y});*/
+    return *mouse_input_event_;
   }
 
   SDL_Keycode key = event.key.keysym.sym;
@@ -117,8 +119,10 @@ EngineEvent& GameInputHandler::handle_sdl_event(SDL_Event event) noexcept {
   } else if (key == SDLK_PERIOD) {
     return *character_menu_command_;
   } else if (key == SDLK_LEFTBRACKET) {
+    auto entity_position = g_coordinator.get_component<SupaRL::TransformComponent>(
+        controllable_entity_->get_id()).position_;
     use_command_ = std::make_unique<UseCommand>(
-        world_, controllable_entity_->get_transform_component().get_position());
+        world_, entity_position);
     return *use_command_;
   } else {
     return EventHandler::handle_sdl_event(event);
