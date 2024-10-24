@@ -3,12 +3,13 @@
 namespace cpprl {
   enum class AIType {
     HOSTILE,
-    CONFUSION
+    CONFUSION,
+    NONE
   };
 
   // AI component
   struct AIComponent {
     AIType type_;
-    AIType prevuious_type_;
+    AIType previous_type_;
   };
 }

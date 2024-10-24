@@ -5,7 +5,6 @@
 #include <algorithm>
 #include <memory>
 
-#include "basic_ai_component.hpp"
 #include "combat_system.hpp"
 #include "entity_manager.hpp"
 #include "game_entity.hpp"

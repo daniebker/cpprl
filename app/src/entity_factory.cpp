@@ -1,8 +1,8 @@
 #include "entity_factory.hpp"
 
-#include "basic_ai_component.hpp"
 #include "colours.hpp"
 #include "components.hpp"
+#include "components/ai.hpp"
 #include "core/coordinator.hpp"
 #include "components/defence.hpp"
 #include "components/attack.hpp"
@@ -22,6 +22,7 @@ namespace cpprl {
     auto entity = new Entity();
     SupaRL::Entity entity_id = g_coordinator.create_entity();
     entity->set_id(entity_id);
+
     g_coordinator.add_component(entity_id, SupaRL::AsciiComponent{
         .symbol_ = symbol,
         .colour_ = SupaRL::ColourRGB{.r = color.r, .g = color.g, .b = color.b },
@@ -44,9 +45,12 @@ namespace cpprl {
     Entity* entity = create_base("Orc", DARK_GREEN, "o");
     auto entity_id = entity->get_id();
 
-    entity->set_ai_component(std::make_unique<HostileAI>());
     entity->set_stats_component(
         std::make_unique<StatsComponent>(10, 1, 10, 10, 2));
+
+    g_coordinator.add_component(entity_id, AIComponent{
+        .type_ = AIType::HOSTILE,
+        .previous_type_ = AIType::NONE});
 
     g_coordinator.add_component(entity_id, SupaRL::AttackComponent{
         .damage_ = 3});
@@ -66,11 +70,14 @@ namespace cpprl {
   Entity* TrollFactory::create(SupaRL::Vector2D at_position) {
     Entity* entity = create_base("Troll", DARK_GREEN, "T");
 
-    entity->set_ai_component(std::make_unique<HostileAI>());
     entity->set_stats_component(
         std::make_unique<StatsComponent>(20, 1, 10, 20, 2));
 
     auto entity_id = entity->get_id();
+
+    g_coordinator.add_component(entity_id, AIComponent{
+        .type_ = AIType::HOSTILE,
+        .previous_type_ = AIType::NONE});
 
     g_coordinator.add_component(entity_id, SupaRL::AttackComponent{
         .damage_ = 4});

@@ -52,6 +52,8 @@ namespace cpprl {
   class PickupCommand : public Command {
     public:
       PickupCommand(World& world, Entity* entity) : Command(world, entity){};
+      PickupCommand(World& world, SupaRL::Entity entity)
+        : Command(world, entity){};
       StateResult execute() override;
   };
 
@@ -63,6 +65,8 @@ namespace cpprl {
     public:
       DropItemCommand(World& world, Entity* entity, int item_index)
         : Command(world, entity), item_index_(item_index){};
+      DropItemCommand(World& world, SupaRL::Entity entity, int item_index)
+        : Command(world, entity), item_index_(item_index) {};
       ~DropItemCommand() override = default;
       StateResult execute() override;
   };
@@ -70,6 +74,7 @@ namespace cpprl {
   class InventoryCommand final : public Command {
     public:
       InventoryCommand(World& world, Entity* entity) : Command(world, entity) {}
+      InventoryCommand(World& world, SupaRL::Entity entity) : Command(world, entity){};
       StateResult execute() override;
   };
 
@@ -110,6 +115,14 @@ namespace cpprl {
         : Command(world, entity),
         sub_command_(sub_command),
         ui_window_(ui_window) {}
+      SelectItemCommand(
+          World& world,
+          SupaRL::Entity entity,
+          UiWindow& ui_window,
+          ItemSubCommand sub_command)
+        : Command(world, entity),
+        sub_command_(sub_command),
+        ui_window_(ui_window){};
       StateResult execute() override;
   };
 
@@ -131,6 +144,8 @@ namespace cpprl {
     public:
       UseItemCommand(World& world, Entity* entity, int item_index)
         : Command(world, entity), item_index_(item_index) {}
+      UseItemCommand(World& world, SupaRL::Entity entity, int item_index)
+        : Command(world, entity), item_index_(item_index){};
       StateResult execute() override;
   };
 
@@ -167,6 +182,8 @@ namespace cpprl {
 
     public:
       DirectionalCommand(World& world, Entity* entity, SupaRL::Vector2D move_vector)
+        : Command(world, entity), move_vector_(move_vector){};
+      DirectionalCommand(World& world, SupaRL::Entity entity, SupaRL::Vector2D move_vector)
         : Command(world, entity), move_vector_(move_vector){};
       virtual StateResult execute();
   };
@@ -220,6 +237,8 @@ namespace cpprl {
   class MovementCommand : public DirectionalCommand {
     public:
       MovementCommand(World& world, Entity* entity, SupaRL::Vector2D move_vector)
+        : DirectionalCommand(world, entity, move_vector){};
+      MovementCommand(World& world, SupaRL::Entity entity, SupaRL::Vector2D move_vector)
         : DirectionalCommand(world, entity, move_vector){};
       virtual StateResult execute();
   };

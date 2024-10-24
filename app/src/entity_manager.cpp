@@ -166,10 +166,8 @@ namespace cpprl {
       for (const auto& entity : entities_) {
         auto& defence_component = g_coordinator.get_component<SupaRL::DefenceComponent>(
             entity->get_id());
-        const std::optional<std::reference_wrapper<AIComponent>> ai_component =
-          entity->get_ai_component();
 
-        if (ai_component.has_value() && defence_component.is_not_dead()) {
+        if (defence_component.is_not_dead()) {
           auto entity_position = g_coordinator.get_component<SupaRL::TransformComponent>(
               entity->get_id()).position_;
           float distance = position.distance_to(
