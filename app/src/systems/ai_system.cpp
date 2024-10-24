@@ -1,4 +1,6 @@
 #include "systems/ai_system.hpp"
+#include "entity_manager.hpp"
+#include "world.hpp"
 #include <core/coordinator.hpp>
 #include <components/ai.hpp>
 #include <components/transform.hpp>

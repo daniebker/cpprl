@@ -231,6 +231,8 @@ namespace cpprl {
     public:
       MeleeCommand(World& world, Entity* entity, SupaRL::Vector2D target_vector)
         : DirectionalCommand(world, entity, target_vector){};
+      MeleeCommand(World& world, SupaRL::Entity entity, SupaRL::Vector2D target_vector)
+        : DirectionalCommand(world, entity, target_vector){};
       StateResult execute();
   };
 

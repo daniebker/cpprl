@@ -10,6 +10,7 @@
 #include "game_entity.hpp"
 #include "state.hpp"
 #include "world.hpp"
+#include "components/ai.hpp"
 #include <core/types.hpp>
 #include <components/identity.hpp>
 #include <components/physique.hpp>
@@ -198,11 +199,18 @@ namespace cpprl {
         auto& target = optional_ref_target.value().get();
         auto& entity_name = g_coordinator.get_component<SupaRL::IdentityComponent>(
             target.get_id()).name_;
-        std::unique_ptr<AIComponent> old_ai = target.transfer_ai_component();
 
-        std::unique_ptr<AIComponent> confusion_ai =
-          std::make_unique<ConfusionAI>(num_turns_, std::move(old_ai));
-        target.set_ai_component(std::move(confusion_ai));
+        auto& ai_component = g_coordinator.get_component<AIComponent>(
+            target.get_id());
+
+        auto& status_condition = g_coordinator.get_component<SupaRL::StatusConditionComponent>(
+            target.get_id());
+
+        status_condition.max_ticks_ = num_turns_;
+        status_condition.name_ = "confused";
+        ai_component.previous_type_ = ai_component.type_;
+        ai_component.type_ = AIType::CONFUSION;
+
         world.get_message_log().add_message(
             fmt::format(
               "The eyes of the {} look vacant, as it starts to "
