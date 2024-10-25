@@ -91,24 +91,6 @@ namespace cpprl {
     }
   }
 
-  void World::handle_enemy_turns() {
-    for (const auto& entity : *entities_) {
-      const std::optional<std::reference_wrapper<AIComponent>> ai_component =
-        entity->get_ai_component();
-      try {
-      auto& defence_component = g_coordinator.get_component<SupaRL::DefenceComponent>(
-          entity->get_id());
-      if (ai_component.has_value() &&
-          defence_component.is_not_dead()) {
-        entity->update(*this);
-      }
-      } catch (std::exception& e) {
-        // TODO: this is a hack until the enemy turn system is in place.
-        continue;
-      }
-    }
-  }
-
   void World::spawn_player() {
     auto player_factory_ = std::make_unique<PlayerFactory>();
     auto spawn_position = dungeon_.get_map().get_rooms().at(0).get_center();
