@@ -37,7 +37,6 @@ namespace cpprl {
       void generate_map(int width, int height, bool with_entities = false);
       Dungeon& get_dungeon() { return dungeon_; }
       void render(Renderer& renderer);
-      void handle_enemy_turns();
       void scroll_current_view(int scroll_amount);
       void handle_player_death();
       void set_targeting_tile(

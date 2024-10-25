@@ -50,7 +50,7 @@ namespace cpprl {
             return;
           }
 
-          auto action = NoOpEvent(world_);
+          auto action = NoOpEvent(*world_);
           action.execute();
         }
       }

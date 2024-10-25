@@ -13,6 +13,7 @@
 #include "rendering.hpp"
 #include "systems/physics_system.hpp"
 #include "systems/status_condition_system.hpp"
+#include "systems/ai_system.hpp"
 
 namespace cpprl {
 
@@ -30,12 +31,12 @@ namespace cpprl {
       std::unique_ptr<State> engine_state_;
       std::shared_ptr<SupaRL::PhysicsSystem> physics_system_;
       std::shared_ptr<SupaRL::StatusConditionSystem> status_condition_system_;
+      std::shared_ptr<AISystem> ai_system_;
 
       int argc_;
       char** argv_;
 
       void generate_map(int width, int height);
-      void handle_enemy_turns();
 
     public:
       Engine();

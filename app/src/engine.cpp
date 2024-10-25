@@ -26,8 +26,10 @@
 #include "components/ascii.hpp"
 #include "components/physique.hpp"
 #include "components/identity.hpp"
+#include "components/ai.hpp"
 #include "systems/status_condition_system.hpp"
 #include "systems/combat_system.hpp"
+#include "systems/ai_system.hpp"
 #include "core/types.hpp"
 
 // TODO: Service Locator pattern?
@@ -61,6 +63,7 @@ namespace cpprl {
     g_coordinator.register_component<SupaRL::AsciiComponent>();
     g_coordinator.register_component<SupaRL::PhysiqueComponent>();
     g_coordinator.register_component<SupaRL::IdentityComponent>();
+    g_coordinator.register_component<AIComponent>();
 
     status_condition_system_ = g_coordinator.register_system<SupaRL::StatusConditionSystem>();
     {
@@ -68,6 +71,14 @@ namespace cpprl {
       signature.set(g_coordinator.get_component_type<SupaRL::StatusConditionComponent>());
       signature.set(g_coordinator.get_component_type<SupaRL::DefenceComponent>());
       g_coordinator.set_system_signature<SupaRL::StatusConditionSystem>(signature);
+    }
+
+    ai_system_ = g_coordinator.register_system<AISystem>();
+    {
+      SupaRL::Signature signature;
+      signature.set(g_coordinator.get_component_type<AIComponent>());
+      signature.set(g_coordinator.get_component_type<SupaRL::TransformComponent>());
+      g_coordinator.set_system_signature<AISystem>(signature);
     }
     /**/
     /*g_coordinator.register_system<SupaRL::CombatSystem>();*/
@@ -123,6 +134,8 @@ namespace cpprl {
       // when trying to load. Can't even inspect the file in the browser.
       // gets as far as setting the dungeon seed and then blows up.
       serializer.deserialize(*world_);
+      ai_system_->set_world(world_.get());
+      ai_system_->set_player(world_->get_player());
 
       engine_state_->on_exit();
       engine_state_ = std::make_unique<InGameState>(*world_);
@@ -156,7 +169,6 @@ namespace cpprl {
             load();
           } else if (std::holds_alternative<EndTurn>(result)) {
             status_condition_system_->update();
-            world_->handle_enemy_turns();
             auto playerId = world_->get_player()->get_id();
             auto& player_defence = g_coordinator.get_component<SupaRL::DefenceComponent>(playerId);
             if (player_defence.is_dead()) {
@@ -165,6 +177,7 @@ namespace cpprl {
               engine_state_->on_enter();
             }
             physics_system_->update();
+            ai_system_->update();
           } else if (std::holds_alternative<Quit>(result)) {
             // TODO: there's a bug here. We should only save
             // when exiting the game, not when quitting to the main menu.
