@@ -1,7 +1,6 @@
 #include "dungeon.hpp"
 
 #include <memory>
-#include <tuple>
 #include <core/math.hpp>
 
 #include "rectangular_room.hpp"

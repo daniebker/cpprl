@@ -134,8 +134,8 @@ namespace cpprl {
       // when trying to load. Can't even inspect the file in the browser.
       // gets as far as setting the dungeon seed and then blows up.
       serializer.deserialize(*world_);
-      ai_system_->set_world(world_.get());
-      ai_system_->set_player(world_->get_player());
+      ai_system_->set_world(*world_.get());
+      ai_system_->set_player(world_->get_player()->get_id());
 
       engine_state_->on_exit();
       engine_state_ = std::make_unique<InGameState>(*world_);
