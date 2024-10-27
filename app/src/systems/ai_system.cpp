@@ -4,15 +4,39 @@
 #include <core/coordinator.hpp>
 #include <components/ai.hpp>
 #include <components/transform.hpp>
+#include <components/physique.hpp>
 #include "events/command.hpp"
 
 extern SupaRL::Coordinator g_coordinator;
 
 namespace cpprl {
+  // TODO: this does't belogn here
+  /**
+   * @brief Get the blocking entity at a given position
+   * If there is no blocking entity at the given position, return -1
+   *
+   * @param entities
+   * @param position
+   * @return SupaRL::Entity
+   */
+  SupaRL::Entity get_blocking_entity_at(std::set<SupaRL::Entity> entities, SupaRL::Vector2D position) {
+      for (const auto& entity : entities) {
+      auto& entity_position = g_coordinator.get_component<SupaRL::TransformComponent>(
+          entity).position_;
+      auto entity_is_blocking = g_coordinator.get_component<SupaRL::PhysiqueComponent>(
+          entity).is_blocking_;
+        if (entity_is_blocking &&
+            entity_position == position) {
+          return entity;
+        }
+      }
+      return -1;
+  }
+
   // TODO: implement Bresenham line
-  bool can_path_to_target(tcod::BresenhamLine& path, World& world) {
+  bool can_path_to_target(tcod::BresenhamLine& path, std::set<Entity> entities) {
     for (const auto [x, y] : path) {
-      if (world.get_entities().get_blocking_entity_at({x, y})) {
+      if (get_blocking_entity_at(entities, {x,y}) >= 0) {
         return false;
       }
     }

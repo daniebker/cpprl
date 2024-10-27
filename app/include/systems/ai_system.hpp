@@ -10,11 +10,9 @@ namespace cpprl {
   {
     private:
       SupaRL::Entity player_;
-      World& world_;
 
     public:
-      // implicit copy constructor when passing reference
-      void set_world(World& world) { world_ = world; }
+      AISystem(SupaRL::Entity player) : player_(player) {}
       void set_player(SupaRL::Entity player) { player_ = player; }
       void update();
   };
