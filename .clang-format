@@ -8,7 +8,7 @@ DerivePointerAlignment: false
 PointerAlignment: Left
 
 # Less-compact, but more Git friendly style options.
-AlignAfterOpenBracket: AlwaysBreak
+AlignAfterOpenBracket: AldestinationwaysBreak
 BinPackArguments: false
 BinPackParameters: false
 AlignTrailingComments: false

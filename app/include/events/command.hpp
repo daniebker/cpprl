@@ -1,231 +1,252 @@
-#ifndef COMMAND_H
-#define COMMAND_H
+#pragma once
 
 #include "types/entity_fwd.hpp"
-#include "types/math.hpp"
+#include <core/math.hpp>
 #include "types/state_result.hpp"
 #include "types/world_fwd.hpp"
+#include <core/types.hpp>
 
 namespace cpprl {
-class UiWindow;
+  class UiWindow;
 
-class EngineEvent {
- protected:
-  World& world_;
+  class EngineEvent {
+    protected:
+      World& world_;
 
- public:
-  explicit EngineEvent(World& world) : world_(world) {}
-  virtual ~EngineEvent() {}
-  virtual StateResult execute() = 0;
-};
+    public:
+      explicit EngineEvent(World& world) : world_(world) {}
+      virtual ~EngineEvent() {}
+      virtual StateResult execute() = 0;
+  };
 
-class Command : public EngineEvent {
- protected:
-  Entity* entity_;
+  class Command : public EngineEvent {
+    protected:
+      Entity* entity_;
 
- public:
-  Command(World& world, Entity* entity) : EngineEvent(world), entity_(entity) {}
-  virtual ~Command() {}
-  virtual StateResult execute() = 0;
-};
+    public:
+      Command(World& world, Entity* entity) : EngineEvent(world), entity_(entity) {}
+      Command(World& world, SupaRL::Entity entity);
+      virtual ~Command() {}
+      virtual StateResult execute() = 0;
+  };
 
-class ScrollCommand : public EngineEvent {
- public:
-  ScrollCommand(World& world, UiWindow& ui_window, int scroll_amount)
-      : EngineEvent(world),
+  class ScrollCommand : public EngineEvent {
+    public:
+      ScrollCommand(World& world, UiWindow& ui_window, int scroll_amount)
+        : EngineEvent(world),
         ui_window_(ui_window),
         scroll_amount_(scroll_amount){};
-  virtual StateResult execute();
+      virtual StateResult execute();
 
- private:
-  UiWindow& ui_window_;
-  int scroll_amount_;
-};
+    private:
+      UiWindow& ui_window_;
+      int scroll_amount_;
+  };
 
-class ViewHistoryCommand : public EngineEvent {
- public:
-  ViewHistoryCommand(World& world) : EngineEvent(world){};
-  virtual StateResult execute();
-};
+  class ViewHistoryCommand : public EngineEvent {
+    public:
+      ViewHistoryCommand(World& world) : EngineEvent(world){};
+      virtual StateResult execute();
+  };
 
-class PickupCommand : public Command {
- public:
-  PickupCommand(World& world, Entity* entity) : Command(world, entity){};
-  StateResult execute() override;
-};
+  class PickupCommand : public Command {
+    public:
+      PickupCommand(World& world, Entity* entity) : Command(world, entity){};
+      PickupCommand(World& world, SupaRL::Entity entity)
+        : Command(world, entity){};
+      StateResult execute() override;
+  };
 
-// TODO: base class from useItemCommand
-class DropItemCommand final : public Command {
- private:
-  int item_index_;
+  // TODO: base class from useItemCommand
+  class DropItemCommand final : public Command {
+    private:
+      int item_index_;
 
- public:
-  DropItemCommand(World& world, Entity* entity, int item_index)
-      : Command(world, entity), item_index_(item_index){};
-  ~DropItemCommand() override = default;
-  StateResult execute() override;
-};
+    public:
+      DropItemCommand(World& world, Entity* entity, int item_index)
+        : Command(world, entity), item_index_(item_index){};
+      DropItemCommand(World& world, SupaRL::Entity entity, int item_index)
+        : Command(world, entity), item_index_(item_index) {};
+      ~DropItemCommand() override = default;
+      StateResult execute() override;
+  };
 
-class InventoryCommand final : public Command {
- public:
-  InventoryCommand(World& world, Entity* entity) : Command(world, entity) {}
-  StateResult execute() override;
-};
+  class InventoryCommand final : public Command {
+    public:
+      InventoryCommand(World& world, Entity* entity) : Command(world, entity) {}
+      InventoryCommand(World& world, SupaRL::Entity entity) : Command(world, entity){};
+      StateResult execute() override;
+  };
 
-class CharacterMenuCommand final : public Command {
- public:
-  using Command::Command;
-  StateResult execute() override;
-};
+  class CharacterMenuCommand final : public Command {
+    public:
+      using Command::Command;
+      StateResult execute() override;
+  };
 
-class MainMenuCommand final : public EngineEvent {
- public:
-  MainMenuCommand(World& world) : EngineEvent(world) {}
-  StateResult execute() override;
-};
+  class MainMenuCommand final : public EngineEvent {
+    public:
+      MainMenuCommand(World& world) : EngineEvent(world) {}
+      StateResult execute() override;
+  };
 
-class UseCommand final : public EngineEvent {
- private:
-  Vector2D position_;
+  class UseCommand final : public EngineEvent {
+    private:
+      SupaRL::Vector2D position_;
 
- public:
-  UseCommand(World& world, Vector2D position)
-      : EngineEvent(world), position_(position) {}
-  StateResult execute() override;
-};
+    public:
+      UseCommand(World& world, SupaRL::Vector2D position)
+        : EngineEvent(world), position_(position) {}
+      StateResult execute() override;
+  };
 
-enum ItemSubCommand { USE_ITEM, DROP_ITEM };
-class SelectItemCommand final : public Command {
- private:
-  ItemSubCommand sub_command_;
-  UiWindow& ui_window_;
+  enum ItemSubCommand { USE_ITEM, DROP_ITEM };
+  class SelectItemCommand final : public Command {
+    private:
+      ItemSubCommand sub_command_;
+      UiWindow& ui_window_;
 
- public:
-  SelectItemCommand(
-      World& world,
-      Entity* entity,
-      UiWindow& ui_window,
-      ItemSubCommand sub_command)
-      : Command(world, entity),
+    public:
+      SelectItemCommand(
+          World& world,
+          Entity* entity,
+          UiWindow& ui_window,
+          ItemSubCommand sub_command)
+        : Command(world, entity),
         sub_command_(sub_command),
         ui_window_(ui_window) {}
-  StateResult execute() override;
-};
+      SelectItemCommand(
+          World& world,
+          SupaRL::Entity entity,
+          UiWindow& ui_window,
+          ItemSubCommand sub_command)
+        : Command(world, entity),
+        sub_command_(sub_command),
+        ui_window_(ui_window){};
+      StateResult execute() override;
+  };
 
-enum MenuSubCommand { NEW_GAME, CONTINUE, QUIT };
-class SelectMenuItemCommand final : public EngineEvent {
- private:
-  UiWindow& ui_window_;
+  enum MenuSubCommand { NEW_GAME, CONTINUE, QUIT };
+  class SelectMenuItemCommand final : public EngineEvent {
+    private:
+      UiWindow& ui_window_;
 
- public:
-  SelectMenuItemCommand(World& world, UiWindow& ui_window)
-      : EngineEvent(world), ui_window_(ui_window) {}
-  StateResult execute() override;
-};
+    public:
+      SelectMenuItemCommand(World& world, UiWindow& ui_window)
+        : EngineEvent(world), ui_window_(ui_window) {}
+      StateResult execute() override;
+  };
 
-class UseItemCommand final : public Command {
- private:
-  int item_index_;
+  class UseItemCommand final : public Command {
+    private:
+      int item_index_;
 
- public:
-  UseItemCommand(World& world, Entity* entity, int item_index)
-      : Command(world, entity), item_index_(item_index) {}
-  StateResult execute() override;
-};
+    public:
+      UseItemCommand(World& world, Entity* entity, int item_index)
+        : Command(world, entity), item_index_(item_index) {}
+      UseItemCommand(World& world, SupaRL::Entity entity, int item_index)
+        : Command(world, entity), item_index_(item_index){};
+      StateResult execute() override;
+  };
 
-class BoostStatCommand final : public EngineEvent {
- private:
-  UiWindow& ui_window_;
+  class BoostStatCommand final : public EngineEvent {
+    private:
+      UiWindow& ui_window_;
 
- public:
-  BoostStatCommand(World& world, UiWindow& ui_window)
-      : EngineEvent(world), ui_window_(ui_window) {}
-  StateResult execute() override;
-};
+    public:
+      BoostStatCommand(World& world, UiWindow& ui_window)
+        : EngineEvent(world), ui_window_(ui_window) {}
+      StateResult execute() override;
+  };
 
-class CloseViewCommand final : public EngineEvent {
- public:
-  CloseViewCommand(World& world) : EngineEvent(world){};
-  virtual StateResult execute() override;
-};
+  class CloseViewCommand final : public EngineEvent {
+    public:
+      CloseViewCommand(World& world) : EngineEvent(world){};
+      virtual StateResult execute() override;
+  };
 
-class DieEvent : public EngineEvent {
- public:
-  DieEvent(World& world, Entity* entity)
-      : EngineEvent(world), entity_(entity) {}
-  virtual ~DieEvent() = default;
-  virtual StateResult execute() override;
+  class DieEvent : public EngineEvent {
+    public:
+      DieEvent(World& world, Entity* entity)
+        : EngineEvent(world), entity_(entity) {}
+      virtual ~DieEvent() = default;
+      virtual StateResult execute() override;
 
- private:
-  Entity* entity_;
-};
+    private:
+      Entity* entity_;
+  };
 
-class DirectionalCommand : public Command {
- protected:
-  Vector2D move_vector_;
+  class DirectionalCommand : public Command {
+    protected:
+      SupaRL::Vector2D move_vector_;
 
- public:
-  DirectionalCommand(World& world, Entity* entity, Vector2D move_vector)
-      : Command(world, entity), move_vector_(move_vector){};
-  virtual StateResult execute();
-};
+    public:
+      DirectionalCommand(World& world, Entity* entity, SupaRL::Vector2D move_vector)
+        : Command(world, entity), move_vector_(move_vector){};
+      DirectionalCommand(World& world, SupaRL::Entity entity, SupaRL::Vector2D move_vector)
+        : Command(world, entity), move_vector_(move_vector){};
+      virtual StateResult execute();
+  };
 
-class NoOpEvent : public EngineEvent {
- public:
-  NoOpEvent(World& world) : EngineEvent(world) {}
-  StateResult execute() override { return {}; }
-};
+  class NoOpEvent : public EngineEvent {
+    public:
+      NoOpEvent(World& world) : EngineEvent(world) {}
+      StateResult execute() override { return {}; }
+  };
 
-class ResetGameCommand : public EngineEvent {
- public:
-  ResetGameCommand(World& world) : EngineEvent(world) {}
-  StateResult execute() override { return Reset{}; }
-};
+  class ResetGameCommand : public EngineEvent {
+    public:
+      ResetGameCommand(World& world) : EngineEvent(world) {}
+      StateResult execute() override { return Reset{}; }
+  };
 
-class MouseInputEvent final : public EngineEvent {
- private:
-  Vector2D position_;
+  class MouseInputEvent final : public EngineEvent {
+    private:
+      SupaRL::Vector2D position_;
 
- public:
-  MouseInputEvent(World& world, Vector2D position)
-      : EngineEvent(world), position_(position) {}
-  StateResult execute() override;
-};
+    public:
+      MouseInputEvent(World& world, SupaRL::Vector2D position)
+        : EngineEvent(world), position_(position) {}
+      StateResult execute() override;
+  };
 
-class MouseClickEvent final : public EngineEvent {
-  // TODO: remove this?
- private:
-  Vector2D position_;
+  class MouseClickEvent final : public EngineEvent {
+    // TODO: remove this?
+    private:
+      SupaRL::Vector2D position_;
 
- public:
-  MouseClickEvent(World& world, Vector2D position)
-      : EngineEvent(world), position_(position) {}
-  StateResult execute() override;
-};
+    public:
+      MouseClickEvent(World& world, SupaRL::Vector2D position)
+        : EngineEvent(world), position_(position) {}
+      StateResult execute() override;
+  };
 
-class ExitTargetingModeCommand final : public EngineEvent {
- public:
-  ExitTargetingModeCommand(World& world) : EngineEvent(world) {}
-  StateResult execute() override;
-};
+  class ExitTargetingModeCommand final : public EngineEvent {
+    public:
+      ExitTargetingModeCommand(World& world) : EngineEvent(world) {}
+      StateResult execute() override;
+  };
 
-class MeleeCommand : DirectionalCommand {
- public:
-  MeleeCommand(World& world, Entity* entity, Vector2D target_vector)
-      : DirectionalCommand(world, entity, target_vector){};
-  StateResult execute();
-};
+  class MeleeCommand : DirectionalCommand {
+    public:
+      MeleeCommand(World& world, Entity* entity, SupaRL::Vector2D target_vector)
+        : DirectionalCommand(world, entity, target_vector){};
+      MeleeCommand(World& world, SupaRL::Entity entity, SupaRL::Vector2D target_vector)
+        : DirectionalCommand(world, entity, target_vector){};
+      StateResult execute();
+  };
 
-class MovementCommand : public DirectionalCommand {
- public:
-  MovementCommand(World& world, Entity* entity, Vector2D move_vector)
-      : DirectionalCommand(world, entity, move_vector){};
-  virtual StateResult execute();
-};
-class QuitCommand : public EngineEvent {
- public:
-  QuitCommand(World& world) : EngineEvent(world){};
-  virtual StateResult execute();
-};
-}  // namespace cpprl
-#endif
+  class MovementCommand : public DirectionalCommand {
+    public:
+      MovementCommand(World& world, Entity* entity, SupaRL::Vector2D move_vector)
+        : DirectionalCommand(world, entity, move_vector){};
+      MovementCommand(World& world, SupaRL::Entity entity, SupaRL::Vector2D move_vector)
+        : DirectionalCommand(world, entity, move_vector){};
+      virtual StateResult execute();
+  };
+  class QuitCommand : public EngineEvent {
+    public:
+      QuitCommand(World& world) : EngineEvent(world){};
+      virtual StateResult execute();
+  };
+}

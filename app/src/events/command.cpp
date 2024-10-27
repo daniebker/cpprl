@@ -4,30 +4,46 @@
 
 #include "combat_system.hpp"
 #include "entity_manager.hpp"
-#include "exceptions.hpp"
 #include "game_entity.hpp"
 #include "gui.hpp"
 #include "input_handler.hpp"
 #include "state.hpp"
+#include "controller.hpp"
 #include "world.hpp"
+#include "core/coordinator.hpp"
+#include <components/velocity.hpp>
+#include <components/identity.hpp>
+#include <components/attack.hpp>
+#include <components/defence.hpp>
 
+extern SupaRL::Coordinator g_coordinator;
 namespace cpprl {
+  Command::Command(World& world, SupaRL::Entity entity) : EngineEvent(world) {
+    auto& entity_manager = world.get_entities();
+    auto entity_obj = entity_manager.get_entity(entity);
+
+    if(entity_obj.has_value()) {
+      // TODO: Convert from SupaRL::Entity to Entity from cpprl
+      entity_ = &entity_obj.value().get();
+    }
+  }
 
   StateResult PickupCommand::execute() {
+    auto entity_position = g_coordinator.get_component<SupaRL::TransformComponent>(
+        entity_->get_id()).position_;
     std::optional<std::reference_wrapper<Entity>> optional_item_ref =
       world_.get_entities().get_non_blocking_entity_at(
-          entity_->get_transform_component().get_position());
+          entity_position);
     if(!optional_item_ref.has_value()) {
       return NoOp{"There is nothing here to pick up."};
     }
 
     Entity& item = optional_item_ref.value().get();
-    if (item.get_name().find("corpse") != std::string::npos) {
-      return NoOp{"There is nothing here to pick up."};
-    }
+    auto& item_name = g_coordinator.get_component<SupaRL::IdentityComponent>(
+        item.get_id()).name_;
 
     world_.get_message_log().add_message(
-        "You pick up the " + item.get_name() + ".", WHITE);
+        "You pick up the " + item_name + ".", WHITE);
     entity_->get_container().add(&item);
     world_.get_entities().remove(&item);
 
@@ -115,11 +131,12 @@ namespace cpprl {
   }
 
   StateResult DieEvent::execute() {
+    auto& entity_name = g_coordinator.get_component<SupaRL::IdentityComponent>(
+        entity_->get_id()).name_;
     world_.get_message_log().add_message(
-        fmt::format("{} has died!", util::capitalize(entity_->get_name())));
-    entity_->get_defense_component().die(*entity_);
+        fmt::format("{} has died!", util::capitalize(entity_name)));
 
-    if (entity_->get_name() != "player") {
+    if (entity_name != "player") {
       const std::optional<std::reference_wrapper<StatsComponent>>
         stats_component = world_.get_player()->get_stats_component();
       assert(stats_component.has_value());
@@ -136,8 +153,10 @@ namespace cpprl {
   }
 
   StateResult DirectionalCommand::execute() {
+    auto entity_position = g_coordinator.get_component<SupaRL::TransformComponent>(
+        entity_->get_id()).position_;
     auto targetPos =
-      entity_->get_transform_component().get_position() + move_vector_;
+      entity_position + move_vector_;
 
     if (world_.get_entities().get_blocking_entity_at(targetPos)) {
       auto action = MeleeCommand(world_, entity_, move_vector_);
@@ -150,6 +169,8 @@ namespace cpprl {
 
   StateResult MouseInputEvent::execute() {
     world_.get_map().set_highlight_tile(position_);
+    std::cout << "position_: " << position_.x << ", " << position_.y << std::endl;
+    world_.get_controller().cursor = position_;
     return {};
   }
 
@@ -162,46 +183,56 @@ namespace cpprl {
   }
 
   StateResult MeleeCommand::execute() {
+    auto entity_position = g_coordinator.get_component<SupaRL::TransformComponent>(
+        entity_->get_id()).position_;
+    auto entity_name = g_coordinator.get_component<SupaRL::IdentityComponent>(
+        entity_->get_id()).name_;
     auto targetPos =
-      entity_->get_transform_component().get_position() + move_vector_;
+      entity_position + move_vector_;
     std::optional<std::reference_wrapper<Entity>> target =
       world_.get_entities().get_blocking_entity_at(targetPos);
 
     tcod::ColorRGB attack_colour = WHITE;
-    if (entity_->get_name() != "player") {
+    if (entity_name != "player") {
       attack_colour = RED;
     }
 
     if (target.has_value()) {
-      int damage = combat_system::handle_attack(*entity_, target.value().get());
-      if (damage > 0) {
-        std::string message = fmt::format(
-            "{} attacks {} for {} hit points.",
-            util::capitalize(entity_->get_name()),
-            util::capitalize(target.value().get().get_name()),
-            damage);
-
-        world_.get_message_log().add_message(message, attack_colour, true);
-
-        if (target.value().get().get_defense_component().is_dead()) {
-          auto action = DieEvent(world_, &target.value().get());
-          return action.execute();
-        }
-      } else {
-        std::string message = fmt::format(
-            "{} attacks {} but does no damage.",
-            util::capitalize(entity_->get_name()),
-            util::capitalize(target.value().get().get_name()));
-
-        world_.get_message_log().add_message(message, attack_colour, true);
+      combat_system::handle_attack(*entity_, target.value().get());
+      /*if (damage > 0) {*/
+      /*  std::string message = fmt::format(*/
+      /*      "{} attacks {} for {} hit points.",*/
+      /*      util::capitalize(entity_name),*/
+      /*      util::capitalize(target_name),*/
+      /*      damage);*/
+      /**/
+      /*  world_.get_message_log().add_message(message, attack_colour, true);*/
+      /**/
+      /*  auto& target_defence = g_coordinator.get_component<SupaRL::DefenceComponent>(*/
+      /*      target.value().get().get_id());*/
+      /*  if (target_defence.is_dead()) {*/
+      /*    auto action = DieEvent(world_, &target.value().get());*/
+      /*    return action.execute();*/
+      /*  }*/
+      /*} else {*/
+      /*auto& target_name = g_coordinator.get_component<SupaRL::IdentityComponent>(*/
+      /*    target.value().get().get_id()).name_;*/
+      /*  std::string message = fmt::format(*/
+      /*      "{} attacks {} but does no damage.",*/
+      /*      util::capitalize(entity_name),*/
+      /*      util::capitalize(target_name));*/
+      /**/
+      /*  world_.get_message_log().add_message(message, attack_colour, true);*/
       }
-    }
+    /*}*/
     return EndTurn{};
   };
 
   StateResult MovementCommand::execute() {
-    Vector2D new_position =
-      entity_->get_transform_component().get_position() + move_vector_;
+    auto entity_position = g_coordinator.get_component<SupaRL::TransformComponent>(
+        entity_->get_id()).position_;
+    SupaRL::Vector2D new_position =
+      entity_position + move_vector_;
     auto& map = world_.get_map();
 
     if (map.is_not_in_bounds(new_position)) {
@@ -213,7 +244,10 @@ namespace cpprl {
     }
 
     if (map.is_walkable(new_position)) {
-      entity_->get_transform_component().move(new_position);
+
+      g_coordinator.get_component<SupaRL::VelocityComponent>(
+          entity_->get_id()).velocity_ = {move_vector_.x, move_vector_.y};
+
     } else {
       return NoOp{"You can't walk on that."};
     }
@@ -275,9 +309,13 @@ namespace cpprl {
     }
 
     if (cursor == 3) {
-      player->get_attack_component().boost_damage(1);
+      auto& attack_component = g_coordinator.get_component<SupaRL::AttackComponent>(
+          player->get_id());
+      attack_component.damage_ += 1;
     } else if (cursor == 4) {
-      player->get_defense_component().boost_defense(1);
+      auto& defence_component = g_coordinator.get_component<SupaRL::DefenceComponent>(
+          player->get_id());
+      defence_component.defence_ += 1;
     }
     stats.reduce_stats_points(1);
     return EndTurn{};
