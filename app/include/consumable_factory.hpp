@@ -11,31 +11,31 @@ class AbstractConsumableFactory {
  public:
   virtual ~AbstractConsumableFactory() = default;
 
-  virtual Entity* create() = 0;
+  virtual std::unique_ptr<Entity> create() = 0;
 
  protected:
-  Entity* create_base(
+  std::unique_ptr<Entity> create_base(
       std::string name, tcod::ColorRGB color, std::string_view symbol);
 };
 
 class HealthPotionFactory : public AbstractConsumableFactory {
  public:
-  Entity* create() override;
+  std::unique_ptr<Entity> create() override;
 };
 
 class FireballScrollFactory : public AbstractConsumableFactory {
  public:
-  Entity* create() override;
+  std::unique_ptr<Entity> create() override;
 };
 
 class LightningScrollFactory : public AbstractConsumableFactory {
  public:
-  Entity* create() override;
+  std::unique_ptr<Entity> create() override;
 };
 
 class ConfusionScrollFactory : public AbstractConsumableFactory {
  public:
-  Entity* create() override;
+  std::unique_ptr<Entity> create() override;
 };
 }  // namespace cpprl
 

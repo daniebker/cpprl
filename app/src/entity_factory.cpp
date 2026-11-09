@@ -5,17 +5,17 @@
 #include "components.hpp"
 
 namespace cpprl {
-Entity* AbstractEntityFactory::create_base(
+std::unique_ptr<Entity> AbstractEntityFactory::create_base(
     const std::string& name, tcod::ColorRGB color, std::string_view symbol) {
-  return new Entity(
+  return std::make_unique<Entity>(
       name,
       true,
       std::make_unique<TransformComponent>(0, 0),
       std::make_unique<ASCIIComponent>(symbol, color, 1));
 }
 
-Entity* OrcFactory::create() {
-  Entity* entity = create_base("Orc", DARK_GREEN, "o");
+std::unique_ptr<Entity> OrcFactory::create() {
+  auto entity = create_base("Orc", DARK_GREEN, "o");
 
   entity->set_attack_component(std::make_unique<AttackComponent>(3));
   entity->set_defense_component(std::make_unique<DefenseComponent>(0, 10));
@@ -26,8 +26,8 @@ Entity* OrcFactory::create() {
   return entity;
 }
 
-Entity* TrollFactory::create() {
-  Entity* entity = create_base("Troll", DARK_GREEN, "T");
+std::unique_ptr<Entity> TrollFactory::create() {
+  auto entity = create_base("Troll", DARK_GREEN, "T");
 
   entity->set_attack_component(std::make_unique<AttackComponent>(4));
   entity->set_defense_component(std::make_unique<DefenseComponent>(1, 16));
@@ -38,8 +38,8 @@ Entity* TrollFactory::create() {
   return entity;
 }
 
-Entity* PlayerFactory::create() {
-  Entity* entity = create_base("Player", TEAL, "@");
+std::unique_ptr<Entity> PlayerFactory::create() {
+  auto entity = create_base("Player", TEAL, "@");
 
   entity->set_attack_component(std::make_unique<AttackComponent>(5));
   entity->set_defense_component(std::make_unique<DefenseComponent>(2, 30));

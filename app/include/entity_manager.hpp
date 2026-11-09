@@ -38,15 +38,15 @@ class EntityManager {
       Vector2D position);
   void place_entities(
       RectangularRoom room, int max_monsters_per_room, int max_items_per_room);
-  Entity* spawn(Entity* entity);
-  Entity* spawn(Entity* entity, Vector2D position);
+  Entity* spawn(std::unique_ptr<Entity> entity);
+  Entity* spawn(std::unique_ptr<Entity> entity, Vector2D position);
   void reserve(size_t size) { entities_.reserve(size); }
   void shrink_to_fit() { entities_.shrink_to_fit(); }
-  void remove(const Entity* entity);
+  std::unique_ptr<Entity> remove(const Entity* entity);
   size_t size() const { return entities_.size(); }
 
-  using iterator = std::vector<Entity*>::iterator;
-  using const_iterator = std::vector<Entity*>::const_iterator;
+  using iterator = std::vector<std::unique_ptr<Entity>>::iterator;
+  using const_iterator = std::vector<std::unique_ptr<Entity>>::const_iterator;
   // Iterator for EntityManager
 
   iterator begin() { return entities_.begin(); }
@@ -74,14 +74,14 @@ class EntityManager {
     archive(size);
     entities_.reserve(size);
     for (size_t i = 0; i < size; i++) {
-      auto entity = new Entity("", false, nullptr, nullptr);
+      auto entity = std::make_unique<Entity>("", false, nullptr, nullptr);
       entity->unpack(archive);
-      entities_.emplace_back(entity);
+      entities_.emplace_back(std::move(entity));
     }
   }
 
  private:
-  std::vector<Entity*> entities_;
+  std::vector<std::unique_ptr<Entity>> entities_;
   std::unique_ptr<AbstractEntityFactory> orc_factory_;
   std::unique_ptr<AbstractEntityFactory> troll_factory_;
 };

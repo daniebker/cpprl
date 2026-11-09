@@ -35,7 +35,7 @@ void Engine::init(int argc, char** argv) {
   argv_ = argv;
   renderer_ = std::make_unique<TCODRenderer>(argc, argv);
   engine_state_ = std::make_unique<MainMenuState>(
-      *world_, new MainMenuWindow(60, 35, {0, 0}));
+      *world_, std::make_unique<MainMenuWindow>(60, 35, Vector2D{0, 0}));
   engine_state_->on_enter();
 }
 

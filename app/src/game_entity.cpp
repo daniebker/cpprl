@@ -18,6 +18,8 @@ namespace cpprl {
     transformComponent_(std::move(transformComponent)),
     asciiComponent_(std::move(asciiComponent)) {}
 
+  Entity::~Entity() = default;
+
   void Entity::update(World& world) { aiComponent_->update(world, this); }
 
   // TODO: not sure this belongs here
