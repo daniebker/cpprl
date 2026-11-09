@@ -93,14 +93,14 @@ void World::handle_enemy_turns() {
 
 void World::spawn_player() {
   auto player_factory_ = std::make_unique<PlayerFactory>();
-  Entity* player = player_factory_->create();
+  std::unique_ptr<Entity> player = player_factory_->create();
   player->get_transform_component().move(
       dungeon_.get_map().get_rooms().at(0).get_center());
-  World::spawn_player(player);
+  World::spawn_player(std::move(player));
 }
 
-void World::spawn_player(Entity* player) {
-  player_ = entities_->spawn(player);
+void World::spawn_player(std::unique_ptr<Entity> player) {
+  player_ = entities_->spawn(std::move(player));
   dungeon_.get_map().compute_fov(
       player_->get_transform_component().get_position(), 4);
   DefenseComponent& player_defense = player_->get_defense_component();
@@ -109,7 +109,10 @@ void World::spawn_player(Entity* player) {
   entities_->shrink_to_fit();
 }
 
-void World::reset() { entities_->clear(); }
+void World::reset() {
+  entities_->clear();
+  player_ = nullptr;
+}
 
 void World::scroll_current_view(int scroll_amount) {
   if (current_window_) {

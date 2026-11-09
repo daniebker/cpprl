@@ -26,11 +26,15 @@ namespace cpprl {
       return NoOp{"There is nothing here to pick up."};
     }
 
-    world_.get_message_log().add_message(
-        "You pick up the " + item.get_name() + ".", WHITE);
-    entity_->get_container().add(&item);
-    world_.get_entities().remove(&item);
+    std::string item_name = item.get_name();
+    ActionResult result =
+        item.get_consumable_component().pick_up(&item, entity_, world_);
+    if (std::holds_alternative<Failure>(result)) {
+      return NoOp{std::get<Failure>(result).message};
+    }
 
+    world_.get_message_log().add_message(
+        "You pick up the " + item_name + ".", WHITE);
     return EndTurn{};
   }
 
@@ -38,15 +42,15 @@ namespace cpprl {
     if (item_index_ <= 1) {
       return NoOp{"You can't drop that."};
     }
-    Entity* item = entity_->get_container().get_inventory()[item_index_ - 1];
+    Entity* item =
+        entity_->get_container().get_inventory()[item_index_ - 1].get();
     // TODO: this is why I can't drop a corpse
     // Should a corpse be consumable?
     ConsumableComponent* consumable_component = &item->get_consumable_component();
     if (!consumable_component) {
       return NoOp{"There's nothing to drop."};
     }
-    ActionResult result = consumable_component->drop(item, entity_);
-    world_.get_entities().spawn(item);
+    ActionResult result = consumable_component->drop(item, entity_, world_);
     if (std::holds_alternative<Failure>(result)) {
       std::string message = std::get<Failure>(result).message;
       return NoOp{message.c_str()};
@@ -66,13 +70,15 @@ namespace cpprl {
   StateResult ViewHistoryCommand::execute() {
     return Change{std::make_unique<ViewMessageHistoryState>(
         world_,
-        new HistoryWindow(
-          60, 35, {0, 0}, world_.get_message_log(), "Message Log"))};
+        std::make_unique<HistoryWindow>(
+          60, 35, Vector2D{0, 0}, world_.get_message_log(), "Message Log"))};
   }
 
   StateResult InventoryCommand::execute() {
     return Change{std::make_unique<ViewInventoryState>(
-        world_, new InventoryWindow(40, 20, {0, 0}, entity_, "Inventory"))};
+        world_,
+        std::make_unique<InventoryWindow>(
+          40, 20, Vector2D{0, 0}, entity_, "Inventory"))};
   }
 
   // TODO: can this be a template?
@@ -93,7 +99,8 @@ namespace cpprl {
 
   StateResult UseItemCommand::execute() {
     // TODO: this throws when inventory is empty
-    Entity* item = entity_->get_container().get_inventory()[item_index_ - 1];
+    Entity* item =
+        entity_->get_container().get_inventory()[item_index_ - 1].get();
     ConsumableComponent* consumable_component = &item->get_consumable_component();
     if (!consumable_component) {
       return NoOp{"There's nothing to use."};
@@ -257,12 +264,14 @@ namespace cpprl {
 
   StateResult MainMenuCommand::execute() {
     return Change{std::make_unique<MainMenuState>(
-        world_, new MainMenuWindow(60, 35, {0, 0}))};
+        world_, std::make_unique<MainMenuWindow>(60, 35, Vector2D{0, 0}))};
   }
 
   StateResult CharacterMenuCommand::execute() {
     return Change{std::make_unique<CharacterMenuState>(
-        world_, new CharacterMenuWindow(60, 35, {0, 0}, entity_))};
+        world_,
+        std::make_unique<CharacterMenuWindow>(
+          60, 35, Vector2D{0, 0}, entity_))};
   }
 
   StateResult BoostStatCommand::execute() {

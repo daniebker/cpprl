@@ -37,7 +37,7 @@ namespace cpprl {
           std::unique_ptr<TransformComponent> transformComponent,
           std::unique_ptr<ASCIIComponent> asciiComponent);
 
-      ~Entity() = default;
+      ~Entity();
 
       TransformComponent& get_transform_component() {
         return *transformComponent_;

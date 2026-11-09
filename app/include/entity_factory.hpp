@@ -10,26 +10,26 @@ class AbstractEntityFactory {
  public:
   virtual ~AbstractEntityFactory() = default;
 
-  virtual Entity* create() = 0;
+  virtual std::unique_ptr<Entity> create() = 0;
 
  protected:
-  Entity* create_base(
+  std::unique_ptr<Entity> create_base(
       const std::string& name, tcod::ColorRGB color, std::string_view symbol);
 };
 
 class OrcFactory : public AbstractEntityFactory {
  public:
-  Entity* create() override;
+  std::unique_ptr<Entity> create() override;
 };
 
 class TrollFactory : public AbstractEntityFactory {
  public:
-  Entity* create() override;
+  std::unique_ptr<Entity> create() override;
 };
 
 class PlayerFactory : public AbstractEntityFactory {
  public:
-  Entity* create() override;
+  std::unique_ptr<Entity> create() override;
 };
 }  // namespace cpprl
 

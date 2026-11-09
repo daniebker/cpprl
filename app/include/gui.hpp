@@ -46,7 +46,7 @@ class UiWindow {
       : width_(width),
         height_(height),
         position_(position),
-        console_(new TCODConsole(width, height)),
+        console_(std::make_unique<TCODConsole>(width_, height_)),
         cursor_(0),
         title_(title){};
   virtual ~UiWindow() = default;

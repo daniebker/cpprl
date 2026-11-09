@@ -43,46 +43,56 @@ namespace cpprl {
     inventory_.reserve(size);
   }
 
-  bool Container::add(Entity* entity) {
-    if (size_ > 0 && inventory_.size() >= size_) {
+  bool Container::add(std::unique_ptr<Entity> entity) {
+    if (is_full()) {
       return false;
     }
     inventory_.push_back(std::move(entity));
     return true;
   }
 
-  void Container::remove(const Entity* entityToRemove) {
-    inventory_.erase(
-        std::begin(std::ranges::remove_if(
-            inventory_,
-            [&entityToRemove](const Entity* entity) {
-            return entity == entityToRemove;
-            })),
-        inventory_.end());
-  }
-
-  ActionResult ConsumableComponent::pick_up(Entity* owner, Entity* wearer) {
-    if (auto* container = &wearer->get_container();
-        container && container->add(std::move(owner))) {
-      // Remove the owner?
-      return Success{};
+  std::unique_ptr<Entity> Container::remove(const Entity* entityToRemove) {
+    auto it = std::ranges::find_if(
+        inventory_, [entityToRemove](const std::unique_ptr<Entity>& entity) {
+          return entity.get() == entityToRemove;
+        });
+    if (it == inventory_.end()) {
+      return nullptr;
     }
-    return Failure{"There's nothing to pick up."};
+    std::unique_ptr<Entity> removed = std::move(*it);
+    inventory_.erase(it);
+    return removed;
   }
 
-  ActionResult ConsumableComponent::drop(Entity* owner, Entity* wearer) {
-    if (auto* container = &wearer->get_container(); container) {
-      container->remove(owner);
-      owner->get_transform_component().move(
-          wearer->get_transform_component().get_position());
-      return Success{};
+  ActionResult ConsumableComponent::pick_up(
+      Entity* owner, Entity* wearer, World& world) {
+    Container& container = wearer->get_container();
+    if (container.is_full()) {
+      return Failure{"Your inventory is full."};
     }
-    return Failure{};
+    std::unique_ptr<Entity> item = world.get_entities().remove(owner);
+    if (!item) {
+      return Failure{"There's nothing to pick up."};
+    }
+    container.add(std::move(item));
+    return Success{};
   }
 
+  ActionResult ConsumableComponent::drop(
+      Entity* owner, Entity* wearer, World& world) {
+    std::unique_ptr<Entity> item = wearer->get_container().remove(owner);
+    if (!item) {
+      return Failure{"There's nothing to drop."};
+    }
+    world.get_entities().spawn(
+        std::move(item), wearer->get_transform_component().get_position());
+    return Success{};
+  }
+
+  // Removes (and destroys) the owning item, and therefore this component.
+  // Callers must not touch any members after calling this.
   ActionResult ConsumableComponent::use(Entity* owner, Entity* wearer, World&) {
-    if (auto* container = &wearer->get_container(); container) {
-      container->remove(owner);
+    if (wearer->get_container().remove(owner)) {
       return Success{};
     }
     return Failure{""};
@@ -119,7 +129,8 @@ namespace cpprl {
 
     Entity& closest_living_monster = optional_closest_monster_ref.value().get();
 
-    int inflicted = combat_system::handle_spell(damage_, closest_living_monster);
+    const float damage = damage_;
+    int inflicted = combat_system::handle_spell(damage, closest_living_monster);
     ConsumableComponent::use(owner, wearer, world);
     if (inflicted > 0) {
       world.get_message_log().add_message(
@@ -127,7 +138,7 @@ namespace cpprl {
             "A lightning bolt strikes the {} with a loud "
             "thunder! The damage is {} hit points.",
             closest_living_monster.get_name(),
-            damage_),
+            damage),
           GREEN);
 
       if (closest_living_monster.get_defense_component().is_dead()) {
@@ -144,8 +155,8 @@ namespace cpprl {
 
   ActionResult FireSpell::use(Entity* owner, Entity* wearer, World& world) {
     auto on_pick = [&, owner, wearer]() {
-      ConsumableComponent::use(owner, wearer, world);
-      for (Entity* entity : world.get_entities()) {
+      for (const auto& entity_ptr : world.get_entities()) {
+        Entity* entity = entity_ptr.get();
         if (const auto* defense_component = &entity->get_defense_component();
             defense_component && defense_component->is_not_dead() &&
             entity->get_transform_component().get_position().distance_to(
@@ -166,6 +177,7 @@ namespace cpprl {
           }
         }
       }
+      ConsumableComponent::use(owner, wearer, world);
     };
     return Poll{
       std::make_unique<PickTileAOEState>(world, on_pick, max_range_, aoe_)};

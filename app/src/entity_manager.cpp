@@ -19,7 +19,9 @@ void EntityManager::clear_except_player() {
   entities_.erase(
       std::begin(std::ranges::remove_if(
           entities_,
-          [](const Entity* entity) { return entity->get_name() != "Player"; })),
+          [](const std::unique_ptr<Entity>& entity) {
+            return entity->get_name() != "Player";
+          })),
       entities_.end());
 }
 
@@ -42,11 +44,10 @@ void EntityManager::place_entities(
     }
 
     if (random->getFloat(0.0f, 1.0f) < 0.8f) {
-      Entity* entity = orc_factory_->create();
-      entity->get_transform_component().move({x, y});
-      spawn(std::move(entity));
+      auto entity = orc_factory_->create();
+      spawn(std::move(entity), {x, y});
     } else {
-      Entity* entity = troll_factory_->create();
+      auto entity = troll_factory_->create();
       spawn(std::move(entity), {x, y});
     }
   }
@@ -66,31 +67,31 @@ void EntityManager::place_entities(
     float dice = random->getFloat(.0f, 1.0f);
     if (dice <= 0.7f) {
       auto health_potion_factory = std::make_unique<HealthPotionFactory>();
-      Entity* entity = health_potion_factory->create();
+      auto entity = health_potion_factory->create();
       spawn(std::move(entity), {x, y});
     } else if (dice <= .8f) {
       auto lighting_scroll_factory = std::make_unique<LightningScrollFactory>();
-      Entity* entity = lighting_scroll_factory->create();
+      auto entity = lighting_scroll_factory->create();
       spawn(std::move(entity), {x, y});
     } else if (dice <= .9f) {
       auto fireball_scroll_factory = std::make_unique<FireballScrollFactory>();
-      Entity* entity = fireball_scroll_factory->create();
+      auto entity = fireball_scroll_factory->create();
       spawn(std::move(entity), {x, y});
     } else if (dice <= 1.0f) {
       auto confusion_scroll_factory =
           std::make_unique<ConfusionScrollFactory>();
-      Entity* entity = confusion_scroll_factory->create();
+      auto entity = confusion_scroll_factory->create();
       spawn(std::move(entity), {x, y});
     }
   }
 }
 
-Entity* EntityManager::spawn(Entity* src) {
-  return entities_.emplace_back(src);
+Entity* EntityManager::spawn(std::unique_ptr<Entity> src) {
+  return entities_.emplace_back(std::move(src)).get();
 }
 
-Entity* EntityManager::spawn(Entity* src, Vector2D position) {
-  Entity* entity = spawn(src);
+Entity* EntityManager::spawn(std::unique_ptr<Entity> src, Vector2D position) {
+  Entity* entity = spawn(std::move(src));
 
   if (position != entity->get_transform_component().get_position()) {
     entity->get_transform_component().move(position);
@@ -136,11 +137,17 @@ EntityManager::get_non_blocking_entity_at(Vector2D position) {
   return std::nullopt;
 }
 
-void EntityManager::remove(const Entity* entity) {
-  const auto condition = [&entity](const Entity* e) { return e == entity; };
-  entities_.erase(
-      std::begin(std::ranges::remove_if(entities_, condition)),
-      std::end(entities_));
+std::unique_ptr<Entity> EntityManager::remove(const Entity* entity) {
+  auto it = std::ranges::find_if(
+      entities_, [entity](const std::unique_ptr<Entity>& e) {
+        return e.get() == entity;
+      });
+  if (it == entities_.end()) {
+    return nullptr;
+  }
+  std::unique_ptr<Entity> removed = std::move(*it);
+  entities_.erase(it);
+  return removed;
 }
 
 std::optional<std::reference_wrapper<Entity>>

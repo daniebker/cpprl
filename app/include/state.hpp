@@ -75,18 +75,17 @@ class PickTileAOEState final : public PickTileState {
 
 class GuiViewState : public State {
  protected:
-  UiWindow* window_;
+  std::unique_ptr<UiWindow> window_;
 
  public:
-  GuiViewState(World& world, UiWindow* window)
-      : State(world), window_(window) {}
+  GuiViewState(World& world, std::unique_ptr<UiWindow> window);
+  ~GuiViewState() override;
   void render(Renderer& renderer) override;
 };
 
 class ViewMessageHistoryState final : public GuiViewState {
  public:
-  ViewMessageHistoryState(World& world, UiWindow* window)
-      : GuiViewState(world, window) {}
+  using GuiViewState::GuiViewState;
   void on_enter() override;
 };
 
@@ -104,15 +103,13 @@ class GameOverState final : public GuiViewState {
 
 class MainMenuState final : public GuiViewState {
  public:
-  MainMenuState(World& world, UiWindow* window) : GuiViewState(world, window) {}
-  ~MainMenuState() { delete window_; }
+  using GuiViewState::GuiViewState;
   void on_enter() override;
 };
 
 class CharacterMenuState final : public GuiViewState {
  public:
-  CharacterMenuState(World& world, UiWindow* window)
-      : GuiViewState(world, window) {}
+  using GuiViewState::GuiViewState;
   void on_enter() override;
 };
 

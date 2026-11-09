@@ -101,15 +101,18 @@ class ASCIIComponent {
 class Container {
  private:
   size_t size_;
-  std::vector<Entity*> inventory_;
+  std::vector<std::unique_ptr<Entity>> inventory_;
 
  public:
   Container() = default;
   explicit Container(int size);
   virtual ~Container() = default;
-  bool add(Entity* actor);
-  void remove(const Entity* actor);
-  std::vector<Entity*> get_inventory() const { return inventory_; }
+  bool is_full() const { return size_ > 0 && inventory_.size() >= size_; }
+  bool add(std::unique_ptr<Entity> actor);
+  std::unique_ptr<Entity> remove(const Entity* actor);
+  const std::vector<std::unique_ptr<Entity>>& get_inventory() const {
+    return inventory_;
+  }
   size_t get_size() const { return size_; }
 
   template <class Archive>
@@ -126,9 +129,9 @@ class Container {
     int nb_items;
     archive(nb_items);
     for (int i = 0; i < nb_items; i++) {
-      Entity* entity = new Entity("", false, nullptr, nullptr);
+      auto entity = std::make_unique<Entity>("", false, nullptr, nullptr);
       entity->unpack(archive);
-      inventory_.emplace_back(entity);
+      inventory_.emplace_back(std::move(entity));
     }
   }
 };
@@ -138,8 +141,8 @@ class ConsumableComponent {
   ConsumableComponent() = default;
   virtual ~ConsumableComponent() = default;
   // TODO: should also be an action result
-  ActionResult pick_up(Entity* owner, Entity* wearer);
-  ActionResult drop(Entity* owner, Entity* wearer);
+  ActionResult pick_up(Entity* owner, Entity* wearer, World& world);
+  ActionResult drop(Entity* owner, Entity* wearer, World& world);
   virtual ActionResult use(Entity* owner, Entity* wearer, World& world);
 
   template <class Archive>

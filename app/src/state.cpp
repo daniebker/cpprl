@@ -23,6 +23,11 @@ void InGameState::on_enter() {
       std::make_unique<GameInputHandler>(world_, world_.get_player());
 }
 
+GuiViewState::GuiViewState(World& world, std::unique_ptr<UiWindow> window)
+    : State(world), window_(std::move(window)) {}
+
+GuiViewState::~GuiViewState() = default;
+
 void GuiViewState::render(Renderer&) { window_->render(g_console); }
 
 void ViewMessageHistoryState::on_enter() {
@@ -45,13 +50,13 @@ void NextLevelState::on_enter() {
       "dungeon...",
       WHITE);
 
-  world_.get_entities().clear();
+  // The entity manager owns the player, so keep it while clearing the level.
+  world_.get_entities().clear_except_player();
   // TODO: Should this go in on exit?
   world_.get_dungeon().increase_level();
   world_.generate_map(80, 35, true);
-  // Add the player back to the entities.
-  world_.get_entities().spawn(
-      world_.get_player(), world_.get_map().get_rooms().at(0).get_center());
+  world_.get_player()->get_transform_component().move(
+      world_.get_map().get_rooms().at(0).get_center());
 }
 
 StateResult NextLevelState::on_update(SDL_Event&) {
@@ -96,17 +101,19 @@ void PickTileAOEState::render(Renderer&) {
 
 void GameOverState::on_enter() {
   input_handler_ = std::make_unique<MenuInputHandler>(world_);
-  window_ = new GameOverWindow(20, 10, {0, 0}, "Game Over");
+  window_ = std::make_unique<GameOverWindow>(
+      20, 10, Vector2D{0, 0}, "Game Over");
 }
 
 void MainMenuState::on_enter() {
-  window_ = new MainMenuWindow(20, 10, {0, 0}, "Main Menu");
+  window_ = std::make_unique<MainMenuWindow>(
+      20, 10, Vector2D{0, 0}, "Main Menu");
   input_handler_ = std::make_unique<MainMenuInputHandler>(world_, *window_);
 }
 
 void CharacterMenuState::on_enter() {
-  window_ = new CharacterMenuWindow(
-      20, 10, {0, 0}, world_.get_player(), "Character Menu");
+  window_ = std::make_unique<CharacterMenuWindow>(
+      20, 10, Vector2D{0, 0}, world_.get_player(), "Character Menu");
   input_handler_ =
       std::make_unique<CharacterMenuInputHandler>(world_, *window_);
 }

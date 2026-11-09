@@ -23,8 +23,9 @@ class World {
   MessageLog message_log_;
   std::unique_ptr<UI> ui_;
   std::unique_ptr<Controller> controller_;
-  UiWindow* current_window_;
-  Entity* player_;
+  // Non-owning observers; entities_ owns the player.
+  UiWindow* current_window_ = nullptr;
+  Entity* player_ = nullptr;
 
  public:
   World();
@@ -45,7 +46,7 @@ class World {
       float max_range = 0.0f, std::function<void()> callback = nullptr);
   Entity* get_player() const { return player_; }
   void spawn_player();
-  void spawn_player(Entity* player);
+  void spawn_player(std::unique_ptr<Entity> player);
 
   template <class Archive>
   void save(Archive& archive) const {
@@ -76,11 +77,11 @@ class World {
       }
     }
     archive(entities_);
-    player_ = new Entity("", false, nullptr, nullptr);
+    auto player = std::make_unique<Entity>("", false, nullptr, nullptr);
     // TODO: If player is confused, quitting and reopening the game removes the
     // confused state
-    player_->unpack(archive);
-    spawn_player(player_);
+    player->unpack(archive);
+    spawn_player(std::move(player));
     archive(message_log_);
   }
 };
